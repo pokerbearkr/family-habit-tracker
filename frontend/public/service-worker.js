@@ -72,3 +72,25 @@ self.addEventListener('activate', (event) => {
   );
   self.clients.claim();
 });
+
+// Notification click event - open the app when notification is clicked
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true })
+      .then((clientList) => {
+        // If a window is already open, focus it
+        for (let i = 0; i < clientList.length; i++) {
+          const client = clientList[i];
+          if (client.url.includes('/dashboard') && 'focus' in client) {
+            return client.focus();
+          }
+        }
+        // Otherwise, open a new window
+        if (clients.openWindow) {
+          return clients.openWindow('/dashboard');
+        }
+      })
+  );
+});

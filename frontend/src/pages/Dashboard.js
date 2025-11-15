@@ -18,12 +18,28 @@ function Dashboard() {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [notificationPermission, setNotificationPermission] = useState(
+    typeof Notification !== 'undefined' ? Notification.permission : 'denied'
+  );
   const navigate = useNavigate();
   const today = new Date().toISOString().split('T')[0];
 
   useEffect(() => {
     loadData();
+    // Request notification permission on mount
+    requestNotificationPermission();
   }, []);
+
+  // Poll for updates every 30 seconds to check for new habit completions
+  useEffect(() => {
+    if (!user.familyId) return;
+
+    const interval = setInterval(() => {
+      loadData();
+    }, 30000); // 30 seconds
+
+    return () => clearInterval(interval);
+  }, [user.familyId, logs]);
 
   // WebSocket disabled - uncomment to enable real-time updates
   // useEffect(() => {
@@ -32,6 +48,46 @@ function Dashboard() {
   //     return () => websocketService.disconnect();
   //   }
   // }, [user]);
+
+  const requestNotificationPermission = async () => {
+    if (typeof Notification === 'undefined') {
+      console.log('브라우저가 알림을 지원하지 않습니다.');
+      return;
+    }
+
+    if (Notification.permission === 'default') {
+      const permission = await Notification.requestPermission();
+      setNotificationPermission(permission);
+    }
+  };
+
+  const showNotification = (title, body) => {
+    if (typeof Notification === 'undefined' || Notification.permission !== 'granted') {
+      return;
+    }
+
+    if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+      // Use service worker for notification
+      navigator.serviceWorker.ready.then((registration) => {
+        registration.showNotification(title, {
+          body,
+          icon: '/logo192.png',
+          badge: '/logo192.png',
+          tag: 'habit-check',
+          requireInteraction: false,
+          vibrate: [200, 100, 200]
+        });
+      });
+    } else {
+      // Fallback to regular notification
+      new Notification(title, {
+        body,
+        icon: '/logo192.png',
+        tag: 'habit-check',
+        requireInteraction: false
+      });
+    }
+  };
 
   const loadData = async () => {
     try {
@@ -42,6 +98,23 @@ function Dashboard() {
           habitLogAPI.getFamilyLogs(today),
           familyAPI.getMy()
         ]);
+
+        // Check for new habit completions and show notifications
+        if (logs.length > 0) {
+          const newLogs = logsRes.data.filter(newLog =>
+            newLog.completed &&
+            newLog.user.id !== user.id &&
+            !logs.find(oldLog => oldLog.id === newLog.id && oldLog.completed)
+          );
+
+          newLogs.forEach(log => {
+            showNotification(
+              `${log.user.displayName}님이 습관을 완료했습니다!`,
+              `"${log.habit.name}" 습관을 체크했습니다.`
+            );
+          });
+        }
+
         setHabits(habitsRes.data);
         setLogs(logsRes.data);
         setFamily(familyRes.data);
@@ -191,6 +264,18 @@ function Dashboard() {
 
       <div style={styles.content}>
         {error && <div style={styles.errorMessage}>{error}</div>}
+
+        {/* Notification Permission Banner */}
+        {notificationPermission !== 'granted' && notificationPermission !== 'denied' && (
+          <div style={styles.notificationBanner}>
+            <p style={styles.notificationText}>
+              가족 구성원이 습관을 체크하면 알림을 받으시겠어요?
+            </p>
+            <button onClick={requestNotificationPermission} style={styles.notificationButton}>
+              알림 켜기
+            </button>
+          </div>
+        )}
 
         {/* My Habits Section */}
         <div style={styles.section}>
@@ -672,6 +757,35 @@ const styles = {
     boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
     maxWidth: '600px',
     textAlign: 'center'
+  },
+  notificationBanner: {
+    backgroundColor: '#e7f3ff',
+    border: '1px solid #007bff',
+    borderRadius: '8px',
+    padding: 'clamp(12px, 3vw, 16px)',
+    marginBottom: '20px',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    gap: '10px',
+    width: '100%',
+    boxSizing: 'border-box'
+  },
+  notificationText: {
+    margin: 0,
+    color: '#333',
+    fontSize: 'clamp(13px, 3.5vw, 15px)',
+    textAlign: 'center'
+  },
+  notificationButton: {
+    padding: '8px 16px',
+    backgroundColor: '#007bff',
+    color: 'white',
+    border: 'none',
+    borderRadius: '5px',
+    cursor: 'pointer',
+    fontWeight: 'bold',
+    fontSize: 'clamp(13px, 3.5vw, 14px)'
   }
 };
 

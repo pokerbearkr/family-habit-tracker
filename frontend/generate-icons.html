@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Generate PWA Icons</title>
+</head>
+<body>
+    <h1>PWA 아이콘 생성</h1>
+    <p>아이콘이 생성되면 자동으로 다운로드됩니다.</p>
+
+    <script>
+        function generateIcon(size, filename) {
+            const canvas = document.createElement('canvas');
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+
+            // 배경 - 파란색 그라데이션
+            const gradient = ctx.createLinearGradient(0, 0, size, size);
+            gradient.addColorStop(0, '#007bff');
+            gradient.addColorStop(1, '#0056b3');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, size, size);
+
+            // 별 이모지
+            ctx.font = `${size * 0.6}px Arial`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('⭐', size / 2, size / 2);
+
+            // 다운로드
+            canvas.toBlob(function(blob) {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            });
+        }
+
+        // 192x192 생성
+        setTimeout(() => generateIcon(192, 'logo192.png'), 100);
+
+        // 512x512 생성
+        setTimeout(() => generateIcon(512, 'logo512.png'), 500);
+
+        // favicon은 ICO 형식이 필요하므로 별도로 처리
+        setTimeout(() => {
+            const canvas = document.createElement('canvas');
+            canvas.width = 64;
+            canvas.height = 64;
+            const ctx = canvas.getContext('2d');
+
+            const gradient = ctx.createLinearGradient(0, 0, 64, 64);
+            gradient.addColorStop(0, '#007bff');
+            gradient.addColorStop(1, '#0056b3');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, 64, 64);
+
+            ctx.font = '40px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('⭐', 32, 32);
+
+            canvas.toBlob(function(blob) {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'favicon-64.png';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+
+                alert('아이콘 3개가 다운로드되었습니다!\n\nfavicon-64.png 파일을 https://favicon.io/favicon-converter/ 에서 .ico로 변환한 후\n모든 파일을 public 폴더에 넣어주세요.');
+            });
+        }, 1000);
+    </script>
+</body>
+</html>
