@@ -34,6 +34,10 @@ function Family() {
 
   const handleCreateFamily = async (e) => {
     e.preventDefault();
+
+    // Prevent duplicate submissions
+    if (submitting) return;
+
     setError('');
     setSubmitting(true);
 
@@ -56,6 +60,10 @@ function Family() {
 
   const handleJoinFamily = async (e) => {
     e.preventDefault();
+
+    // Prevent duplicate submissions
+    if (submitting) return;
+
     setError('');
     setSubmitting(true);
 

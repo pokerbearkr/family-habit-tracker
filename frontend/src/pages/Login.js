@@ -12,6 +12,10 @@ function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Prevent duplicate submissions
+    if (loading) return;
+
     setError('');
     setLoading(true);
 
@@ -21,10 +25,10 @@ function Login() {
         navigate('/dashboard');
       } else {
         setError(result.message);
+        setLoading(false);
       }
     } catch (err) {
       setError('로그인 중 오류가 발생했습니다. 다시 시도해주세요.');
-    } finally {
       setLoading(false);
     }
   };

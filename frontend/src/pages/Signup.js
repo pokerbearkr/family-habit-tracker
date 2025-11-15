@@ -35,6 +35,10 @@ function Signup() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Prevent duplicate submissions
+    if (loading) return;
+
     setError('');
     setLoading(true);
 
