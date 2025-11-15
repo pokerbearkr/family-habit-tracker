@@ -84,7 +84,7 @@ function Family() {
   const handleLeaveFamily = async () => {
     if (
       window.confirm(
-        'Are you sure you want to leave this family? You will lose access to all shared habits.'
+        '정말 이 가족을 떠나시겠습니까? 모든 공유 습관에 대한 접근 권한을 잃게 됩니다.'
       )
     ) {
       try {
@@ -95,14 +95,14 @@ function Family() {
         const errorMsg = error.response?.data?.message ||
                         error.response?.data?.error ||
                         (typeof error.response?.data === 'string' ? error.response.data : null) ||
-                        'Failed to leave family';
+                        '가족 떠나기에 실패했습니다';
         setError(errorMsg);
       }
     }
   };
 
   if (loading) {
-    return <div style={styles.container}>Loading...</div>;
+    return <div style={styles.container}>로딩 중...</div>;
   }
 
   return (
@@ -125,57 +125,57 @@ function Family() {
       <div style={styles.content}>
         {family ? (
           <div style={styles.card}>
-            <h2>{family.name}</h2>
+            <h2 style={styles.familyName}>{family.name}</h2>
             <div style={styles.inviteBox}>
-              <p>Invite Code:</p>
+              <p style={styles.inviteLabel}>초대 코드</p>
               <h3 style={styles.inviteCode}>{family.inviteCode}</h3>
-              <p style={styles.hint}>Share this code with family members</p>
+              <p style={styles.hint}>가족 구성원과 이 코드를 공유하세요</p>
             </div>
 
             <div style={styles.membersList}>
-              <h3>Family Members ({family.members?.length || 0})</h3>
+              <h3 style={styles.membersTitle}>가족 구성원 ({family.members?.length || 0}명)</h3>
               {family.members?.map((member) => (
                 <div key={member.id} style={styles.member}>
-                  <span>{member.displayName}</span>
+                  <span style={styles.memberName}>{member.displayName}</span>
                   <span style={styles.username}>@{member.username}</span>
                 </div>
               ))}
             </div>
 
             <button onClick={handleLeaveFamily} style={styles.dangerButton}>
-              Leave Family
+              가족 떠나기
             </button>
           </div>
         ) : (
           <div style={styles.card}>
-            <h2>Join or Create a Family</h2>
+            <h2 style={styles.cardTitle}>가족 만들기 또는 가입하기</h2>
             {error && <div style={styles.error}>{error}</div>}
 
             <div style={styles.section}>
-              <h3>Create New Family</h3>
+              <h3 style={styles.sectionTitle}>새 가족 만들기</h3>
               <form onSubmit={handleCreateFamily} style={styles.form}>
                 <input
                   type="text"
-                  placeholder="Family name"
+                  placeholder="가족 이름"
                   value={newFamilyName}
                   onChange={(e) => setNewFamilyName(e.target.value)}
                   style={styles.input}
                   required
                 />
                 <button type="submit" style={styles.button}>
-                  Create Family
+                  만들기
                 </button>
               </form>
             </div>
 
-            <div style={styles.divider}>OR</div>
+            <div style={styles.divider}>또는</div>
 
             <div style={styles.section}>
-              <h3>Join Existing Family</h3>
+              <h3 style={styles.sectionTitle}>기존 가족 가입하기</h3>
               <form onSubmit={handleJoinFamily} style={styles.form}>
                 <input
                   type="text"
-                  placeholder="Enter invite code"
+                  placeholder="초대 코드 입력"
                   value={inviteCode}
                   onChange={(e) =>
                     setInviteCode(e.target.value.toUpperCase())
@@ -184,7 +184,7 @@ function Family() {
                   required
                 />
                 <button type="submit" style={styles.button}>
-                  Join Family
+                  가입하기
                 </button>
               </form>
             </div>
@@ -248,84 +248,139 @@ const styles = {
     width: '100%',
     boxSizing: 'border-box'
   },
+  familyName: {
+    fontSize: 'clamp(20px, 5vw, 24px)',
+    margin: '0 0 clamp(15px, 4vw, 20px) 0',
+    color: '#333'
+  },
+  cardTitle: {
+    fontSize: 'clamp(18px, 4.5vw, 22px)',
+    margin: '0 0 clamp(15px, 4vw, 20px) 0',
+    color: '#333'
+  },
   inviteBox: {
     backgroundColor: '#f0f8ff',
-    padding: '20px',
+    padding: 'clamp(15px, 4vw, 20px)',
     borderRadius: '8px',
     textAlign: 'center',
-    margin: '20px 0'
+    margin: 'clamp(15px, 4vw, 20px) 0',
+    width: '100%',
+    boxSizing: 'border-box'
+  },
+  inviteLabel: {
+    margin: '0 0 10px 0',
+    fontSize: 'clamp(14px, 3.5vw, 16px)',
+    color: '#666'
   },
   inviteCode: {
-    fontSize: '32px',
-    letterSpacing: '4px',
+    fontSize: 'clamp(24px, 6vw, 32px)',
+    letterSpacing: 'clamp(2px, 1vw, 4px)',
     color: '#007bff',
-    margin: '10px 0'
+    margin: '10px 0',
+    wordBreak: 'break-all'
   },
   hint: {
     color: '#666',
-    fontSize: '14px'
+    fontSize: 'clamp(12px, 3vw, 14px)',
+    margin: '10px 0 0 0'
   },
   membersList: {
-    margin: '30px 0'
+    margin: 'clamp(20px, 5vw, 30px) 0',
+    width: '100%'
+  },
+  membersTitle: {
+    fontSize: 'clamp(16px, 4vw, 18px)',
+    marginBottom: '12px',
+    color: '#333'
   },
   member: {
     display: 'flex',
     justifyContent: 'space-between',
-    padding: '12px',
+    alignItems: 'center',
+    padding: 'clamp(10px, 3vw, 12px)',
     backgroundColor: '#f9f9f9',
     borderRadius: '5px',
-    marginBottom: '8px'
+    marginBottom: '8px',
+    width: '100%',
+    boxSizing: 'border-box',
+    gap: '10px'
+  },
+  memberName: {
+    fontSize: 'clamp(14px, 3.5vw, 16px)',
+    color: '#333',
+    wordBreak: 'break-word',
+    flex: 1
   },
   username: {
     color: '#666',
-    fontSize: '14px'
+    fontSize: 'clamp(12px, 3vw, 14px)',
+    flexShrink: 0,
+    whiteSpace: 'nowrap'
   },
   section: {
-    margin: '30px 0'
+    margin: 'clamp(20px, 5vw, 30px) 0',
+    width: '100%'
+  },
+  sectionTitle: {
+    fontSize: 'clamp(16px, 4vw, 18px)',
+    marginBottom: '10px',
+    color: '#333'
   },
   form: {
     display: 'flex',
+    flexDirection: 'column',
     gap: '10px',
-    marginTop: '15px'
+    marginTop: '15px',
+    width: '100%'
   },
   input: {
-    flex: 1,
-    padding: '10px',
+    width: '100%',
+    padding: 'clamp(10px, 2.5vw, 12px)',
     border: '1px solid #ddd',
     borderRadius: '5px',
-    fontSize: '16px'
+    fontSize: 'clamp(14px, 3.5vw, 16px)',
+    boxSizing: 'border-box'
   },
   button: {
-    padding: '10px 20px',
+    padding: 'clamp(10px, 2.5vw, 12px) clamp(16px, 4vw, 20px)',
     backgroundColor: '#007bff',
     color: 'white',
     border: 'none',
     borderRadius: '5px',
     cursor: 'pointer',
-    fontWeight: 'bold'
+    fontWeight: 'bold',
+    fontSize: 'clamp(14px, 3.5vw, 16px)',
+    width: '100%',
+    boxSizing: 'border-box'
   },
   dangerButton: {
-    padding: '10px 20px',
+    padding: 'clamp(10px, 2.5vw, 12px) clamp(16px, 4vw, 20px)',
     backgroundColor: '#dc3545',
     color: 'white',
     border: 'none',
     borderRadius: '5px',
     cursor: 'pointer',
     fontWeight: 'bold',
-    width: '100%'
+    fontSize: 'clamp(14px, 3.5vw, 16px)',
+    width: '100%',
+    marginTop: 'clamp(10px, 3vw, 15px)',
+    boxSizing: 'border-box'
   },
   error: {
     backgroundColor: '#fee',
     color: '#c33',
-    padding: '10px',
+    padding: 'clamp(10px, 2.5vw, 12px)',
     borderRadius: '5px',
-    marginBottom: '20px'
+    marginBottom: '20px',
+    fontSize: 'clamp(13px, 3.5vw, 15px)',
+    width: '100%',
+    boxSizing: 'border-box'
   },
   divider: {
     textAlign: 'center',
     color: '#999',
-    margin: '30px 0',
-    fontSize: '14px',
+    margin: 'clamp(20px, 5vw, 30px) 0',
+    fontSize: 'clamp(13px, 3.5vw, 14px)',
     fontWeight: 'bold'
   }
 };
