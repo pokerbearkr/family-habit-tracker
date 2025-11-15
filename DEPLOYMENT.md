@@ -35,10 +35,9 @@
    - **Region**: `Singapore`
    - **Branch**: `main`
    - **Root Directory**: `backend`
-   - **Runtime**: `Java`
-   - **Build Command**: `./gradlew build -x test`
-   - **Start Command**: `java -Dspring.profiles.active=prod -jar build/libs/habit-tracker-1.0.0.jar`
+   - **Environment**: `Docker`
    - **Plan**: `Free`
+5. Render가 자동으로 `Dockerfile`을 감지합니다
 
 ### 4. 환경 변수 설정
 백엔드 서비스 설정에서 **"Environment"** 탭으로 이동하여 다음 환경 변수 추가:
