@@ -128,25 +128,30 @@ const styles = {
     justifyContent: 'center',
     alignItems: 'center',
     minHeight: '100vh',
-    backgroundColor: '#f0f2f5'
+    backgroundColor: '#f0f2f5',
+    padding: 'clamp(12px, 3vw, 20px)',
+    boxSizing: 'border-box'
   },
   card: {
     backgroundColor: 'white',
-    padding: '40px',
+    padding: 'clamp(24px, 5vw, 40px)',
     borderRadius: '10px',
     boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
-    width: '400px',
-    maxWidth: '90%'
+    width: '100%',
+    maxWidth: '400px',
+    boxSizing: 'border-box'
   },
   title: {
     textAlign: 'center',
     color: '#333',
-    marginBottom: '10px'
+    marginBottom: '10px',
+    fontSize: 'clamp(20px, 5vw, 28px)'
   },
   subtitle: {
     textAlign: 'center',
     color: '#666',
-    marginBottom: '30px'
+    marginBottom: 'clamp(20px, 4vw, 30px)',
+    fontSize: 'clamp(16px, 4vw, 20px)'
   },
   error: {
     backgroundColor: '#fee',

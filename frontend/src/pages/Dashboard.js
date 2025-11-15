@@ -420,19 +420,26 @@ const styles = {
   },
   familyInfo: {
     backgroundColor: 'white',
-    margin: '20px',
-    padding: '20px',
+    margin: 'clamp(12px, 3vw, 20px)',
+    padding: 'clamp(12px, 3vw, 20px)',
     borderRadius: '10px',
-    boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+    width: 'calc(100% - clamp(24px, 6vw, 40px))',
+    boxSizing: 'border-box'
   },
   content: {
-    padding: '20px'
+    padding: 'clamp(12px, 3vw, 24px)',
+    width: '100%',
+    boxSizing: 'border-box'
   },
   section: {
     backgroundColor: 'white',
-    padding: '20px',
+    padding: 'clamp(12px, 3vw, 20px)',
     borderRadius: '10px',
-    boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+    marginBottom: 'clamp(12px, 3vw, 20px)',
+    width: '100%',
+    boxSizing: 'border-box'
   },
   sectionHeader: {
     display: 'flex',

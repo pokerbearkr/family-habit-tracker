@@ -234,15 +234,19 @@ const styles = {
     justifyContent: 'center'
   },
   content: {
-    padding: '40px 20px',
+    padding: 'clamp(20px, 5vw, 40px) clamp(12px, 3vw, 20px)',
     maxWidth: '600px',
-    margin: '0 auto'
+    margin: '0 auto',
+    width: '100%',
+    boxSizing: 'border-box'
   },
   card: {
     backgroundColor: 'white',
-    padding: '40px',
+    padding: 'clamp(20px, 5vw, 40px)',
     borderRadius: '10px',
-    boxShadow: '0 2px 10px rgba(0,0,0,0.1)'
+    boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+    width: '100%',
+    boxSizing: 'border-box'
   },
   inviteBox: {
     backgroundColor: '#f0f8ff',

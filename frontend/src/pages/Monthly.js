@@ -257,25 +257,31 @@ const styles = {
     justifyContent: 'center'
   },
   content: {
-    padding: '20px',
+    padding: 'clamp(12px, 3vw, 24px)',
     maxWidth: '1200px',
-    margin: '0 auto'
+    margin: '0 auto',
+    width: '100%',
+    boxSizing: 'border-box'
   },
   monthSelector: {
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    gap: '20px',
-    marginBottom: '30px',
+    gap: 'clamp(10px, 3vw, 20px)',
+    marginBottom: 'clamp(16px, 4vw, 30px)',
     backgroundColor: 'white',
-    padding: '20px',
+    padding: 'clamp(12px, 3vw, 20px)',
     borderRadius: '10px',
-    boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+    width: '100%',
+    boxSizing: 'border-box'
   },
   monthTitle: {
     margin: 0,
-    minWidth: '200px',
-    textAlign: 'center'
+    minWidth: '120px',
+    textAlign: 'center',
+    fontSize: 'clamp(16px, 4vw, 20px)',
+    whiteSpace: 'nowrap'
   },
   navButton: {
     padding: '10px 20px',
@@ -288,16 +294,18 @@ const styles = {
   },
   section: {
     backgroundColor: 'white',
-    padding: '20px',
-    marginBottom: '20px',
+    padding: 'clamp(12px, 3vw, 20px)',
+    marginBottom: 'clamp(12px, 3vw, 20px)',
     borderRadius: '10px',
-    boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+    width: '100%',
+    boxSizing: 'border-box'
   },
   statsGrid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
-    gap: '15px',
-    marginTop: '15px'
+    gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 200px), 1fr))',
+    gap: 'clamp(8px, 2vw, 15px)',
+    marginTop: '12px'
   },
   statCard: {
     padding: '15px',
@@ -335,42 +343,49 @@ const styles = {
   calendar: {
     display: 'grid',
     gridTemplateColumns: 'repeat(7, 1fr)',
-    gap: '5px',
-    marginTop: '15px'
+    gap: 'clamp(2px, 1vw, 8px)',
+    marginTop: '15px',
+    width: '100%',
+    maxWidth: '100%'
   },
   calendarDay: {
     aspectRatio: '1',
-    padding: '8px',
+    padding: 'clamp(2px, 1.5vw, 10px)',
     border: '1px solid #dee2e6',
-    borderRadius: '5px',
+    borderRadius: '4px',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
     cursor: 'pointer',
-    transition: 'transform 0.2s'
+    transition: 'transform 0.2s',
+    minWidth: 0,
+    overflow: 'hidden'
   },
   dayNumber: {
     fontWeight: 'bold',
-    fontSize: '14px',
-    marginBottom: '4px'
+    fontSize: 'clamp(10px, 2.5vw, 16px)',
+    marginBottom: '2px',
+    lineHeight: 1
   },
   dayCompletion: {
-    fontSize: '11px',
-    color: '#666'
+    fontSize: 'clamp(8px, 2vw, 12px)',
+    color: '#666',
+    whiteSpace: 'nowrap',
+    lineHeight: 1
   },
   legend: {
     display: 'flex',
     justifyContent: 'center',
-    gap: '20px',
-    marginTop: '15px',
+    gap: '12px',
+    marginTop: '12px',
     flexWrap: 'wrap'
   },
   legendItem: {
     display: 'flex',
     alignItems: 'center',
-    gap: '8px',
-    fontSize: '14px'
+    gap: '6px',
+    fontSize: '12px'
   },
   legendColor: {
     width: '20px',
