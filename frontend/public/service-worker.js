@@ -73,6 +73,32 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
+// Push event - show notification when push message received
+self.addEventListener('push', (event) => {
+  let data = { title: '새 알림', body: '새로운 업데이트가 있습니다.' };
+
+  if (event.data) {
+    try {
+      data = event.data.json();
+    } catch (e) {
+      console.error('Failed to parse push data:', e);
+    }
+  }
+
+  const options = {
+    body: data.body,
+    icon: data.icon || '/logo192.png',
+    badge: data.badge || '/logo192.png',
+    vibrate: [200, 100, 200],
+    tag: 'habit-notification',
+    requireInteraction: false
+  };
+
+  event.waitUntil(
+    self.registration.showNotification(data.title, options)
+  );
+});
+
 // Notification click event - open the app when notification is clicked
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { habitAPI, habitLogAPI, familyAPI } from '../services/api';
+import { habitAPI, habitLogAPI, familyAPI, pushAPI } from '../services/api';
 import websocketService from '../services/websocket';
 
 function Dashboard() {
@@ -58,7 +58,57 @@ function Dashboard() {
     if (Notification.permission === 'default') {
       const permission = await Notification.requestPermission();
       setNotificationPermission(permission);
+
+      // If permission granted, subscribe to push notifications
+      if (permission === 'granted') {
+        await subscribeToPushNotifications();
+      }
     }
+  };
+
+  const subscribeToPushNotifications = async () => {
+    try {
+      if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+        console.log('Push notifications not supported');
+        return;
+      }
+
+      const registration = await navigator.serviceWorker.ready;
+
+      // Get VAPID public key from server
+      const { data } = await pushAPI.getVapidPublicKey();
+      const vapidPublicKey = data.publicKey;
+
+      // Convert VAPID key from base64 to Uint8Array
+      const convertedVapidKey = urlBase64ToUint8Array(vapidPublicKey);
+
+      // Subscribe to push notifications
+      const subscription = await registration.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: convertedVapidKey
+      });
+
+      // Send subscription to server
+      await pushAPI.subscribe(subscription);
+      console.log('Push notification subscription successful');
+    } catch (error) {
+      console.error('Failed to subscribe to push notifications:', error);
+    }
+  };
+
+  const urlBase64ToUint8Array = (base64String) => {
+    const padding = '='.repeat((4 - base64String.length % 4) % 4);
+    const base64 = (base64String + padding)
+      .replace(/\-/g, '+')
+      .replace(/_/g, '/');
+
+    const rawData = window.atob(base64);
+    const outputArray = new Uint8Array(rawData.length);
+
+    for (let i = 0; i < rawData.length; ++i) {
+      outputArray[i] = rawData.charCodeAt(i);
+    }
+    return outputArray;
   };
 
   const showNotification = (title, body) => {

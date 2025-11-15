@@ -62,4 +62,11 @@ export const habitLogAPI = {
     api.get('/logs/monthly', { params: { year, month } })
 };
 
+// Push Notification API
+export const pushAPI = {
+  getVapidPublicKey: () => api.get('/push/vapid-public-key'),
+  subscribe: (subscription) => api.post('/push/subscribe', subscription),
+  unsubscribe: (endpoint) => api.post('/push/unsubscribe', { endpoint })
+};
+
 export default api;

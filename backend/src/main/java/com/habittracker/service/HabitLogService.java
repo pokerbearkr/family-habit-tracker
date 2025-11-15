@@ -23,6 +23,7 @@ public class HabitLogService {
     private final HabitRepository habitRepository;
     private final AuthService authService;
     private final SimpMessagingTemplate messagingTemplate;
+    private final PushNotificationService pushNotificationService;
 
     @Transactional
     public HabitLog logHabit(LogHabitRequest request) {
@@ -61,6 +62,11 @@ public class HabitLogService {
         // Broadcast update to family members via WebSocket
         broadcastHabitLogUpdate(savedLog, currentUser, habit);
 
+        // Send push notifications to family members if habit was completed
+        if (savedLog.getCompleted() && currentUser.getFamily() != null) {
+            sendPushNotificationsToFamily(currentUser, habit);
+        }
+
         return savedLog;
     }
 
@@ -81,6 +87,19 @@ public class HabitLogService {
                 "/topic/family/" + user.getFamily().getId() + "/habit-updates",
                 message
         );
+    }
+
+    private void sendPushNotificationsToFamily(User user, Habit habit) {
+        // Send push notification to all family members except the current user
+        if (user.getFamily() != null) {
+            user.getFamily().getMembers().stream()
+                .filter(member -> !member.getId().equals(user.getId()))
+                .forEach(member -> {
+                    String title = user.getDisplayName() + "님이 습관을 완료했습니다!";
+                    String body = "\"" + habit.getName() + "\" 습관을 체크했습니다.";
+                    pushNotificationService.sendNotification(member, title, body);
+                });
+        }
     }
 
     @Transactional(readOnly = true)
