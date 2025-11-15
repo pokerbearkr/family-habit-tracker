@@ -62,7 +62,7 @@ function Monthly() {
   }
 
   if (loading) {
-    return <div style={styles.container}>Loading...</div>;
+    return <div style={styles.container}>로딩 중...</div>;
   }
 
   return (

@@ -24,14 +24,14 @@ function Login() {
   return (
     <div style={styles.container}>
       <div style={styles.card}>
-        <h1 style={styles.title}>Family Habit Tracker</h1>
-        <h2 style={styles.subtitle}>Login</h2>
+        <h1 style={styles.title}>가족 습관 트래커</h1>
+        <h2 style={styles.subtitle}>로그인</h2>
 
         {error && <div style={styles.error}>{error}</div>}
 
         <form onSubmit={handleSubmit} style={styles.form}>
           <div style={styles.formGroup}>
-            <label style={styles.label}>Username</label>
+            <label style={styles.label}>아이디</label>
             <input
               type="text"
               value={username}
@@ -42,7 +42,7 @@ function Login() {
           </div>
 
           <div style={styles.formGroup}>
-            <label style={styles.label}>Password</label>
+            <label style={styles.label}>비밀번호</label>
             <input
               type="password"
               value={password}
@@ -53,11 +53,11 @@ function Login() {
           </div>
 
           <button type="submit" style={styles.button}>
-            Login
+            로그인
           </button>
 
           <p style={styles.link}>
-            Don't have an account? <Link to="/signup">Sign up</Link>
+            계정이 없으신가요? <Link to="/signup">회원가입</Link>
           </p>
         </form>
       </div>

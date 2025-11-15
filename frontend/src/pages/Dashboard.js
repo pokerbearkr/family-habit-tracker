@@ -23,12 +23,13 @@ function Dashboard() {
     loadData();
   }, []);
 
-  useEffect(() => {
-    if (user && user.familyId) {
-      websocketService.connect(user.familyId, handleWebSocketMessage);
-      return () => websocketService.disconnect();
-    }
-  }, [user]);
+  // WebSocket disabled - uncomment to enable real-time updates
+  // useEffect(() => {
+  //   if (user && user.familyId) {
+  //     websocketService.connect(user.familyId, handleWebSocketMessage);
+  //     return () => websocketService.disconnect();
+  //   }
+  // }, [user]);
 
   const loadData = async () => {
     try {
@@ -135,10 +136,10 @@ function Dashboard() {
     return (
       <div style={styles.container}>
         <div style={styles.card}>
-          <h2>Welcome, {user.displayName}!</h2>
-          <p>You need to join or create a family to start tracking habits.</p>
+          <h2>환영합니다, {user.displayName}님!</h2>
+          <p>습관 추적을 시작하려면 가족을 만들거나 가입해야 합니다.</p>
           <button onClick={() => navigate('/family')} style={styles.button}>
-            Manage Family
+            가족 관리
           </button>
         </div>
       </div>
@@ -167,8 +168,8 @@ function Dashboard() {
 
       {family && (
         <div style={styles.familyInfo}>
-          <h3>{family.name}</h3>
-          <p>Members: {family.members?.length || 0}</p>
+          <h3 style={styles.familyInfoTitle}>{family.name}</h3>
+          <p>구성원: {family.members?.length || 0}명</p>
         </div>
       )}
 
@@ -185,7 +186,7 @@ function Dashboard() {
               }}
               style={styles.button}
             >
-              {showAddHabit ? 'Cancel' : 'Add Habit'}
+              {showAddHabit ? '취소' : '습관 추가'}
             </button>
           </div>
 
@@ -193,7 +194,7 @@ function Dashboard() {
             <form onSubmit={handleAddHabit} style={styles.form}>
               <input
                 type="text"
-                placeholder="Habit name"
+                placeholder="습관 이름"
                 value={newHabit.name}
                 onChange={(e) =>
                   setNewHabit({ ...newHabit, name: e.target.value })
@@ -203,7 +204,7 @@ function Dashboard() {
               />
               <input
                 type="text"
-                placeholder="Description (optional)"
+                placeholder="설명 (선택사항)"
                 value={newHabit.description}
                 onChange={(e) =>
                   setNewHabit({ ...newHabit, description: e.target.value })
@@ -219,7 +220,7 @@ function Dashboard() {
                 style={styles.colorInput}
               />
               <button type="submit" style={styles.button}>
-                Create
+                생성
               </button>
             </form>
           )}
@@ -228,7 +229,7 @@ function Dashboard() {
             <form onSubmit={handleUpdateHabit} style={styles.form}>
               <input
                 type="text"
-                placeholder="Habit name"
+                placeholder="습관 이름"
                 value={newHabit.name}
                 onChange={(e) =>
                   setNewHabit({ ...newHabit, name: e.target.value })
@@ -238,7 +239,7 @@ function Dashboard() {
               />
               <input
                 type="text"
-                placeholder="Description (optional)"
+                placeholder="설명 (선택사항)"
                 value={newHabit.description}
                 onChange={(e) =>
                   setNewHabit({ ...newHabit, description: e.target.value })
@@ -254,10 +255,10 @@ function Dashboard() {
                 style={styles.colorInput}
               />
               <button type="submit" style={styles.button}>
-                Update
+                수정
               </button>
               <button type="button" onClick={handleCancelEdit} style={styles.cancelButton}>
-                Cancel
+                취소
               </button>
             </form>
           )}
@@ -277,7 +278,7 @@ function Dashboard() {
                   }}
                 >
                   <div style={styles.habitHeader}>
-                    <h3>{habit.name}</h3>
+                    <h3 style={styles.habitName}>{habit.name}</h3>
                     <div style={styles.habitActions}>
                       <button
                         onClick={() => handleToggleHabit(habit.id)}
@@ -339,8 +340,8 @@ function Dashboard() {
                   }}
                 >
                   <div style={styles.habitHeader}>
-                    <div>
-                      <h3>{habit.name}</h3>
+                    <div style={styles.habitInfo}>
+                      <h3 style={styles.habitName}>{habit.name}</h3>
                       <p style={styles.habitOwner}>{habit.userDisplayName}님의 습관</p>
                     </div>
                     <span
@@ -425,7 +426,13 @@ const styles = {
     borderRadius: '10px',
     boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
     width: 'calc(100% - clamp(24px, 6vw, 40px))',
-    boxSizing: 'border-box'
+    boxSizing: 'border-box',
+    overflow: 'hidden'
+  },
+  familyInfoTitle: {
+    margin: '0 0 8px 0',
+    wordBreak: 'break-word',
+    overflowWrap: 'break-word'
   },
   content: {
     padding: 'clamp(12px, 3vw, 24px)',
@@ -483,12 +490,29 @@ const styles = {
     padding: '15px',
     backgroundColor: '#f9f9f9',
     borderRadius: '8px',
-    borderLeft: '4px solid #007bff'
+    borderLeft: '4px solid #007bff',
+    width: '100%',
+    boxSizing: 'border-box',
+    overflow: 'hidden'
   },
   habitHeader: {
     display: 'flex',
     justifyContent: 'space-between',
-    alignItems: 'center'
+    alignItems: 'center',
+    gap: '10px',
+    minWidth: 0
+  },
+  habitInfo: {
+    flex: 1,
+    minWidth: 0,
+    overflow: 'hidden'
+  },
+  habitName: {
+    margin: '0 0 4px 0',
+    fontSize: '16px',
+    wordBreak: 'break-word',
+    overflowWrap: 'break-word',
+    maxWidth: '100%'
   },
   checkButton: {
     width: '40px',
@@ -503,7 +527,9 @@ const styles = {
   description: {
     color: '#666',
     fontSize: '14px',
-    margin: '8px 0'
+    margin: '8px 0',
+    wordBreak: 'break-word',
+    overflowWrap: 'break-word'
   },
   familySection: {
     marginTop: '15px',
@@ -542,7 +568,9 @@ const styles = {
     fontSize: '12px',
     color: '#6c757d',
     margin: '4px 0 0 0',
-    fontWeight: 'normal'
+    fontWeight: 'normal',
+    wordBreak: 'break-word',
+    overflowWrap: 'break-word'
   },
   statusBadge: {
     width: '40px',

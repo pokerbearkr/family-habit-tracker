@@ -44,8 +44,8 @@ function Signup() {
     return (
       <div style={styles.container}>
         <div style={styles.card}>
-          <h2 style={styles.success}>Account created successfully!</h2>
-          <p style={{ textAlign: 'center' }}>Redirecting to login...</p>
+          <h2 style={styles.success}>계정이 성공적으로 생성되었습니다!</h2>
+          <p style={{ textAlign: 'center' }}>로그인 페이지로 이동 중...</p>
         </div>
       </div>
     );
@@ -54,14 +54,14 @@ function Signup() {
   return (
     <div style={styles.container}>
       <div style={styles.card}>
-        <h1 style={styles.title}>Family Habit Tracker</h1>
-        <h2 style={styles.subtitle}>Sign Up</h2>
+        <h1 style={styles.title}>가족 습관 트래커</h1>
+        <h2 style={styles.subtitle}>회원가입</h2>
 
         {error && <div style={styles.error}>{error}</div>}
 
         <form onSubmit={handleSubmit} style={styles.form}>
           <div style={styles.formGroup}>
-            <label style={styles.label}>Username</label>
+            <label style={styles.label}>아이디</label>
             <input
               type="text"
               name="username"
@@ -73,7 +73,7 @@ function Signup() {
           </div>
 
           <div style={styles.formGroup}>
-            <label style={styles.label}>Email</label>
+            <label style={styles.label}>이메일</label>
             <input
               type="email"
               name="email"
@@ -85,7 +85,7 @@ function Signup() {
           </div>
 
           <div style={styles.formGroup}>
-            <label style={styles.label}>Display Name</label>
+            <label style={styles.label}>표시 이름</label>
             <input
               type="text"
               name="displayName"
@@ -97,7 +97,7 @@ function Signup() {
           </div>
 
           <div style={styles.formGroup}>
-            <label style={styles.label}>Password</label>
+            <label style={styles.label}>비밀번호</label>
             <input
               type="password"
               name="password"
@@ -110,11 +110,11 @@ function Signup() {
           </div>
 
           <button type="submit" style={styles.button}>
-            Sign Up
+            회원가입
           </button>
 
           <p style={styles.link}>
-            Already have an account? <Link to="/login">Login</Link>
+            이미 계정이 있으신가요? <Link to="/login">로그인</Link>
           </p>
         </form>
       </div>

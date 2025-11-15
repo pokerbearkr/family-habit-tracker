@@ -251,12 +251,16 @@ const styles = {
   familyName: {
     fontSize: 'clamp(20px, 5vw, 24px)',
     margin: '0 0 clamp(15px, 4vw, 20px) 0',
-    color: '#333'
+    color: '#333',
+    wordBreak: 'break-word',
+    overflowWrap: 'break-word'
   },
   cardTitle: {
     fontSize: 'clamp(18px, 4.5vw, 22px)',
     margin: '0 0 clamp(15px, 4vw, 20px) 0',
-    color: '#333'
+    color: '#333',
+    wordBreak: 'break-word',
+    overflowWrap: 'break-word'
   },
   inviteBox: {
     backgroundColor: '#f0f8ff',
