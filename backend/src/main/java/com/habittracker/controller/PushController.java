@@ -1,7 +1,7 @@
 package com.habittracker.controller;
 
 import com.habittracker.dto.PushSubscriptionRequest;
-import com.habittracker.model.User;
+import com.habittracker.entity.User;
 import com.habittracker.service.PushNotificationService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
