@@ -1,7 +1,7 @@
 package com.habittracker.repository;
 
+import com.habittracker.entity.User;
 import com.habittracker.model.PushSubscription;
-import com.habittracker.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

@@ -1,5 +1,6 @@
 package com.habittracker.model;
 
+import com.habittracker.entity.User;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;

@@ -1,19 +1,16 @@
 package com.habittracker.service;
 
+import com.habittracker.entity.User;
 import com.habittracker.model.PushSubscription;
-import com.habittracker.model.User;
 import com.habittracker.repository.PushSubscriptionRepository;
 import nl.martijndwars.webpush.Notification;
 import nl.martijndwars.webpush.PushService;
-import org.jose4j.lang.JoseException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 @Service
 public class PushNotificationService {
