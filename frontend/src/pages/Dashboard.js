@@ -16,6 +16,8 @@ function Dashboard() {
     description: '',
     color: '#007bff'
   });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const navigate = useNavigate();
   const today = new Date().toISOString().split('T')[0];
 
@@ -33,6 +35,7 @@ function Dashboard() {
 
   const loadData = async () => {
     try {
+      setError('');
       if (user.familyId) {
         const [habitsRes, logsRes, familyRes] = await Promise.all([
           habitAPI.getAll(),
@@ -45,6 +48,9 @@ function Dashboard() {
       }
     } catch (error) {
       console.error('Error loading data:', error);
+      setError('데이터를 불러오는데 실패했습니다. 다시 시도해주세요.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -132,6 +138,16 @@ function Dashboard() {
     setNewHabit({ name: '', description: '', color: '#007bff' });
   };
 
+  if (loading) {
+    return (
+      <div style={styles.container}>
+        <div style={styles.loadingContainer}>
+          <p>로딩 중...</p>
+        </div>
+      </div>
+    );
+  }
+
   if (!user.familyId) {
     return (
       <div style={styles.container}>
@@ -174,6 +190,8 @@ function Dashboard() {
       )}
 
       <div style={styles.content}>
+        {error && <div style={styles.errorMessage}>{error}</div>}
+
         {/* My Habits Section */}
         <div style={styles.section}>
           <div style={styles.sectionHeader}>
@@ -620,6 +638,22 @@ const styles = {
     cursor: 'pointer',
     fontSize: '12px',
     fontWeight: 'normal'
+  },
+  loadingContainer: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    minHeight: '50vh',
+    fontSize: '18px',
+    color: '#666'
+  },
+  errorMessage: {
+    backgroundColor: '#fee',
+    color: '#c33',
+    padding: '12px',
+    borderRadius: '8px',
+    marginBottom: '20px',
+    textAlign: 'center'
   },
   cancelButton: {
     padding: '10px 20px',

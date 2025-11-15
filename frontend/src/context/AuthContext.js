@@ -10,7 +10,12 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
-      setUser(JSON.parse(storedUser));
+      try {
+        setUser(JSON.parse(storedUser));
+      } catch (error) {
+        console.error('Failed to parse stored user data:', error);
+        localStorage.removeItem('user');
+      }
     }
     setLoading(false);
   }, []);
@@ -64,12 +69,25 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   };
 
+  const updateUserFamily = (familyId, familyName) => {
+    if (user) {
+      const updatedUser = {
+        ...user,
+        familyId,
+        familyName
+      };
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+      setUser(updatedUser);
+    }
+  };
+
   const value = {
     user,
     loading,
     login,
     signup,
-    logout
+    logout,
+    updateUserFamily
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

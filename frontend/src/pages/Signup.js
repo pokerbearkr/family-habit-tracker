@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
@@ -11,8 +11,20 @@ function Signup() {
   });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { signup } = useAuth();
+
+  // Cleanup timeout on unmount to prevent memory leak
+  useEffect(() => {
+    let timeoutId;
+    if (success) {
+      timeoutId = setTimeout(() => navigate('/login'), 2000);
+    }
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId);
+    };
+  }, [success, navigate]);
 
   const handleChange = (e) => {
     setFormData({
@@ -24,19 +36,26 @@ function Signup() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setLoading(true);
 
-    const result = await signup(
-      formData.username,
-      formData.email,
-      formData.password,
-      formData.displayName
-    );
+    try {
+      const result = await signup(
+        formData.username,
+        formData.email,
+        formData.password,
+        formData.displayName
+      );
 
-    if (result.success) {
-      setSuccess(true);
-      setTimeout(() => navigate('/login'), 2000);
-    } else {
-      setError(result.message);
+      if (result.success) {
+        setSuccess(true);
+        // setTimeout handled by useEffect to prevent memory leak
+      } else {
+        setError(result.message);
+        setLoading(false);
+      }
+    } catch (err) {
+      setError('회원가입 중 오류가 발생했습니다. 다시 시도해주세요.');
+      setLoading(false);
     }
   };
 
@@ -59,7 +78,7 @@ function Signup() {
 
         {error && <div style={styles.error}>{error}</div>}
 
-        <form onSubmit={handleSubmit} style={styles.form}>
+        <form onSubmit={handleSubmit} style={styles.form} autoComplete="on">
           <div style={styles.formGroup}>
             <label style={styles.label}>아이디</label>
             <input
@@ -68,6 +87,7 @@ function Signup() {
               value={formData.username}
               onChange={handleChange}
               style={styles.input}
+              autoComplete="username"
               required
             />
           </div>
@@ -80,6 +100,7 @@ function Signup() {
               value={formData.email}
               onChange={handleChange}
               style={styles.input}
+              autoComplete="email"
               required
             />
           </div>
@@ -92,6 +113,7 @@ function Signup() {
               value={formData.displayName}
               onChange={handleChange}
               style={styles.input}
+              autoComplete="name"
               required
             />
           </div>
@@ -104,13 +126,14 @@ function Signup() {
               value={formData.password}
               onChange={handleChange}
               style={styles.input}
+              autoComplete="new-password"
               required
               minLength="6"
             />
           </div>
 
-          <button type="submit" style={styles.button}>
-            회원가입
+          <button type="submit" style={styles.button} disabled={loading}>
+            {loading ? '가입 중...' : '회원가입'}
           </button>
 
           <p style={styles.link}>

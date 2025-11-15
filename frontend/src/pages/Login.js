@@ -6,18 +6,26 @@ function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { login } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setLoading(true);
 
-    const result = await login(username, password);
-    if (result.success) {
-      navigate('/dashboard');
-    } else {
-      setError(result.message);
+    try {
+      const result = await login(username, password);
+      if (result.success) {
+        navigate('/dashboard');
+      } else {
+        setError(result.message);
+      }
+    } catch (err) {
+      setError('로그인 중 오류가 발생했습니다. 다시 시도해주세요.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -29,14 +37,16 @@ function Login() {
 
         {error && <div style={styles.error}>{error}</div>}
 
-        <form onSubmit={handleSubmit} style={styles.form}>
+        <form onSubmit={handleSubmit} style={styles.form} autoComplete="on">
           <div style={styles.formGroup}>
             <label style={styles.label}>아이디</label>
             <input
               type="text"
+              name="username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               style={styles.input}
+              autoComplete="username"
               required
             />
           </div>
@@ -45,15 +55,17 @@ function Login() {
             <label style={styles.label}>비밀번호</label>
             <input
               type="password"
+              name="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               style={styles.input}
+              autoComplete="current-password"
               required
             />
           </div>
 
-          <button type="submit" style={styles.button}>
-            로그인
+          <button type="submit" style={styles.button} disabled={loading}>
+            {loading ? '로그인 중...' : '로그인'}
           </button>
 
           <p style={styles.link}>
@@ -132,7 +144,9 @@ const styles = {
     borderRadius: '5px',
     fontSize: '16px',
     cursor: 'pointer',
-    fontWeight: 'bold'
+    fontWeight: 'bold',
+    opacity: 1,
+    transition: 'opacity 0.2s'
   },
   link: {
     textAlign: 'center',

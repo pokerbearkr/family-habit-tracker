@@ -4,9 +4,10 @@ import { useAuth } from '../context/AuthContext';
 import { familyAPI } from '../services/api';
 
 function Family() {
-  const { user, logout } = useAuth();
+  const { user, logout, updateUserFamily } = useAuth();
   const [family, setFamily] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
   const [newFamilyName, setNewFamilyName] = useState('');
   const [inviteCode, setInviteCode] = useState('');
   const [error, setError] = useState('');
@@ -34,16 +35,12 @@ function Family() {
   const handleCreateFamily = async (e) => {
     e.preventDefault();
     setError('');
+    setSubmitting(true);
 
     try {
       const response = await familyAPI.create(newFamilyName);
-      // Update user data in localStorage
-      const storedUser = JSON.parse(localStorage.getItem('user'));
-      if (storedUser) {
-        storedUser.familyId = response.data.id;
-        storedUser.familyName = response.data.name;
-        localStorage.setItem('user', JSON.stringify(storedUser));
-      }
+      // Update user data via AuthContext
+      updateUserFamily(response.data.id, response.data.name);
       // Navigate to dashboard
       navigate('/dashboard');
     } catch (error) {
@@ -51,24 +48,21 @@ function Family() {
       const errorMsg = error.response?.data?.message ||
                       error.response?.data?.error ||
                       (typeof error.response?.data === 'string' ? error.response.data : null) ||
-                      'Failed to create family';
+                      '가족 생성에 실패했습니다';
       setError(errorMsg);
+      setSubmitting(false);
     }
   };
 
   const handleJoinFamily = async (e) => {
     e.preventDefault();
     setError('');
+    setSubmitting(true);
 
     try {
       const response = await familyAPI.join(inviteCode);
-      // Update user data in localStorage
-      const storedUser = JSON.parse(localStorage.getItem('user'));
-      if (storedUser) {
-        storedUser.familyId = response.data.id;
-        storedUser.familyName = response.data.name;
-        localStorage.setItem('user', JSON.stringify(storedUser));
-      }
+      // Update user data via AuthContext
+      updateUserFamily(response.data.id, response.data.name);
       // Navigate to dashboard
       navigate('/dashboard');
     } catch (error) {
@@ -76,8 +70,9 @@ function Family() {
       const errorMsg = error.response?.data?.message ||
                       error.response?.data?.error ||
                       (typeof error.response?.data === 'string' ? error.response.data : null) ||
-                      'Failed to join family';
+                      '가족 가입에 실패했습니다';
       setError(errorMsg);
+      setSubmitting(false);
     }
   };
 
@@ -162,8 +157,8 @@ function Family() {
                   style={styles.input}
                   required
                 />
-                <button type="submit" style={styles.button}>
-                  만들기
+                <button type="submit" style={styles.button} disabled={submitting}>
+                  {submitting ? '생성 중...' : '만들기'}
                 </button>
               </form>
             </div>
@@ -183,8 +178,8 @@ function Family() {
                   style={styles.input}
                   required
                 />
-                <button type="submit" style={styles.button}>
-                  가입하기
+                <button type="submit" style={styles.button} disabled={submitting}>
+                  {submitting ? '가입 중...' : '가입하기'}
                 </button>
               </form>
             </div>
