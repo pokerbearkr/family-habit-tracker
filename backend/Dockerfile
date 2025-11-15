@@ -7,7 +7,8 @@ RUN gradle build -x test --no-daemon
 # Run stage
 FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
-COPY --from=build /app/build/libs/habit-tracker-1.0.0.jar app.jar
+# Copy the jar file (use wildcard to match any version)
+COPY --from=build /app/build/libs/*.jar app.jar
 
 # Expose port
 EXPOSE 8080
