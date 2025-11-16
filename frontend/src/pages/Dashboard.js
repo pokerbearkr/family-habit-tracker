@@ -72,7 +72,9 @@ function Dashboard() {
       }
 
       // Send subscription to server (always send to ensure it's saved)
-      await pushAPI.subscribe(subscription);
+      // Convert subscription to JSON format
+      const subscriptionData = subscription.toJSON();
+      await pushAPI.subscribe(subscriptionData);
       console.log('Push notification subscription sent to server');
     } catch (error) {
       console.error('Failed to subscribe to push notifications:', error);
