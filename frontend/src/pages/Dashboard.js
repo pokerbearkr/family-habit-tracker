@@ -24,10 +24,86 @@ function Dashboard() {
   const navigate = useNavigate();
   const today = new Date().toISOString().split('T')[0];
 
+  // Define functions first
+  const urlBase64ToUint8Array = (base64String) => {
+    const padding = '='.repeat((4 - base64String.length % 4) % 4);
+    const base64 = (base64String + padding)
+      .replace(/\-/g, '+')
+      .replace(/_/g, '/');
+
+    const rawData = window.atob(base64);
+    const outputArray = new Uint8Array(rawData.length);
+
+    for (let i = 0; i < rawData.length; ++i) {
+      outputArray[i] = rawData.charCodeAt(i);
+    }
+    return outputArray;
+  };
+
+  const subscribeToPushNotifications = async () => {
+    try {
+      if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+        console.log('Push notifications not supported');
+        return;
+      }
+
+      const registration = await navigator.serviceWorker.ready;
+
+      // Check if already subscribed
+      let subscription = await registration.pushManager.getSubscription();
+
+      if (!subscription) {
+        // Get VAPID public key from server
+        const { data } = await pushAPI.getVapidPublicKey();
+        const vapidPublicKey = data.publicKey;
+
+        // Convert VAPID key from base64 to Uint8Array
+        const convertedVapidKey = urlBase64ToUint8Array(vapidPublicKey);
+
+        // Subscribe to push notifications
+        subscription = await registration.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: convertedVapidKey
+        });
+
+        console.log('New push subscription created');
+      } else {
+        console.log('Already subscribed to push notifications');
+      }
+
+      // Send subscription to server (always send to ensure it's saved)
+      await pushAPI.subscribe(subscription);
+      console.log('Push notification subscription sent to server');
+    } catch (error) {
+      console.error('Failed to subscribe to push notifications:', error);
+    }
+  };
+
+  const requestNotificationPermission = async () => {
+    if (typeof Notification === 'undefined') {
+      console.log('브라우저가 알림을 지원하지 않습니다.');
+      return;
+    }
+
+    if (Notification.permission === 'default') {
+      const permission = await Notification.requestPermission();
+      setNotificationPermission(permission);
+
+      // If permission granted, subscribe to push notifications
+      if (permission === 'granted') {
+        await subscribeToPushNotifications();
+      }
+    }
+  };
+
   useEffect(() => {
     loadData();
-    // Request notification permission on mount
+    // Request notification permission and subscribe on mount
     requestNotificationPermission();
+    // Also try to subscribe if already granted
+    if (Notification.permission === 'granted') {
+      subscribeToPushNotifications();
+    }
   }, []);
 
   // Poll for updates every 30 seconds to check for new habit completions
@@ -48,68 +124,6 @@ function Dashboard() {
   //     return () => websocketService.disconnect();
   //   }
   // }, [user]);
-
-  const requestNotificationPermission = async () => {
-    if (typeof Notification === 'undefined') {
-      console.log('브라우저가 알림을 지원하지 않습니다.');
-      return;
-    }
-
-    if (Notification.permission === 'default') {
-      const permission = await Notification.requestPermission();
-      setNotificationPermission(permission);
-
-      // If permission granted, subscribe to push notifications
-      if (permission === 'granted') {
-        await subscribeToPushNotifications();
-      }
-    }
-  };
-
-  const subscribeToPushNotifications = async () => {
-    try {
-      if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
-        console.log('Push notifications not supported');
-        return;
-      }
-
-      const registration = await navigator.serviceWorker.ready;
-
-      // Get VAPID public key from server
-      const { data } = await pushAPI.getVapidPublicKey();
-      const vapidPublicKey = data.publicKey;
-
-      // Convert VAPID key from base64 to Uint8Array
-      const convertedVapidKey = urlBase64ToUint8Array(vapidPublicKey);
-
-      // Subscribe to push notifications
-      const subscription = await registration.pushManager.subscribe({
-        userVisibleOnly: true,
-        applicationServerKey: convertedVapidKey
-      });
-
-      // Send subscription to server
-      await pushAPI.subscribe(subscription);
-      console.log('Push notification subscription successful');
-    } catch (error) {
-      console.error('Failed to subscribe to push notifications:', error);
-    }
-  };
-
-  const urlBase64ToUint8Array = (base64String) => {
-    const padding = '='.repeat((4 - base64String.length % 4) % 4);
-    const base64 = (base64String + padding)
-      .replace(/\-/g, '+')
-      .replace(/_/g, '/');
-
-    const rawData = window.atob(base64);
-    const outputArray = new Uint8Array(rawData.length);
-
-    for (let i = 0; i < rawData.length; ++i) {
-      outputArray[i] = rawData.charCodeAt(i);
-    }
-    return outputArray;
-  };
 
   const showNotification = (title, body) => {
     if (typeof Notification === 'undefined' || Notification.permission !== 'granted') {
