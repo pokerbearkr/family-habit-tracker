@@ -5,11 +5,13 @@ import com.habittracker.model.PushSubscription;
 import com.habittracker.repository.PushSubscriptionRepository;
 import nl.martijndwars.webpush.Notification;
 import nl.martijndwars.webpush.PushService;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.security.GeneralSecurityException;
+import java.security.Security;
 import java.util.List;
 
 @Service
@@ -30,6 +32,11 @@ public class PushNotificationService {
     public PushNotificationService(PushSubscriptionRepository pushSubscriptionRepository) {
         this.pushSubscriptionRepository = pushSubscriptionRepository;
         this.pushService = new PushService();
+
+        // Register BouncyCastle provider if not already registered
+        if (Security.getProvider(BouncyCastleProvider.PROVIDER_NAME) == null) {
+            Security.addProvider(new BouncyCastleProvider());
+        }
     }
 
     public void initKeys() throws GeneralSecurityException {
