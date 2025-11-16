@@ -2,9 +2,9 @@ package com.habittracker.controller;
 
 import com.habittracker.dto.PushSubscriptionRequest;
 import com.habittracker.entity.User;
+import com.habittracker.service.AuthService;
 import com.habittracker.service.PushNotificationService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -15,9 +15,11 @@ import java.util.Map;
 public class PushController {
 
     private final PushNotificationService pushNotificationService;
+    private final AuthService authService;
 
-    public PushController(PushNotificationService pushNotificationService) {
+    public PushController(PushNotificationService pushNotificationService, AuthService authService) {
         this.pushNotificationService = pushNotificationService;
+        this.authService = authService;
     }
 
     @GetMapping("/vapid-public-key")
@@ -28,10 +30,9 @@ public class PushController {
     }
 
     @PostMapping("/subscribe")
-    public ResponseEntity<?> subscribe(
-            @AuthenticationPrincipal User user,
-            @RequestBody PushSubscriptionRequest request) {
+    public ResponseEntity<?> subscribe(@RequestBody PushSubscriptionRequest request) {
         try {
+            User user = authService.getCurrentUser();
             pushNotificationService.subscribe(
                 user,
                 request.getEndpoint(),
@@ -45,10 +46,9 @@ public class PushController {
     }
 
     @PostMapping("/unsubscribe")
-    public ResponseEntity<?> unsubscribe(
-            @AuthenticationPrincipal User user,
-            @RequestBody Map<String, String> request) {
+    public ResponseEntity<?> unsubscribe(@RequestBody Map<String, String> request) {
         try {
+            User user = authService.getCurrentUser();
             pushNotificationService.unsubscribe(user, request.get("endpoint"));
             return ResponseEntity.ok().body(Map.of("message", "구독 취소 성공"));
         } catch (Exception e) {
