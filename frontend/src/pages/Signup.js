@@ -1,6 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { Button } from '../components/ui/button';
+import { Input } from '../components/ui/input';
+import { Label } from '../components/ui/label';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
+import { Eye, EyeOff, CheckCircle2 } from 'lucide-react';
 
 function Signup() {
   const [formData, setFormData] = useState({
@@ -75,228 +80,160 @@ function Signup() {
 
   if (success) {
     return (
-      <div style={styles.container}>
-        <div style={styles.card}>
-          <h2 style={styles.success}>계정이 성공적으로 생성되었습니다!</h2>
-          <p style={{ textAlign: 'center' }}>로그인 페이지로 이동 중...</p>
-        </div>
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+        <Card className="w-full max-w-md">
+          <CardContent className="pt-6">
+            <div className="text-center space-y-4">
+              <CheckCircle2 className="h-16 w-16 text-green-500 mx-auto" />
+              <h2 className="text-2xl font-bold text-green-600">
+                계정이 성공적으로 생성되었습니다!
+              </h2>
+              <p className="text-muted-foreground">
+                로그인 페이지로 이동 중...
+              </p>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     );
   }
 
   return (
-    <div style={styles.container}>
-      <div style={styles.card}>
-        <h1 style={styles.title}>가족 습관 트래커</h1>
-        <h2 style={styles.subtitle}>회원가입</h2>
-
-        {error && <div style={styles.error}>{error}</div>}
-
-        <form onSubmit={handleSubmit} style={styles.form} autoComplete="on">
-          <div style={styles.formGroup}>
-            <label style={styles.label}>아이디</label>
-            <input
-              type="text"
-              name="username"
-              value={formData.username}
-              onChange={handleChange}
-              style={styles.input}
-              autoComplete="username"
-              required
-            />
-          </div>
-
-          <div style={styles.formGroup}>
-            <label style={styles.label}>이메일</label>
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              style={styles.input}
-              autoComplete="email"
-              required
-            />
-          </div>
-
-          <div style={styles.formGroup}>
-            <label style={styles.label}>표시 이름</label>
-            <input
-              type="text"
-              name="displayName"
-              value={formData.displayName}
-              onChange={handleChange}
-              style={styles.input}
-              autoComplete="name"
-              required
-            />
-          </div>
-
-          <div style={styles.formGroup}>
-            <label style={styles.label}>비밀번호</label>
-            <div style={styles.passwordContainer}>
-              <input
-                type={showPassword ? "text" : "password"}
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                style={styles.passwordInput}
-                autoComplete="new-password"
-                required
-                minLength="6"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                style={styles.eyeButton}
-                aria-label="비밀번호 표시 토글"
-              >
-                {showPassword ? '👁️' : '👁️‍🗨️'}
-              </button>
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+      <Card className="w-full max-w-md">
+        <CardHeader className="space-y-1 text-center">
+          <CardTitle className="text-3xl font-bold tracking-tight">
+            가족 습관 트래커
+          </CardTitle>
+          <CardDescription className="text-base">
+            계정을 만들어 시작하세요
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {error && (
+            <div className="mb-4 p-3 text-sm text-destructive bg-destructive/10 border border-destructive/20 rounded-md">
+              {error}
             </div>
-          </div>
+          )}
 
-          <div style={styles.formGroup}>
-            <label style={styles.label}>비밀번호 확인</label>
-            <div style={styles.passwordContainer}>
-              <input
-                type={showConfirmPassword ? "text" : "password"}
-                name="confirmPassword"
-                value={formData.confirmPassword}
+          <form onSubmit={handleSubmit} className="space-y-4" autoComplete="on">
+            <div className="space-y-2">
+              <Label htmlFor="username">아이디</Label>
+              <Input
+                id="username"
+                name="username"
+                type="text"
+                value={formData.username}
                 onChange={handleChange}
-                style={styles.passwordInput}
-                autoComplete="new-password"
+                autoComplete="username"
                 required
-                minLength="6"
+                placeholder="아이디를 입력하세요"
               />
-              <button
-                type="button"
-                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                style={styles.eyeButton}
-                aria-label="비밀번호 확인 표시 토글"
-              >
-                {showConfirmPassword ? '👁️' : '👁️‍🗨️'}
-              </button>
             </div>
-          </div>
 
-          <button type="submit" style={styles.button} disabled={loading}>
-            {loading ? '가입 중...' : '회원가입'}
-          </button>
+            <div className="space-y-2">
+              <Label htmlFor="email">이메일</Label>
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                value={formData.email}
+                onChange={handleChange}
+                autoComplete="email"
+                required
+                placeholder="example@email.com"
+              />
+            </div>
 
-          <p style={styles.link}>
-            이미 계정이 있으신가요? <Link to="/login">로그인</Link>
-          </p>
-        </form>
-      </div>
+            <div className="space-y-2">
+              <Label htmlFor="displayName">표시 이름</Label>
+              <Input
+                id="displayName"
+                name="displayName"
+                type="text"
+                value={formData.displayName}
+                onChange={handleChange}
+                autoComplete="name"
+                required
+                placeholder="표시될 이름을 입력하세요"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="password">비밀번호</Label>
+              <div className="relative">
+                <Input
+                  id="password"
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  value={formData.password}
+                  onChange={handleChange}
+                  autoComplete="new-password"
+                  required
+                  minLength="6"
+                  placeholder="최소 6자 이상"
+                  className="pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                  aria-label="비밀번호 표시 토글"
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
+                </button>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword">비밀번호 확인</Label>
+              <div className="relative">
+                <Input
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  type={showConfirmPassword ? "text" : "password"}
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  autoComplete="new-password"
+                  required
+                  minLength="6"
+                  placeholder="비밀번호를 다시 입력하세요"
+                  className="pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                  aria-label="비밀번호 확인 표시 토글"
+                >
+                  {showConfirmPassword ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
+                </button>
+              </div>
+            </div>
+
+            <Button type="submit" className="w-full bg-green-600 hover:bg-green-700" disabled={loading}>
+              {loading ? '가입 중...' : '회원가입'}
+            </Button>
+
+            <p className="text-center text-sm text-muted-foreground">
+              이미 계정이 있으신가요?{' '}
+              <Link to="/login" className="text-primary hover:underline font-medium">
+                로그인
+              </Link>
+            </p>
+          </form>
+        </CardContent>
+      </Card>
     </div>
   );
 }
-
-const styles = {
-  container: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    minHeight: '100vh',
-    backgroundColor: '#f0f2f5',
-    padding: 'clamp(12px, 3vw, 20px)',
-    boxSizing: 'border-box'
-  },
-  card: {
-    backgroundColor: 'white',
-    padding: 'clamp(24px, 5vw, 40px)',
-    borderRadius: '10px',
-    boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
-    width: '100%',
-    maxWidth: '400px',
-    boxSizing: 'border-box'
-  },
-  title: {
-    textAlign: 'center',
-    color: '#333',
-    marginBottom: '10px',
-    fontSize: 'clamp(20px, 5vw, 28px)'
-  },
-  subtitle: {
-    textAlign: 'center',
-    color: '#666',
-    marginBottom: 'clamp(20px, 4vw, 30px)',
-    fontSize: 'clamp(16px, 4vw, 20px)'
-  },
-  error: {
-    backgroundColor: '#fee',
-    color: '#c33',
-    padding: '10px',
-    borderRadius: '5px',
-    marginBottom: '20px'
-  },
-  success: {
-    color: '#2a7',
-    textAlign: 'center'
-  },
-  form: {
-    display: 'flex',
-    flexDirection: 'column'
-  },
-  formGroup: {
-    marginBottom: '20px'
-  },
-  label: {
-    display: 'block',
-    marginBottom: '5px',
-    color: '#333',
-    fontWeight: 'bold'
-  },
-  input: {
-    width: '100%',
-    padding: '10px',
-    border: '1px solid #ddd',
-    borderRadius: '5px',
-    fontSize: '16px',
-    boxSizing: 'border-box'
-  },
-  passwordContainer: {
-    position: 'relative',
-    display: 'flex',
-    alignItems: 'center'
-  },
-  passwordInput: {
-    width: '100%',
-    padding: '10px',
-    paddingRight: '45px',
-    border: '1px solid #ddd',
-    borderRadius: '5px',
-    fontSize: '16px',
-    boxSizing: 'border-box'
-  },
-  eyeButton: {
-    position: 'absolute',
-    right: '10px',
-    background: 'none',
-    border: 'none',
-    cursor: 'pointer',
-    fontSize: '20px',
-    padding: '5px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center'
-  },
-  button: {
-    padding: '12px',
-    backgroundColor: '#28a745',
-    color: 'white',
-    border: 'none',
-    borderRadius: '5px',
-    fontSize: '16px',
-    cursor: 'pointer',
-    fontWeight: 'bold'
-  },
-  link: {
-    textAlign: 'center',
-    marginTop: '20px',
-    color: '#666'
-  }
-};
 
 export default Signup;

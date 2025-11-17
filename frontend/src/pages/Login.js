@@ -1,6 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { Button } from '../components/ui/button';
+import { Input } from '../components/ui/input';
+import { Label } from '../components/ui/label';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
+import { Eye, EyeOff } from 'lucide-react';
 
 function Login() {
   const [username, setUsername] = useState('');
@@ -35,165 +40,82 @@ function Login() {
   };
 
   return (
-    <div style={styles.container}>
-      <div style={styles.card}>
-        <h1 style={styles.title}>가족 습관 트래커</h1>
-        <h2 style={styles.subtitle}>로그인</h2>
-
-        {error && <div style={styles.error}>{error}</div>}
-
-        <form onSubmit={handleSubmit} style={styles.form} autoComplete="on">
-          <div style={styles.formGroup}>
-            <label style={styles.label}>아이디</label>
-            <input
-              type="text"
-              name="username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              style={styles.input}
-              autoComplete="username"
-              required
-            />
-          </div>
-
-          <div style={styles.formGroup}>
-            <label style={styles.label}>비밀번호</label>
-            <div style={styles.passwordContainer}>
-              <input
-                type={showPassword ? "text" : "password"}
-                name="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                style={styles.passwordInput}
-                autoComplete="current-password"
-                required
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                style={styles.eyeButton}
-                aria-label="비밀번호 표시 토글"
-              >
-                {showPassword ? '👁️' : '👁️‍🗨️'}
-              </button>
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+      <Card className="w-full max-w-md">
+        <CardHeader className="space-y-1 text-center">
+          <CardTitle className="text-3xl font-bold tracking-tight">
+            가족 습관 트래커
+          </CardTitle>
+          <CardDescription className="text-base">
+            로그인하여 시작하세요
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {error && (
+            <div className="mb-4 p-3 text-sm text-destructive bg-destructive/10 border border-destructive/20 rounded-md">
+              {error}
             </div>
-          </div>
+          )}
 
-          <button type="submit" style={styles.button} disabled={loading}>
-            {loading ? '로그인 중...' : '로그인'}
-          </button>
+          <form onSubmit={handleSubmit} className="space-y-4" autoComplete="on">
+            <div className="space-y-2">
+              <Label htmlFor="username">아이디</Label>
+              <Input
+                id="username"
+                name="username"
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                autoComplete="username"
+                required
+                placeholder="아이디를 입력하세요"
+              />
+            </div>
 
-          <p style={styles.link}>
-            계정이 없으신가요? <Link to="/signup">회원가입</Link>
-          </p>
-        </form>
-      </div>
+            <div className="space-y-2">
+              <Label htmlFor="password">비밀번호</Label>
+              <div className="relative">
+                <Input
+                  id="password"
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  autoComplete="current-password"
+                  required
+                  placeholder="비밀번호를 입력하세요"
+                  className="pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                  aria-label="비밀번호 표시 토글"
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
+                </button>
+              </div>
+            </div>
+
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading ? '로그인 중...' : '로그인'}
+            </Button>
+
+            <p className="text-center text-sm text-muted-foreground">
+              계정이 없으신가요?{' '}
+              <Link to="/signup" className="text-primary hover:underline font-medium">
+                회원가입
+              </Link>
+            </p>
+          </form>
+        </CardContent>
+      </Card>
     </div>
   );
 }
-
-const styles = {
-  container: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    minHeight: '100vh',
-    backgroundColor: '#f0f2f5',
-    padding: 'clamp(12px, 3vw, 20px)',
-    boxSizing: 'border-box'
-  },
-  card: {
-    backgroundColor: 'white',
-    padding: 'clamp(24px, 5vw, 40px)',
-    borderRadius: '10px',
-    boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
-    width: '100%',
-    maxWidth: '400px',
-    boxSizing: 'border-box'
-  },
-  title: {
-    textAlign: 'center',
-    color: '#333',
-    marginBottom: '10px',
-    fontSize: 'clamp(20px, 5vw, 28px)'
-  },
-  subtitle: {
-    textAlign: 'center',
-    color: '#666',
-    marginBottom: 'clamp(20px, 4vw, 30px)',
-    fontSize: 'clamp(16px, 4vw, 20px)'
-  },
-  error: {
-    backgroundColor: '#fee',
-    color: '#c33',
-    padding: '10px',
-    borderRadius: '5px',
-    marginBottom: '20px'
-  },
-  form: {
-    display: 'flex',
-    flexDirection: 'column'
-  },
-  formGroup: {
-    marginBottom: '20px'
-  },
-  label: {
-    display: 'block',
-    marginBottom: '5px',
-    color: '#333',
-    fontWeight: 'bold'
-  },
-  input: {
-    width: '100%',
-    padding: '10px',
-    border: '1px solid #ddd',
-    borderRadius: '5px',
-    fontSize: '16px',
-    boxSizing: 'border-box'
-  },
-  passwordContainer: {
-    position: 'relative',
-    display: 'flex',
-    alignItems: 'center'
-  },
-  passwordInput: {
-    width: '100%',
-    padding: '10px',
-    paddingRight: '45px',
-    border: '1px solid #ddd',
-    borderRadius: '5px',
-    fontSize: '16px',
-    boxSizing: 'border-box'
-  },
-  eyeButton: {
-    position: 'absolute',
-    right: '10px',
-    background: 'none',
-    border: 'none',
-    cursor: 'pointer',
-    fontSize: '20px',
-    padding: '5px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center'
-  },
-  button: {
-    padding: '12px',
-    backgroundColor: '#007bff',
-    color: 'white',
-    border: 'none',
-    borderRadius: '5px',
-    fontSize: '16px',
-    cursor: 'pointer',
-    fontWeight: 'bold',
-    opacity: 1,
-    transition: 'opacity 0.2s'
-  },
-  link: {
-    textAlign: 'center',
-    marginTop: '20px',
-    color: '#666'
-  }
-};
 
 export default Login;

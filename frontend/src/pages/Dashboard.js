@@ -19,6 +19,27 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { Button } from '../components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
+import { Input } from '../components/ui/input';
+import { Label } from '../components/ui/label';
+import { Badge } from '../components/ui/badge';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '../components/ui/dialog';
+import { Textarea } from '../components/ui/textarea';
+import {
+  Plus,
+  Edit,
+  Trash2,
+  Check,
+  GripVertical,
+  Calendar,
+  Users,
+  LogOut,
+  TrendingUp,
+  Bell,
+  Circle,
+  X
+} from 'lucide-react';
 
 // SortableHabitItem component for drag and drop
 function SortableHabitItem({ habit, userLog, onToggle, onEdit, onDelete, daysDisplay }) {
@@ -43,56 +64,63 @@ function SortableHabitItem({ habit, userLog, onToggle, onEdit, onDelete, daysDis
       style={style}
       {...attributes}
     >
-      <div
-        style={{
-          ...styles.habitCard,
-          borderLeft: `4px solid ${habit.color}`
-        }}
-      >
-        <div style={styles.habitHeader}>
-          <div style={styles.habitTitleContainer}>
-            <div
-              {...listeners}
-              style={styles.dragHandle}
-              title="드래그하여 순서 변경"
-            >
-              ☰
+      <Card className="hover:shadow-md transition-shadow" style={{ borderLeft: `4px solid ${habit.color}` }}>
+        <CardContent className="p-4">
+          <div className="flex justify-between items-start gap-3">
+            <div className="flex items-start gap-2 flex-1 min-w-0">
+              <div
+                {...listeners}
+                className="cursor-grab active:cursor-grabbing mt-1 text-gray-400 hover:text-gray-600"
+                title="드래그하여 순서 변경"
+              >
+                <GripVertical className="w-5 h-5" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="font-semibold text-lg break-words">{habit.name}</h3>
+                {daysDisplay && (
+                  <Badge variant="outline" className="mt-1 text-xs">
+                    {daysDisplay}
+                  </Badge>
+                )}
+                {habit.description && (
+                  <p className="text-sm text-gray-600 mt-2 break-words">{habit.description}</p>
+                )}
+              </div>
             </div>
-            <div>
-              <h3 style={styles.habitName}>{habit.name}</h3>
-              {daysDisplay && <span style={styles.daysLabel}>({daysDisplay})</span>}
-            </div>
-          </div>
-          <div style={styles.habitActions}>
-            <button
+            <Button
               onClick={() => onToggle(habit.id)}
+              size="icon"
+              className="rounded-full w-12 h-12 flex-shrink-0"
               style={{
-                ...styles.checkButton,
-                backgroundColor: userLog?.completed
-                  ? habit.color
-                  : '#ddd'
+                backgroundColor: userLog?.completed ? habit.color : '#e5e7eb',
+                color: 'white'
               }}
             >
-              {userLog?.completed ? '✓' : '○'}
-            </button>
+              {userLog?.completed ? <Check className="w-6 h-6" /> : <Circle className="w-6 h-6" />}
+            </Button>
           </div>
-        </div>
-        {habit.description && <p style={styles.description}>{habit.description}</p>}
-        <div style={styles.habitButtonGroup}>
-          <button
-            onClick={() => onEdit(habit)}
-            style={styles.editButton}
-          >
-            수정
-          </button>
-          <button
-            onClick={() => onDelete(habit.id)}
-            style={styles.deleteButton}
-          >
-            삭제
-          </button>
-        </div>
-      </div>
+          <div className="flex gap-2 mt-3">
+            <Button
+              onClick={() => onEdit(habit)}
+              variant="outline"
+              size="sm"
+              className="flex-1"
+            >
+              <Edit className="w-4 h-4 mr-1" />
+              수정
+            </Button>
+            <Button
+              onClick={() => onDelete(habit.id)}
+              variant="outline"
+              size="sm"
+              className="flex-1 text-red-600 hover:text-red-700 hover:bg-red-50"
+            >
+              <Trash2 className="w-4 h-4 mr-1" />
+              삭제
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
@@ -475,738 +503,472 @@ function Dashboard() {
 
   if (loading) {
     return (
-      <div style={styles.container}>
-        <div style={styles.loadingContainer}>
-          <p>로딩 중...</p>
-        </div>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+        <Card className="w-full max-w-md">
+          <CardContent className="p-8 text-center">
+            <p className="text-lg text-gray-600">로딩 중...</p>
+          </CardContent>
+        </Card>
       </div>
     );
   }
 
   if (!user.familyId) {
     return (
-      <div style={styles.container}>
-        <div style={styles.card}>
-          <h2>환영합니다, {user.displayName}님!</h2>
-          <p>습관 추적을 시작하려면 가족을 만들거나 가입해야 합니다.</p>
-          <button onClick={() => navigate('/family')} style={styles.button}>
-            가족 관리
-          </button>
-        </div>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+        <Card className="w-full max-w-md">
+          <CardHeader>
+            <CardTitle className="text-2xl">환영합니다, {user.displayName}님!</CardTitle>
+            <CardDescription>
+              습관 추적을 시작하려면 가족을 만들거나 가입해야 합니다.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button onClick={() => navigate('/family')} className="w-full">
+              <Users className="w-4 h-4 mr-2" />
+              가족 관리
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     );
   }
 
   return (
-    <div style={styles.container}>
-      <div style={styles.header}>
-        <div style={styles.headerLeft}>
-          <h1 style={styles.title}>습관 트래커</h1>
-          <span style={styles.userName}>{user.displayName}</span>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+      {/* Header */}
+      <header className="bg-white shadow-sm border-b sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center gap-4">
+          <div className="flex items-center gap-3 flex-1 min-w-0">
+            <h1 className="text-xl md:text-2xl font-bold text-gray-900 truncate">습관 트래커</h1>
+            <Badge variant="secondary" className="hidden sm:flex">
+              {user.displayName}
+            </Badge>
+          </div>
+          <div className="flex gap-2">
+            <Button
+              onClick={() => navigate('/monthly')}
+              variant="outline"
+              size="icon"
+              title="월간 통계"
+            >
+              <TrendingUp className="w-5 h-5" />
+            </Button>
+            <Button
+              onClick={() => navigate('/family')}
+              variant="outline"
+              size="icon"
+              title="가족 관리"
+            >
+              <Users className="w-5 h-5" />
+            </Button>
+            <Button
+              onClick={logout}
+              variant="outline"
+              size="icon"
+              title="로그아웃"
+            >
+              <LogOut className="w-5 h-5" />
+            </Button>
+          </div>
         </div>
-        <div style={styles.headerRight}>
-          <button onClick={() => navigate('/monthly')} style={styles.btnSmall}>
-            📊
-          </button>
-          <button onClick={() => navigate('/family')} style={styles.btnSmall}>
-            👨‍👩‍👧‍👦
-          </button>
-          <button onClick={logout} style={styles.btnSmall}>
-            🚪
-          </button>
-        </div>
-      </div>
+      </header>
 
-      {family && (
-        <div style={styles.familyInfo}>
-          <h3 style={styles.familyInfoTitle}>{family.name}</h3>
-          <p>구성원: {family.members?.length || 0}명</p>
-        </div>
-      )}
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto px-4 py-6 space-y-6">
+        {/* Family Info Card */}
+        {family && (
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2">
+                <Users className="w-5 h-5" />
+                {family.name}
+              </CardTitle>
+              <CardDescription>
+                구성원: {family.members?.length || 0}명
+              </CardDescription>
+            </CardHeader>
+          </Card>
+        )}
 
-      <div style={styles.content}>
-        {error && <div style={styles.errorMessage}>{error}</div>}
+        {/* Error Message */}
+        {error && (
+          <Card className="border-red-300 bg-red-50">
+            <CardContent className="p-4">
+              <p className="text-red-700 text-center">{error}</p>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Notification Permission Banner */}
         {notificationPermission !== 'granted' && notificationPermission !== 'denied' && (
-          <div style={styles.notificationBanner}>
-            <p style={styles.notificationText}>
-              가족 구성원이 습관을 체크하면 알림을 받으시겠어요?
-            </p>
-            <button onClick={requestNotificationPermission} style={styles.notificationButton}>
-              알림 켜기
-            </button>
-          </div>
+          <Card className="border-blue-300 bg-blue-50">
+            <CardContent className="p-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+              <div className="flex items-center gap-2 text-sm text-gray-700">
+                <Bell className="w-5 h-5 text-blue-600" />
+                <p>가족 구성원이 습관을 체크하면 알림을 받으시겠어요?</p>
+              </div>
+              <Button onClick={requestNotificationPermission} size="sm">
+                알림 켜기
+              </Button>
+            </CardContent>
+          </Card>
         )}
 
         {/* My Habits Section */}
-        <div style={styles.section}>
-          <div style={styles.sectionHeader}>
-            <h2>내 습관</h2>
-            <button
-              onClick={() => {
-                setShowAddHabit(!showAddHabit);
-                setEditingHabit(null);
-                setNewHabit({ name: '', description: '', color: '#007bff' });
-              }}
-              style={styles.button}
-            >
-              {showAddHabit ? '취소' : '습관 추가'}
-            </button>
-          </div>
-
-          {showAddHabit && (
-            <form onSubmit={handleAddHabit} style={styles.form}>
-              <input
-                type="text"
-                placeholder="습관 이름"
-                value={newHabit.name}
-                onChange={(e) =>
-                  setNewHabit({ ...newHabit, name: e.target.value })
-                }
-                style={styles.input}
-                required
-              />
-              <input
-                type="text"
-                placeholder="설명 (선택사항)"
-                value={newHabit.description}
-                onChange={(e) =>
-                  setNewHabit({ ...newHabit, description: e.target.value })
-                }
-                style={styles.input}
-              />
-              <input
-                type="color"
-                value={newHabit.color}
-                onChange={(e) =>
-                  setNewHabit({ ...newHabit, color: e.target.value })
-                }
-                style={styles.colorInput}
-              />
-
-              <div style={styles.habitTypeContainer}>
-                <label style={styles.radioLabel}>
-                  <input
-                    type="radio"
-                    value="DAILY"
-                    checked={newHabit.habitType === 'DAILY'}
-                    onChange={(e) => setNewHabit({ ...newHabit, habitType: e.target.value })}
-                  />
-                  매일
-                </label>
-                <label style={styles.radioLabel}>
-                  <input
-                    type="radio"
-                    value="WEEKLY"
-                    checked={newHabit.habitType === 'WEEKLY'}
-                    onChange={(e) => setNewHabit({ ...newHabit, habitType: e.target.value })}
-                  />
-                  주간 (요일 선택)
-                </label>
-              </div>
-
-              {newHabit.habitType === 'WEEKLY' && (
-                <div style={styles.daysSelector}>
-                  {[
-                    { num: 1, label: '월' },
-                    { num: 2, label: '화' },
-                    { num: 3, label: '수' },
-                    { num: 4, label: '목' },
-                    { num: 5, label: '금' },
-                    { num: 6, label: '토' },
-                    { num: 7, label: '일' }
-                  ].map(day => (
-                    <button
-                      key={day.num}
-                      type="button"
-                      onClick={() => toggleDaySelection(day.num)}
-                      style={{
-                        ...styles.dayButton,
-                        backgroundColor: newHabit.selectedDays?.includes(day.num) ? '#007bff' : '#f0f0f0',
-                        color: newHabit.selectedDays?.includes(day.num) ? 'white' : '#333'
-                      }}
-                    >
-                      {day.label}
-                    </button>
-                  ))}
-                </div>
-              )}
-
-              <button type="submit" style={styles.button}>
-                생성
-              </button>
-            </form>
-          )}
-
-          {editingHabit && (
-            <form onSubmit={handleUpdateHabit} style={styles.form}>
-              <input
-                type="text"
-                placeholder="습관 이름"
-                value={newHabit.name}
-                onChange={(e) =>
-                  setNewHabit({ ...newHabit, name: e.target.value })
-                }
-                style={styles.input}
-                required
-              />
-              <input
-                type="text"
-                placeholder="설명 (선택사항)"
-                value={newHabit.description}
-                onChange={(e) =>
-                  setNewHabit({ ...newHabit, description: e.target.value })
-                }
-                style={styles.input}
-              />
-              <input
-                type="color"
-                value={newHabit.color}
-                onChange={(e) =>
-                  setNewHabit({ ...newHabit, color: e.target.value })
-                }
-                style={styles.colorInput}
-              />
-
-              <div style={styles.habitTypeContainer}>
-                <label style={styles.radioLabel}>
-                  <input
-                    type="radio"
-                    value="DAILY"
-                    checked={newHabit.habitType === 'DAILY'}
-                    onChange={(e) => setNewHabit({ ...newHabit, habitType: e.target.value })}
-                  />
-                  매일
-                </label>
-                <label style={styles.radioLabel}>
-                  <input
-                    type="radio"
-                    value="WEEKLY"
-                    checked={newHabit.habitType === 'WEEKLY'}
-                    onChange={(e) => setNewHabit({ ...newHabit, habitType: e.target.value })}
-                  />
-                  주간 (요일 선택)
-                </label>
-              </div>
-
-              {newHabit.habitType === 'WEEKLY' && (
-                <div style={styles.daysSelector}>
-                  {[
-                    { num: 1, label: '월' },
-                    { num: 2, label: '화' },
-                    { num: 3, label: '수' },
-                    { num: 4, label: '목' },
-                    { num: 5, label: '금' },
-                    { num: 6, label: '토' },
-                    { num: 7, label: '일' }
-                  ].map(day => (
-                    <button
-                      key={day.num}
-                      type="button"
-                      onClick={() => toggleDaySelection(day.num)}
-                      style={{
-                        ...styles.dayButton,
-                        backgroundColor: newHabit.selectedDays?.includes(day.num) ? '#007bff' : '#f0f0f0',
-                        color: newHabit.selectedDays?.includes(day.num) ? 'white' : '#333'
-                      }}
-                    >
-                      {day.label}
-                    </button>
-                  ))}
-                </div>
-              )}
-
-              <button type="submit" style={styles.button}>
-                수정
-              </button>
-              <button type="button" onClick={handleCancelEdit} style={styles.cancelButton}>
-                취소
-              </button>
-            </form>
-          )}
-
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragEnd={handleDragEnd}
-          >
-            <SortableContext
-              items={habits
-                .filter(habit => habit.userId === user.id)
-                .sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0))
-                .map(h => h.id)}
-              strategy={verticalListSortingStrategy}
-            >
-              <div style={styles.habitsList}>
-                {habits
-                  .filter(habit => habit.userId === user.id && isHabitForToday(habit))
-                  .sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0))
-                  .map((habit) => {
-                    const userLog = logs.find(
-                      (log) => log.habit.id === habit.id && log.user.id === user.id
-                    );
-                    const daysDisplay = getDaysDisplay(habit);
-
-                    return (
-                      <SortableHabitItem
-                        key={habit.id}
-                        habit={habit}
-                        userLog={userLog}
-                        onToggle={handleToggleHabit}
-                        onEdit={handleEditHabit}
-                        onDelete={handleDeleteHabit}
-                        daysDisplay={daysDisplay}
-                      />
-                    );
-                  })}
-                {habits.filter(habit => habit.userId === user.id && isHabitForToday(habit)).length === 0 && (
-                  <p style={styles.emptyMessage}>오늘 할 습관이 없습니다!</p>
+        <Card>
+          <CardHeader>
+            <div className="flex justify-between items-center">
+              <CardTitle>내 습관</CardTitle>
+              <Button
+                onClick={() => {
+                  setShowAddHabit(!showAddHabit);
+                  setEditingHabit(null);
+                  setNewHabit({ name: '', description: '', color: '#007bff', habitType: 'DAILY', selectedDays: [] });
+                }}
+                size="sm"
+              >
+                {showAddHabit ? (
+                  <>
+                    <X className="w-4 h-4 mr-1" />
+                    취소
+                  </>
+                ) : (
+                  <>
+                    <Plus className="w-4 h-4 mr-1" />
+                    습관 추가
+                  </>
                 )}
-              </div>
-            </SortableContext>
-          </DndContext>
-        </div>
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {/* Add Habit Form */}
+            {showAddHabit && (
+              <Card className="bg-gray-50">
+                <CardContent className="p-4">
+                  <form onSubmit={handleAddHabit} className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="habit-name">습관 이름</Label>
+                      <Input
+                        id="habit-name"
+                        type="text"
+                        placeholder="예: 물 마시기"
+                        value={newHabit.name}
+                        onChange={(e) => setNewHabit({ ...newHabit, name: e.target.value })}
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="habit-description">설명 (선택사항)</Label>
+                      <Textarea
+                        id="habit-description"
+                        placeholder="습관에 대한 설명을 입력하세요"
+                        value={newHabit.description}
+                        onChange={(e) => setNewHabit({ ...newHabit, description: e.target.value })}
+                        rows={2}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="habit-color">색상</Label>
+                      <Input
+                        id="habit-color"
+                        type="color"
+                        value={newHabit.color}
+                        onChange={(e) => setNewHabit({ ...newHabit, color: e.target.value })}
+                        className="h-10 w-20"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>습관 유형</Label>
+                      <div className="flex gap-4">
+                        <label className="flex items-center gap-2 cursor-pointer">
+                          <input
+                            type="radio"
+                            value="DAILY"
+                            checked={newHabit.habitType === 'DAILY'}
+                            onChange={(e) => setNewHabit({ ...newHabit, habitType: e.target.value })}
+                            className="w-4 h-4"
+                          />
+                          <span>매일</span>
+                        </label>
+                        <label className="flex items-center gap-2 cursor-pointer">
+                          <input
+                            type="radio"
+                            value="WEEKLY"
+                            checked={newHabit.habitType === 'WEEKLY'}
+                            onChange={(e) => setNewHabit({ ...newHabit, habitType: e.target.value })}
+                            className="w-4 h-4"
+                          />
+                          <span>주간 (요일 선택)</span>
+                        </label>
+                      </div>
+                    </div>
+
+                    {newHabit.habitType === 'WEEKLY' && (
+                      <div className="space-y-2">
+                        <Label>요일 선택</Label>
+                        <div className="grid grid-cols-7 gap-2">
+                          {[
+                            { num: 1, label: '월' },
+                            { num: 2, label: '화' },
+                            { num: 3, label: '수' },
+                            { num: 4, label: '목' },
+                            { num: 5, label: '금' },
+                            { num: 6, label: '토' },
+                            { num: 7, label: '일' }
+                          ].map(day => (
+                            <Button
+                              key={day.num}
+                              type="button"
+                              onClick={() => toggleDaySelection(day.num)}
+                              variant={newHabit.selectedDays?.includes(day.num) ? "default" : "outline"}
+                              size="sm"
+                              className="w-full"
+                            >
+                              {day.label}
+                            </Button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    <Button type="submit" className="w-full">
+                      <Plus className="w-4 h-4 mr-2" />
+                      생성
+                    </Button>
+                  </form>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Edit Habit Dialog */}
+            <Dialog open={!!editingHabit} onOpenChange={(open) => !open && handleCancelEdit()}>
+              <DialogContent className="max-w-md">
+                <DialogHeader>
+                  <DialogTitle>습관 수정</DialogTitle>
+                  <DialogDescription>
+                    습관의 정보를 수정하세요
+                  </DialogDescription>
+                </DialogHeader>
+                <form onSubmit={handleUpdateHabit} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="edit-habit-name">습관 이름</Label>
+                    <Input
+                      id="edit-habit-name"
+                      type="text"
+                      placeholder="습관 이름"
+                      value={newHabit.name}
+                      onChange={(e) => setNewHabit({ ...newHabit, name: e.target.value })}
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="edit-habit-description">설명 (선택사항)</Label>
+                    <Textarea
+                      id="edit-habit-description"
+                      placeholder="설명"
+                      value={newHabit.description}
+                      onChange={(e) => setNewHabit({ ...newHabit, description: e.target.value })}
+                      rows={2}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="edit-habit-color">색상</Label>
+                    <Input
+                      id="edit-habit-color"
+                      type="color"
+                      value={newHabit.color}
+                      onChange={(e) => setNewHabit({ ...newHabit, color: e.target.value })}
+                      className="h-10 w-20"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>습관 유형</Label>
+                    <div className="flex gap-4">
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="radio"
+                          value="DAILY"
+                          checked={newHabit.habitType === 'DAILY'}
+                          onChange={(e) => setNewHabit({ ...newHabit, habitType: e.target.value })}
+                          className="w-4 h-4"
+                        />
+                        <span>매일</span>
+                      </label>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="radio"
+                          value="WEEKLY"
+                          checked={newHabit.habitType === 'WEEKLY'}
+                          onChange={(e) => setNewHabit({ ...newHabit, habitType: e.target.value })}
+                          className="w-4 h-4"
+                        />
+                        <span>주간 (요일 선택)</span>
+                      </label>
+                    </div>
+                  </div>
+
+                  {newHabit.habitType === 'WEEKLY' && (
+                    <div className="space-y-2">
+                      <Label>요일 선택</Label>
+                      <div className="grid grid-cols-7 gap-2">
+                        {[
+                          { num: 1, label: '월' },
+                          { num: 2, label: '화' },
+                          { num: 3, label: '수' },
+                          { num: 4, label: '목' },
+                          { num: 5, label: '금' },
+                          { num: 6, label: '토' },
+                          { num: 7, label: '일' }
+                        ].map(day => (
+                          <Button
+                            key={day.num}
+                            type="button"
+                            onClick={() => toggleDaySelection(day.num)}
+                            variant={newHabit.selectedDays?.includes(day.num) ? "default" : "outline"}
+                            size="sm"
+                            className="w-full"
+                          >
+                            {day.label}
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  <DialogFooter className="gap-2">
+                    <Button type="button" variant="outline" onClick={handleCancelEdit}>
+                      취소
+                    </Button>
+                    <Button type="submit">
+                      <Edit className="w-4 h-4 mr-2" />
+                      수정
+                    </Button>
+                  </DialogFooter>
+                </form>
+              </DialogContent>
+            </Dialog>
+
+            {/* Habits List with Drag and Drop */}
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
+            >
+              <SortableContext
+                items={habits
+                  .filter(habit => habit.userId === user.id)
+                  .sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0))
+                  .map(h => h.id)}
+                strategy={verticalListSortingStrategy}
+              >
+                <div className="space-y-3">
+                  {habits
+                    .filter(habit => habit.userId === user.id && isHabitForToday(habit))
+                    .sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0))
+                    .map((habit) => {
+                      const userLog = logs.find(
+                        (log) => log.habit.id === habit.id && log.user.id === user.id
+                      );
+                      const daysDisplay = getDaysDisplay(habit);
+
+                      return (
+                        <SortableHabitItem
+                          key={habit.id}
+                          habit={habit}
+                          userLog={userLog}
+                          onToggle={handleToggleHabit}
+                          onEdit={handleEditHabit}
+                          onDelete={handleDeleteHabit}
+                          daysDisplay={daysDisplay}
+                        />
+                      );
+                    })}
+                  {habits.filter(habit => habit.userId === user.id && isHabitForToday(habit)).length === 0 && (
+                    <Card className="border-dashed">
+                      <CardContent className="p-8 text-center">
+                        <Calendar className="w-12 h-12 mx-auto mb-2 text-gray-400" />
+                        <p className="text-gray-500 italic">오늘 할 습관이 없습니다!</p>
+                      </CardContent>
+                    </Card>
+                  )}
+                </div>
+              </SortableContext>
+            </DndContext>
+          </CardContent>
+        </Card>
 
         {/* Family Members' Habits Section */}
-        <div style={styles.section}>
-          <div style={styles.sectionHeader}>
-            <h2>가족 구성원의 습관</h2>
-          </div>
+        <Card>
+          <CardHeader>
+            <CardTitle>가족 구성원의 습관</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {habits
+                .filter(habit => habit.userId !== user.id && isHabitForToday(habit))
+                .map((habit) => {
+                  const habitLog = logs.find(
+                    (log) => log.habit.id === habit.id
+                  );
+                  const isCompleted = habitLog?.completed || false;
+                  const daysDisplay = getDaysDisplay(habit);
 
-          <div style={styles.habitsList}>
-            {habits
-              .filter(habit => habit.userId !== user.id && isHabitForToday(habit))
-              .map((habit) => {
-                const habitLog = logs.find(
-                  (log) => log.habit.id === habit.id
-                );
-                const isCompleted = habitLog?.completed || false;
-                const daysDisplay = getDaysDisplay(habit);
-
-                return (
-                  <div
-                    key={habit.id}
-                    style={{
-                      ...styles.habitCard,
-                      borderLeft: `4px solid ${habit.color}`,
-                      opacity: 0.85
-                    }}
-                  >
-                    <div style={styles.habitHeader}>
-                      <div style={styles.habitInfo}>
-                        <div>
-                          <h3 style={styles.habitName}>{habit.name}</h3>
-                          {daysDisplay && <span style={styles.daysLabel}>({daysDisplay})</span>}
+                  return (
+                    <Card
+                      key={habit.id}
+                      className="opacity-90"
+                      style={{ borderLeft: `4px solid ${habit.color}` }}
+                    >
+                      <CardContent className="p-4">
+                        <div className="flex justify-between items-start gap-3">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-1">
+                              <h3 className="font-semibold text-lg break-words">{habit.name}</h3>
+                              {daysDisplay && (
+                                <Badge variant="outline" className="text-xs">
+                                  {daysDisplay}
+                                </Badge>
+                              )}
+                            </div>
+                            <p className="text-sm text-gray-600 mb-2 break-words">
+                              {habit.userDisplayName}님의 습관
+                            </p>
+                            {habit.description && (
+                              <p className="text-sm text-gray-500 break-words">{habit.description}</p>
+                            )}
+                          </div>
+                          <div
+                            className="rounded-full w-12 h-12 flex items-center justify-center flex-shrink-0"
+                            style={{
+                              backgroundColor: isCompleted ? habit.color : '#e5e7eb',
+                              color: 'white'
+                            }}
+                          >
+                            {isCompleted ? <Check className="w-6 h-6" /> : <Circle className="w-6 h-6" />}
+                          </div>
                         </div>
-                        <p style={styles.habitOwner}>{habit.userDisplayName}님의 습관</p>
-                      </div>
-                      <span
-                        style={{
-                          ...styles.statusBadge,
-                          backgroundColor: isCompleted ? habit.color : '#ddd'
-                        }}
-                      >
-                        {isCompleted ? '✓' : '○'}
-                      </span>
-                    </div>
-                    {habit.description && <p style={styles.description}>{habit.description}</p>}
-                  </div>
-                );
-              })}
-            {habits.filter(habit => habit.userId !== user.id && isHabitForToday(habit)).length === 0 && (
-              <p style={styles.emptyMessage}>오늘 다른 가족 구성원의 습관이 없습니다.</p>
-            )}
-          </div>
-        </div>
-      </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              {habits.filter(habit => habit.userId !== user.id && isHabitForToday(habit)).length === 0 && (
+                <Card className="border-dashed">
+                  <CardContent className="p-8 text-center">
+                    <Users className="w-12 h-12 mx-auto mb-2 text-gray-400" />
+                    <p className="text-gray-500 italic">오늘 다른 가족 구성원의 습관이 없습니다.</p>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      </main>
     </div>
   );
 }
-
-const styles = {
-  container: {
-    minHeight: '100vh',
-    backgroundColor: '#f0f2f5'
-  },
-  header: {
-    backgroundColor: 'white',
-    padding: '12px 16px',
-    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    gap: '10px'
-  },
-  headerLeft: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '12px',
-    flex: 1,
-    minWidth: 0
-  },
-  headerRight: {
-    display: 'flex',
-    gap: '6px',
-    flexShrink: 0
-  },
-  title: {
-    fontSize: '18px',
-    margin: 0,
-    whiteSpace: 'nowrap'
-  },
-  userName: {
-    fontSize: '14px',
-    color: '#666',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    whiteSpace: 'nowrap'
-  },
-  btnSmall: {
-    padding: '8px 12px',
-    backgroundColor: '#007bff',
-    color: 'white',
-    border: 'none',
-    borderRadius: '8px',
-    cursor: 'pointer',
-    fontSize: '18px',
-    minWidth: '40px',
-    height: '40px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center'
-  },
-  familyInfo: {
-    backgroundColor: 'white',
-    margin: 'clamp(12px, 3vw, 20px)',
-    padding: 'clamp(12px, 3vw, 20px)',
-    borderRadius: '10px',
-    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-    width: 'calc(100% - clamp(24px, 6vw, 40px))',
-    boxSizing: 'border-box',
-    overflow: 'hidden'
-  },
-  familyInfoTitle: {
-    margin: '0 0 8px 0',
-    wordBreak: 'break-word',
-    overflowWrap: 'break-word'
-  },
-  content: {
-    padding: 'clamp(12px, 3vw, 24px)',
-    width: '100%',
-    boxSizing: 'border-box'
-  },
-  section: {
-    backgroundColor: 'white',
-    padding: 'clamp(12px, 3vw, 20px)',
-    borderRadius: '10px',
-    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-    marginBottom: 'clamp(12px, 3vw, 20px)',
-    width: '100%',
-    boxSizing: 'border-box'
-  },
-  sectionHeader: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: '20px'
-  },
-  form: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: 'clamp(12px, 3vw, 15px)',
-    marginBottom: '20px',
-    width: '100%',
-    boxSizing: 'border-box'
-  },
-  input: {
-    width: '100%',
-    padding: 'clamp(8px, 2vw, 10px)',
-    border: '1px solid #ddd',
-    borderRadius: '5px',
-    fontSize: 'clamp(14px, 3.5vw, 16px)',
-    boxSizing: 'border-box'
-  },
-  colorInput: {
-    width: 'clamp(50px, 15vw, 60px)',
-    height: 'clamp(36px, 10vw, 40px)',
-    border: '1px solid #ddd',
-    borderRadius: '5px',
-    cursor: 'pointer'
-  },
-  habitTypeContainer: {
-    display: 'flex',
-    gap: 'clamp(12px, 3vw, 20px)',
-    marginBottom: '15px',
-    flexWrap: 'wrap',
-    width: '100%'
-  },
-  radioLabel: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '5px',
-    cursor: 'pointer',
-    fontSize: 'clamp(13px, 3.5vw, 14px)',
-    whiteSpace: 'nowrap'
-  },
-  daysSelector: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(45px, 1fr))',
-    gap: 'clamp(6px, 2vw, 8px)',
-    marginBottom: '15px',
-    width: '100%'
-  },
-  dayButton: {
-    padding: 'clamp(8px, 2vw, 10px) clamp(6px, 1.5vw, 8px)',
-    border: 'none',
-    borderRadius: '5px',
-    cursor: 'pointer',
-    fontSize: 'clamp(12px, 3vw, 14px)',
-    fontWeight: 'bold',
-    transition: 'all 0.2s',
-    minHeight: '36px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center'
-  },
-  button: {
-    padding: 'clamp(10px, 2.5vw, 12px) clamp(16px, 4vw, 20px)',
-    backgroundColor: '#007bff',
-    color: 'white',
-    border: 'none',
-    borderRadius: '5px',
-    cursor: 'pointer',
-    fontWeight: 'bold',
-    fontSize: 'clamp(14px, 3.5vw, 16px)',
-    width: '100%',
-    boxSizing: 'border-box'
-  },
-  habitsList: {
-    display: 'grid',
-    gap: '15px'
-  },
-  habitCard: {
-    padding: '15px',
-    backgroundColor: '#f9f9f9',
-    borderRadius: '8px',
-    borderLeft: '4px solid #007bff',
-    width: '100%',
-    boxSizing: 'border-box',
-    overflow: 'hidden'
-  },
-  habitHeader: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    gap: '10px',
-    minWidth: 0
-  },
-  habitInfo: {
-    flex: 1,
-    minWidth: 0,
-    overflow: 'hidden'
-  },
-  habitTitleContainer: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
-    flex: 1,
-    minWidth: 0
-  },
-  dragHandle: {
-    cursor: 'grab',
-    padding: '4px 8px',
-    color: '#999',
-    fontSize: '20px',
-    userSelect: 'none',
-    touchAction: 'none'
-  },
-  habitName: {
-    margin: '0 0 4px 0',
-    fontSize: '16px',
-    wordBreak: 'break-word',
-    overflowWrap: 'break-word',
-    maxWidth: '100%'
-  },
-  daysLabel: {
-    fontSize: '12px',
-    color: '#666',
-    fontWeight: 'normal'
-  },
-  checkButton: {
-    width: '40px',
-    height: '40px',
-    borderRadius: '50%',
-    border: 'none',
-    fontSize: '20px',
-    cursor: 'pointer',
-    color: 'white',
-    fontWeight: 'bold'
-  },
-  description: {
-    color: '#666',
-    fontSize: '14px',
-    margin: '8px 0',
-    wordBreak: 'break-word',
-    overflowWrap: 'break-word'
-  },
-  familySection: {
-    marginTop: '15px',
-    paddingTop: '15px',
-    borderTop: '1px solid #e9ecef'
-  },
-  familyTitle: {
-    fontSize: '14px',
-    fontWeight: 'bold',
-    color: '#495057',
-    marginBottom: '10px'
-  },
-  familyProgress: {
-    display: 'flex',
-    gap: '8px',
-    marginTop: '10px',
-    flexWrap: 'wrap'
-  },
-  memberItem: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '6px'
-  },
-  memberBadge: {
-    padding: '4px 12px',
-    borderRadius: '15px',
-    fontSize: '12px',
-    color: 'white',
-    fontWeight: 'bold'
-  },
-  memberName: {
-    fontSize: '13px',
-    color: '#495057'
-  },
-  habitOwner: {
-    fontSize: '12px',
-    color: '#6c757d',
-    margin: '4px 0 0 0',
-    fontWeight: 'normal',
-    wordBreak: 'break-word',
-    overflowWrap: 'break-word'
-  },
-  statusBadge: {
-    width: '40px',
-    height: '40px',
-    borderRadius: '50%',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontSize: '20px',
-    color: 'white',
-    fontWeight: 'bold'
-  },
-  emptyMessage: {
-    textAlign: 'center',
-    color: '#6c757d',
-    padding: '20px',
-    fontStyle: 'italic'
-  },
-  habitActions: {
-    display: 'flex',
-    gap: '10px',
-    alignItems: 'center'
-  },
-  habitButtonGroup: {
-    display: 'flex',
-    gap: '6px',
-    marginTop: '8px'
-  },
-  editButton: {
-    flex: 1,
-    padding: '6px 10px',
-    backgroundColor: 'transparent',
-    color: '#6c757d',
-    border: '1px solid #dee2e6',
-    borderRadius: '4px',
-    cursor: 'pointer',
-    fontSize: '12px',
-    fontWeight: 'normal'
-  },
-  deleteButton: {
-    flex: 1,
-    padding: '6px 10px',
-    backgroundColor: 'transparent',
-    color: '#6c757d',
-    border: '1px solid #dee2e6',
-    borderRadius: '4px',
-    cursor: 'pointer',
-    fontSize: '12px',
-    fontWeight: 'normal'
-  },
-  loadingContainer: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    minHeight: '50vh',
-    fontSize: '18px',
-    color: '#666'
-  },
-  errorMessage: {
-    backgroundColor: '#fee',
-    color: '#c33',
-    padding: '12px',
-    borderRadius: '8px',
-    marginBottom: '20px',
-    textAlign: 'center'
-  },
-  cancelButton: {
-    padding: 'clamp(10px, 2.5vw, 12px) clamp(16px, 4vw, 20px)',
-    backgroundColor: '#6c757d',
-    color: 'white',
-    border: 'none',
-    borderRadius: '5px',
-    cursor: 'pointer',
-    fontWeight: 'bold',
-    fontSize: 'clamp(14px, 3.5vw, 16px)',
-    width: '100%',
-    boxSizing: 'border-box',
-    marginTop: '10px'
-  },
-  card: {
-    backgroundColor: 'white',
-    padding: '40px',
-    margin: '40px auto',
-    borderRadius: '10px',
-    boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
-    maxWidth: '600px',
-    textAlign: 'center'
-  },
-  notificationBanner: {
-    backgroundColor: '#e7f3ff',
-    border: '1px solid #007bff',
-    borderRadius: '8px',
-    padding: 'clamp(12px, 3vw, 16px)',
-    marginBottom: '20px',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    gap: '10px',
-    width: '100%',
-    boxSizing: 'border-box'
-  },
-  notificationText: {
-    margin: 0,
-    color: '#333',
-    fontSize: 'clamp(13px, 3.5vw, 15px)',
-    textAlign: 'center'
-  },
-  notificationButton: {
-    padding: '8px 16px',
-    backgroundColor: '#007bff',
-    color: 'white',
-    border: 'none',
-    borderRadius: '5px',
-    cursor: 'pointer',
-    fontWeight: 'bold',
-    fontSize: 'clamp(13px, 3.5vw, 14px)'
-  }
-};
 
 export default Dashboard;

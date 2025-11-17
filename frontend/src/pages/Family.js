@@ -2,6 +2,23 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { familyAPI, authAPI } from '../services/api';
+import { Button } from '../components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
+import { Input } from '../components/ui/input';
+import { Label } from '../components/ui/label';
+import { Badge } from '../components/ui/badge';
+import {
+  Home,
+  TrendingUp,
+  LogOut,
+  Users,
+  Copy,
+  UserPlus,
+  UserMinus,
+  Bell,
+  BellOff,
+  Check
+} from 'lucide-react';
 
 function Family() {
   const { user, logout, updateUserFamily } = useAuth();
@@ -12,6 +29,7 @@ function Family() {
   const [inviteCode, setInviteCode] = useState('');
   const [error, setError] = useState('');
   const [enableReminders, setEnableReminders] = useState(true);
+  const [copied, setCopied] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -126,388 +144,304 @@ function Family() {
     }
   };
 
+  const handleCopyInviteCode = async () => {
+    try {
+      await navigator.clipboard.writeText(family.inviteCode);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (error) {
+      console.error('Failed to copy:', error);
+    }
+  };
+
   if (loading) {
-    return <div style={styles.container}>로딩 중...</div>;
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+        <div className="text-lg font-medium text-gray-700">로딩 중...</div>
+      </div>
+    );
   }
 
   return (
-    <div style={styles.container}>
-      <div style={styles.header}>
-        <h1 style={styles.title}>가족 관리</h1>
-        <div style={styles.headerRight}>
-          <button onClick={() => navigate('/dashboard')} style={styles.btnSmall}>
-            🏠
-          </button>
-          <button onClick={() => navigate('/monthly')} style={styles.btnSmall}>
-            📊
-          </button>
-          <button onClick={logout} style={styles.btnSmall}>
-            🚪
-          </button>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+      {/* Header */}
+      <header className="bg-white shadow-sm border-b">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center py-4">
+            <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+              <Users className="h-6 w-6 text-indigo-600" />
+              가족 관리
+            </h1>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => navigate('/dashboard')}
+                className="h-10 w-10"
+              >
+                <Home className="h-5 w-5" />
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => navigate('/monthly')}
+                className="h-10 w-10"
+              >
+                <TrendingUp className="h-5 w-5" />
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={logout}
+                className="h-10 w-10"
+              >
+                <LogOut className="h-5 w-5" />
+              </Button>
+            </div>
+          </div>
         </div>
-      </div>
+      </header>
 
-      <div style={styles.content}>
+      {/* Content */}
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {family ? (
-          <div style={styles.card}>
-            <h2 style={styles.familyName}>{family.name}</h2>
-            <div style={styles.inviteBox}>
-              <p style={styles.inviteLabel}>초대 코드</p>
-              <h3 style={styles.inviteCode}>{family.inviteCode}</h3>
-              <p style={styles.hint}>가족 구성원과 이 코드를 공유하세요</p>
-            </div>
-
-            <div style={styles.membersList}>
-              <h3 style={styles.membersTitle}>가족 구성원 ({family.members?.length || 0}명)</h3>
-              {family.members?.map((member) => (
-                <div key={member.id} style={styles.member}>
-                  <span style={styles.memberName}>{member.displayName}</span>
-                  <span style={styles.username}>@{member.username}</span>
+          <div className="space-y-6">
+            {/* Family Info Card */}
+            <Card className="shadow-lg">
+              <CardHeader>
+                <CardTitle className="text-3xl">{family.name}</CardTitle>
+                <CardDescription>가족 정보 및 설정</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* Invite Code Section */}
+                <div className="bg-gradient-to-br from-indigo-50 to-blue-50 border-2 border-indigo-200 rounded-lg p-6">
+                  <Label className="text-sm font-medium text-gray-600 mb-2 block">
+                    초대 코드
+                  </Label>
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="flex-1">
+                      <p className="text-4xl font-bold text-indigo-600 tracking-widest">
+                        {family.inviteCode}
+                      </p>
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={handleCopyInviteCode}
+                      className="h-12 w-12 shrink-0"
+                    >
+                      {copied ? (
+                        <Check className="h-5 w-5 text-green-600" />
+                      ) : (
+                        <Copy className="h-5 w-5" />
+                      )}
+                    </Button>
+                  </div>
+                  <p className="text-sm text-gray-600 mt-3">
+                    가족 구성원과 이 코드를 공유하세요
+                  </p>
                 </div>
-              ))}
-            </div>
 
-            <div style={styles.settingsSection}>
-              <h3 style={styles.settingsTitle}>알림 설정</h3>
-              <div style={styles.settingItem}>
-                <div style={styles.settingInfo}>
-                  <span style={styles.settingLabel}>오후 9시 습관 알림</span>
-                  <span style={styles.settingDescription}>
-                    미완료 습관이 있을 때 알림을 받습니다
-                  </span>
+                {/* Members List */}
+                <div>
+                  <div className="flex items-center gap-2 mb-4">
+                    <Users className="h-5 w-5 text-gray-600" />
+                    <h3 className="text-lg font-semibold text-gray-900">
+                      가족 구성원
+                    </h3>
+                    <Badge variant="secondary" className="ml-auto">
+                      {family.members?.length || 0}명
+                    </Badge>
+                  </div>
+                  <div className="space-y-2">
+                    {family.members?.map((member) => (
+                      <div
+                        key={member.id}
+                        className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center">
+                            <span className="text-indigo-600 font-semibold">
+                              {member.displayName.charAt(0)}
+                            </span>
+                          </div>
+                          <div>
+                            <p className="font-medium text-gray-900">
+                              {member.displayName}
+                            </p>
+                            <p className="text-sm text-gray-500">
+                              @{member.username}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-                <label style={styles.switch}>
-                  <input
-                    type="checkbox"
-                    checked={enableReminders}
-                    onChange={handleToggleReminders}
-                    style={styles.checkbox}
-                  />
-                  <span style={{
-                    ...styles.slider,
-                    backgroundColor: enableReminders ? '#007bff' : '#ccc'
-                  }}>
-                    <span style={{
-                      ...styles.sliderCircle,
-                      transform: enableReminders ? 'translateX(22px)' : 'translateX(0)'
-                    }}></span>
-                  </span>
-                </label>
-              </div>
-            </div>
 
-            <button onClick={handleLeaveFamily} style={styles.dangerButton}>
-              가족 떠나기
-            </button>
+                {/* Settings Section */}
+                <div className="border-t pt-6">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Bell className="h-5 w-5 text-gray-600" />
+                    <h3 className="text-lg font-semibold text-gray-900">
+                      알림 설정
+                    </h3>
+                  </div>
+                  <div className="bg-gray-50 rounded-lg p-4">
+                    <div className="flex items-center justify-between gap-4">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          {enableReminders ? (
+                            <Bell className="h-4 w-4 text-indigo-600" />
+                          ) : (
+                            <BellOff className="h-4 w-4 text-gray-400" />
+                          )}
+                          <Label className="font-medium text-gray-900 cursor-pointer">
+                            오후 9시 습관 알림
+                          </Label>
+                        </div>
+                        <p className="text-sm text-gray-600">
+                          미완료 습관이 있을 때 알림을 받습니다
+                        </p>
+                      </div>
+                      <button
+                        onClick={handleToggleReminders}
+                        className={`
+                          relative inline-flex h-7 w-12 shrink-0 cursor-pointer rounded-full
+                          border-2 border-transparent transition-colors duration-200 ease-in-out
+                          focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2
+                          ${enableReminders ? 'bg-indigo-600' : 'bg-gray-200'}
+                        `}
+                        role="switch"
+                        aria-checked={enableReminders}
+                      >
+                        <span
+                          className={`
+                            pointer-events-none inline-block h-6 w-6 transform rounded-full
+                            bg-white shadow ring-0 transition duration-200 ease-in-out
+                            ${enableReminders ? 'translate-x-5' : 'translate-x-0'}
+                          `}
+                        />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Leave Family Button */}
+                <div className="pt-4">
+                  <Button
+                    variant="destructive"
+                    className="w-full"
+                    onClick={handleLeaveFamily}
+                  >
+                    <UserMinus className="mr-2 h-4 w-4" />
+                    가족 떠나기
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         ) : (
-          <div style={styles.card}>
-            <h2 style={styles.cardTitle}>가족 만들기 또는 가입하기</h2>
-            {error && <div style={styles.error}>{error}</div>}
+          <div className="space-y-6">
+            {/* Create or Join Family */}
+            <Card className="shadow-lg">
+              <CardHeader>
+                <CardTitle className="text-2xl">가족 만들기 또는 가입하기</CardTitle>
+                <CardDescription>
+                  가족을 생성하거나 초대 코드로 기존 가족에 가입하세요
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {error && (
+                  <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+                    {error}
+                  </div>
+                )}
 
-            <div style={styles.section}>
-              <h3 style={styles.sectionTitle}>새 가족 만들기</h3>
-              <form onSubmit={handleCreateFamily} style={styles.form}>
-                <input
-                  type="text"
-                  placeholder="가족 이름"
-                  value={newFamilyName}
-                  onChange={(e) => setNewFamilyName(e.target.value)}
-                  style={styles.input}
-                  required
-                />
-                <button type="submit" style={styles.button} disabled={submitting}>
-                  {submitting ? '생성 중...' : '만들기'}
-                </button>
-              </form>
-            </div>
+                {/* Create Family */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2">
+                    <UserPlus className="h-5 w-5 text-indigo-600" />
+                    <h3 className="text-lg font-semibold text-gray-900">
+                      새 가족 만들기
+                    </h3>
+                  </div>
+                  <form onSubmit={handleCreateFamily} className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="familyName">가족 이름</Label>
+                      <Input
+                        id="familyName"
+                        type="text"
+                        placeholder="예: 우리 가족"
+                        value={newFamilyName}
+                        onChange={(e) => setNewFamilyName(e.target.value)}
+                        required
+                        className="w-full"
+                      />
+                    </div>
+                    <Button
+                      type="submit"
+                      className="w-full"
+                      disabled={submitting}
+                    >
+                      <UserPlus className="mr-2 h-4 w-4" />
+                      {submitting ? '생성 중...' : '만들기'}
+                    </Button>
+                  </form>
+                </div>
 
-            <div style={styles.divider}>또는</div>
+                {/* Divider */}
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-gray-300"></div>
+                  </div>
+                  <div className="relative flex justify-center text-sm">
+                    <span className="px-4 bg-white text-gray-500 font-medium">
+                      또는
+                    </span>
+                  </div>
+                </div>
 
-            <div style={styles.section}>
-              <h3 style={styles.sectionTitle}>기존 가족 가입하기</h3>
-              <form onSubmit={handleJoinFamily} style={styles.form}>
-                <input
-                  type="text"
-                  placeholder="초대 코드 입력"
-                  value={inviteCode}
-                  onChange={(e) =>
-                    setInviteCode(e.target.value.toUpperCase())
-                  }
-                  style={styles.input}
-                  required
-                />
-                <button type="submit" style={styles.button} disabled={submitting}>
-                  {submitting ? '가입 중...' : '가입하기'}
-                </button>
-              </form>
-            </div>
+                {/* Join Family */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2">
+                    <Users className="h-5 w-5 text-indigo-600" />
+                    <h3 className="text-lg font-semibold text-gray-900">
+                      기존 가족 가입하기
+                    </h3>
+                  </div>
+                  <form onSubmit={handleJoinFamily} className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="inviteCode">초대 코드</Label>
+                      <Input
+                        id="inviteCode"
+                        type="text"
+                        placeholder="초대 코드를 입력하세요"
+                        value={inviteCode}
+                        onChange={(e) =>
+                          setInviteCode(e.target.value.toUpperCase())
+                        }
+                        required
+                        className="w-full uppercase tracking-wider"
+                      />
+                    </div>
+                    <Button
+                      type="submit"
+                      className="w-full"
+                      disabled={submitting}
+                    >
+                      <Users className="mr-2 h-4 w-4" />
+                      {submitting ? '가입 중...' : '가입하기'}
+                    </Button>
+                  </form>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         )}
-      </div>
+      </main>
     </div>
   );
 }
-
-const styles = {
-  container: {
-    minHeight: '100vh',
-    backgroundColor: '#f0f2f5'
-  },
-  header: {
-    backgroundColor: 'white',
-    padding: '12px 16px',
-    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    gap: '10px'
-  },
-  headerRight: {
-    display: 'flex',
-    gap: '6px',
-    flexShrink: 0
-  },
-  title: {
-    fontSize: '18px',
-    margin: 0,
-    whiteSpace: 'nowrap'
-  },
-  btnSmall: {
-    padding: '8px 12px',
-    backgroundColor: '#007bff',
-    color: 'white',
-    border: 'none',
-    borderRadius: '8px',
-    cursor: 'pointer',
-    fontSize: '18px',
-    minWidth: '40px',
-    height: '40px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center'
-  },
-  content: {
-    padding: 'clamp(20px, 5vw, 40px) clamp(12px, 3vw, 20px)',
-    maxWidth: '600px',
-    margin: '0 auto',
-    width: '100%',
-    boxSizing: 'border-box'
-  },
-  card: {
-    backgroundColor: 'white',
-    padding: 'clamp(20px, 5vw, 40px)',
-    borderRadius: '10px',
-    boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
-    width: '100%',
-    boxSizing: 'border-box'
-  },
-  familyName: {
-    fontSize: 'clamp(20px, 5vw, 24px)',
-    margin: '0 0 clamp(15px, 4vw, 20px) 0',
-    color: '#333',
-    wordBreak: 'break-word',
-    overflowWrap: 'break-word'
-  },
-  cardTitle: {
-    fontSize: 'clamp(18px, 4.5vw, 22px)',
-    margin: '0 0 clamp(15px, 4vw, 20px) 0',
-    color: '#333',
-    wordBreak: 'break-word',
-    overflowWrap: 'break-word'
-  },
-  inviteBox: {
-    backgroundColor: '#f0f8ff',
-    padding: 'clamp(15px, 4vw, 20px)',
-    borderRadius: '8px',
-    textAlign: 'center',
-    margin: 'clamp(15px, 4vw, 20px) 0',
-    width: '100%',
-    boxSizing: 'border-box'
-  },
-  inviteLabel: {
-    margin: '0 0 10px 0',
-    fontSize: 'clamp(14px, 3.5vw, 16px)',
-    color: '#666'
-  },
-  inviteCode: {
-    fontSize: 'clamp(24px, 6vw, 32px)',
-    letterSpacing: 'clamp(2px, 1vw, 4px)',
-    color: '#007bff',
-    margin: '10px 0',
-    wordBreak: 'break-all'
-  },
-  hint: {
-    color: '#666',
-    fontSize: 'clamp(12px, 3vw, 14px)',
-    margin: '10px 0 0 0'
-  },
-  membersList: {
-    margin: 'clamp(20px, 5vw, 30px) 0',
-    width: '100%'
-  },
-  membersTitle: {
-    fontSize: 'clamp(16px, 4vw, 18px)',
-    marginBottom: '12px',
-    color: '#333'
-  },
-  member: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 'clamp(10px, 3vw, 12px)',
-    backgroundColor: '#f9f9f9',
-    borderRadius: '5px',
-    marginBottom: '8px',
-    width: '100%',
-    boxSizing: 'border-box',
-    gap: '10px'
-  },
-  memberName: {
-    fontSize: 'clamp(14px, 3.5vw, 16px)',
-    color: '#333',
-    wordBreak: 'break-word',
-    flex: 1
-  },
-  username: {
-    color: '#666',
-    fontSize: 'clamp(12px, 3vw, 14px)',
-    flexShrink: 0,
-    whiteSpace: 'nowrap'
-  },
-  settingsSection: {
-    margin: 'clamp(20px, 5vw, 30px) 0',
-    width: '100%',
-    borderTop: '1px solid #eee',
-    paddingTop: 'clamp(15px, 4vw, 20px)'
-  },
-  settingsTitle: {
-    fontSize: 'clamp(16px, 4vw, 18px)',
-    marginBottom: '12px',
-    color: '#333'
-  },
-  settingItem: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 'clamp(10px, 3vw, 15px)',
-    backgroundColor: '#f9f9f9',
-    borderRadius: '8px',
-    gap: '15px'
-  },
-  settingInfo: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '4px',
-    flex: 1
-  },
-  settingLabel: {
-    fontSize: 'clamp(14px, 3.5vw, 16px)',
-    color: '#333',
-    fontWeight: '500'
-  },
-  settingDescription: {
-    fontSize: 'clamp(12px, 3vw, 13px)',
-    color: '#666'
-  },
-  switch: {
-    position: 'relative',
-    display: 'inline-block',
-    width: '50px',
-    height: '28px',
-    flexShrink: 0
-  },
-  checkbox: {
-    opacity: 0,
-    width: 0,
-    height: 0
-  },
-  slider: {
-    position: 'absolute',
-    cursor: 'pointer',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    borderRadius: '28px',
-    transition: '0.3s'
-  },
-  sliderCircle: {
-    position: 'absolute',
-    height: '20px',
-    width: '20px',
-    left: '4px',
-    bottom: '4px',
-    backgroundColor: 'white',
-    borderRadius: '50%',
-    transition: '0.3s'
-  },
-  section: {
-    margin: 'clamp(20px, 5vw, 30px) 0',
-    width: '100%'
-  },
-  sectionTitle: {
-    fontSize: 'clamp(16px, 4vw, 18px)',
-    marginBottom: '10px',
-    color: '#333'
-  },
-  form: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '10px',
-    marginTop: '15px',
-    width: '100%'
-  },
-  input: {
-    width: '100%',
-    padding: 'clamp(10px, 2.5vw, 12px)',
-    border: '1px solid #ddd',
-    borderRadius: '5px',
-    fontSize: 'clamp(14px, 3.5vw, 16px)',
-    boxSizing: 'border-box'
-  },
-  button: {
-    padding: 'clamp(10px, 2.5vw, 12px) clamp(16px, 4vw, 20px)',
-    backgroundColor: '#007bff',
-    color: 'white',
-    border: 'none',
-    borderRadius: '5px',
-    cursor: 'pointer',
-    fontWeight: 'bold',
-    fontSize: 'clamp(14px, 3.5vw, 16px)',
-    width: '100%',
-    boxSizing: 'border-box'
-  },
-  dangerButton: {
-    padding: 'clamp(10px, 2.5vw, 12px) clamp(16px, 4vw, 20px)',
-    backgroundColor: '#dc3545',
-    color: 'white',
-    border: 'none',
-    borderRadius: '5px',
-    cursor: 'pointer',
-    fontWeight: 'bold',
-    fontSize: 'clamp(14px, 3.5vw, 16px)',
-    width: '100%',
-    marginTop: 'clamp(10px, 3vw, 15px)',
-    boxSizing: 'border-box'
-  },
-  error: {
-    backgroundColor: '#fee',
-    color: '#c33',
-    padding: 'clamp(10px, 2.5vw, 12px)',
-    borderRadius: '5px',
-    marginBottom: '20px',
-    fontSize: 'clamp(13px, 3.5vw, 15px)',
-    width: '100%',
-    boxSizing: 'border-box'
-  },
-  divider: {
-    textAlign: 'center',
-    color: '#999',
-    margin: 'clamp(20px, 5vw, 30px) 0',
-    fontSize: 'clamp(13px, 3.5vw, 14px)',
-    fontWeight: 'bold'
-  }
-};
 
 export default Family;
