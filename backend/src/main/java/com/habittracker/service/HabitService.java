@@ -33,6 +33,9 @@ public class HabitService {
         Integer maxOrder = habitRepository.findMaxDisplayOrderByUserId(currentUser.getId());
         int newOrder = (maxOrder == null) ? 0 : maxOrder + 1;
 
+        // Set default habitType if not provided
+        String habitType = request.getHabitType() != null ? request.getHabitType() : "DAILY";
+
         Habit habit = Habit.builder()
                 .name(request.getName())
                 .description(request.getDescription())
@@ -40,6 +43,8 @@ public class HabitService {
                 .user(currentUser)
                 .family(currentUser.getFamily())
                 .displayOrder(newOrder)
+                .habitType(habitType)
+                .selectedDays(request.getSelectedDays())
                 .build();
 
         return habitRepository.save(habit);
@@ -70,6 +75,12 @@ public class HabitService {
         habit.setName(request.getName());
         habit.setDescription(request.getDescription());
         habit.setColor(request.getColor());
+
+        // Update habitType and selectedDays if provided
+        if (request.getHabitType() != null) {
+            habit.setHabitType(request.getHabitType());
+        }
+        habit.setSelectedDays(request.getSelectedDays());
 
         return habitRepository.save(habit);
     }

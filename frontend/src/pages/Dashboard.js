@@ -21,7 +21,7 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 
 // SortableHabitItem component for drag and drop
-function SortableHabitItem({ habit, userLog, onToggle, onEdit, onDelete }) {
+function SortableHabitItem({ habit, userLog, onToggle, onEdit, onDelete, daysDisplay }) {
   const {
     attributes,
     listeners,
@@ -58,7 +58,10 @@ function SortableHabitItem({ habit, userLog, onToggle, onEdit, onDelete }) {
             >
               ☰
             </div>
-            <h3 style={styles.habitName}>{habit.name}</h3>
+            <div>
+              <h3 style={styles.habitName}>{habit.name}</h3>
+              {daysDisplay && <span style={styles.daysLabel}>({daysDisplay})</span>}
+            </div>
           </div>
           <div style={styles.habitActions}>
             <button
@@ -104,7 +107,9 @@ function Dashboard() {
   const [newHabit, setNewHabit] = useState({
     name: '',
     description: '',
-    color: '#007bff'
+    color: '#007bff',
+    habitType: 'DAILY',
+    selectedDays: []
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -309,12 +314,18 @@ function Dashboard() {
   const handleAddHabit = async (e) => {
     e.preventDefault();
     try {
+      const selectedDaysStr = newHabit.habitType === 'WEEKLY' && newHabit.selectedDays.length > 0
+        ? newHabit.selectedDays.join(',')
+        : null;
+
       await habitAPI.create(
         newHabit.name,
         newHabit.description,
-        newHabit.color
+        newHabit.color,
+        newHabit.habitType,
+        selectedDaysStr
       );
-      setNewHabit({ name: '', description: '', color: '#007bff' });
+      setNewHabit({ name: '', description: '', color: '#007bff', habitType: 'DAILY', selectedDays: [] });
       setShowAddHabit(false);
       loadData();
     } catch (error) {
@@ -327,7 +338,9 @@ function Dashboard() {
     setNewHabit({
       name: habit.name,
       description: habit.description || '',
-      color: habit.color
+      color: habit.color,
+      habitType: habit.habitType || 'DAILY',
+      selectedDays: habit.selectedDays ? habit.selectedDays.split(',').map(d => parseInt(d)) : []
     });
     setShowAddHabit(false);
   };
@@ -335,13 +348,19 @@ function Dashboard() {
   const handleUpdateHabit = async (e) => {
     e.preventDefault();
     try {
+      const selectedDaysStr = newHabit.habitType === 'WEEKLY' && newHabit.selectedDays.length > 0
+        ? newHabit.selectedDays.join(',')
+        : null;
+
       await habitAPI.update(
         editingHabit.id,
         newHabit.name,
         newHabit.description,
-        newHabit.color
+        newHabit.color,
+        newHabit.habitType,
+        selectedDaysStr
       );
-      setNewHabit({ name: '', description: '', color: '#007bff' });
+      setNewHabit({ name: '', description: '', color: '#007bff', habitType: 'DAILY', selectedDays: [] });
       setEditingHabit(null);
       loadData();
     } catch (error) {
@@ -410,7 +429,47 @@ function Dashboard() {
 
   const handleCancelEdit = () => {
     setEditingHabit(null);
-    setNewHabit({ name: '', description: '', color: '#007bff' });
+    setNewHabit({ name: '', description: '', color: '#007bff', habitType: 'DAILY', selectedDays: [] });
+  };
+
+  const toggleDaySelection = (dayNumber) => {
+    setNewHabit(prev => {
+      const days = [...prev.selectedDays];
+      const index = days.indexOf(dayNumber);
+      if (index > -1) {
+        days.splice(index, 1);
+      } else {
+        days.push(dayNumber);
+      }
+      return { ...prev, selectedDays: days.sort((a, b) => a - b) };
+    });
+  };
+
+  // Check if a habit should be shown today
+  const isHabitForToday = (habit) => {
+    if (habit.habitType === 'DAILY' || !habit.habitType) {
+      return true; // Daily habits always show
+    }
+
+    if (habit.habitType === 'WEEKLY' && habit.selectedDays) {
+      const todayDayOfWeek = new Date().getDay(); // 0=Sun, 1=Mon, ..., 6=Sat
+      const adjustedDay = todayDayOfWeek === 0 ? 7 : todayDayOfWeek; // Convert to 1=Mon, 7=Sun
+      const selectedDaysArray = habit.selectedDays.split(',').map(d => parseInt(d));
+      return selectedDaysArray.includes(adjustedDay);
+    }
+
+    return true; // Default to showing if type is unknown
+  };
+
+  // Get display text for selected days
+  const getDaysDisplay = (habit) => {
+    if (habit.habitType !== 'WEEKLY' || !habit.selectedDays) {
+      return null;
+    }
+
+    const dayNames = { 1: '월', 2: '화', 3: '수', 4: '목', 5: '금', 6: '토', 7: '일' };
+    const selectedDaysArray = habit.selectedDays.split(',').map(d => parseInt(d));
+    return selectedDaysArray.map(d => dayNames[d]).join('/');
   };
 
   if (loading) {
@@ -524,6 +583,55 @@ function Dashboard() {
                 }
                 style={styles.colorInput}
               />
+
+              <div style={styles.habitTypeContainer}>
+                <label style={styles.radioLabel}>
+                  <input
+                    type="radio"
+                    value="DAILY"
+                    checked={newHabit.habitType === 'DAILY'}
+                    onChange={(e) => setNewHabit({ ...newHabit, habitType: e.target.value })}
+                  />
+                  매일
+                </label>
+                <label style={styles.radioLabel}>
+                  <input
+                    type="radio"
+                    value="WEEKLY"
+                    checked={newHabit.habitType === 'WEEKLY'}
+                    onChange={(e) => setNewHabit({ ...newHabit, habitType: e.target.value })}
+                  />
+                  주간 (요일 선택)
+                </label>
+              </div>
+
+              {newHabit.habitType === 'WEEKLY' && (
+                <div style={styles.daysSelector}>
+                  {[
+                    { num: 1, label: '월' },
+                    { num: 2, label: '화' },
+                    { num: 3, label: '수' },
+                    { num: 4, label: '목' },
+                    { num: 5, label: '금' },
+                    { num: 6, label: '토' },
+                    { num: 7, label: '일' }
+                  ].map(day => (
+                    <button
+                      key={day.num}
+                      type="button"
+                      onClick={() => toggleDaySelection(day.num)}
+                      style={{
+                        ...styles.dayButton,
+                        backgroundColor: newHabit.selectedDays.includes(day.num) ? '#007bff' : '#f0f0f0',
+                        color: newHabit.selectedDays.includes(day.num) ? 'white' : '#333'
+                      }}
+                    >
+                      {day.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+
               <button type="submit" style={styles.button}>
                 생성
               </button>
@@ -559,6 +667,55 @@ function Dashboard() {
                 }
                 style={styles.colorInput}
               />
+
+              <div style={styles.habitTypeContainer}>
+                <label style={styles.radioLabel}>
+                  <input
+                    type="radio"
+                    value="DAILY"
+                    checked={newHabit.habitType === 'DAILY'}
+                    onChange={(e) => setNewHabit({ ...newHabit, habitType: e.target.value })}
+                  />
+                  매일
+                </label>
+                <label style={styles.radioLabel}>
+                  <input
+                    type="radio"
+                    value="WEEKLY"
+                    checked={newHabit.habitType === 'WEEKLY'}
+                    onChange={(e) => setNewHabit({ ...newHabit, habitType: e.target.value })}
+                  />
+                  주간 (요일 선택)
+                </label>
+              </div>
+
+              {newHabit.habitType === 'WEEKLY' && (
+                <div style={styles.daysSelector}>
+                  {[
+                    { num: 1, label: '월' },
+                    { num: 2, label: '화' },
+                    { num: 3, label: '수' },
+                    { num: 4, label: '목' },
+                    { num: 5, label: '금' },
+                    { num: 6, label: '토' },
+                    { num: 7, label: '일' }
+                  ].map(day => (
+                    <button
+                      key={day.num}
+                      type="button"
+                      onClick={() => toggleDaySelection(day.num)}
+                      style={{
+                        ...styles.dayButton,
+                        backgroundColor: newHabit.selectedDays.includes(day.num) ? '#007bff' : '#f0f0f0',
+                        color: newHabit.selectedDays.includes(day.num) ? 'white' : '#333'
+                      }}
+                    >
+                      {day.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+
               <button type="submit" style={styles.button}>
                 수정
               </button>
@@ -582,12 +739,13 @@ function Dashboard() {
             >
               <div style={styles.habitsList}>
                 {habits
-                  .filter(habit => habit.userId === user.id)
+                  .filter(habit => habit.userId === user.id && isHabitForToday(habit))
                   .sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0))
                   .map((habit) => {
                     const userLog = logs.find(
                       (log) => log.habit.id === habit.id && log.user.id === user.id
                     );
+                    const daysDisplay = getDaysDisplay(habit);
 
                     return (
                       <SortableHabitItem
@@ -597,11 +755,12 @@ function Dashboard() {
                         onToggle={handleToggleHabit}
                         onEdit={handleEditHabit}
                         onDelete={handleDeleteHabit}
+                        daysDisplay={daysDisplay}
                       />
                     );
                   })}
-                {habits.filter(habit => habit.userId === user.id).length === 0 && (
-                  <p style={styles.emptyMessage}>아직 습관이 없습니다. 새로운 습관을 추가해보세요!</p>
+                {habits.filter(habit => habit.userId === user.id && isHabitForToday(habit)).length === 0 && (
+                  <p style={styles.emptyMessage}>오늘 할 습관이 없습니다!</p>
                 )}
               </div>
             </SortableContext>
@@ -615,41 +774,47 @@ function Dashboard() {
           </div>
 
           <div style={styles.habitsList}>
-            {habits.filter(habit => habit.userId !== user.id).map((habit) => {
-              const habitLog = logs.find(
-                (log) => log.habit.id === habit.id
-              );
-              const isCompleted = habitLog?.completed || false;
+            {habits
+              .filter(habit => habit.userId !== user.id && isHabitForToday(habit))
+              .map((habit) => {
+                const habitLog = logs.find(
+                  (log) => log.habit.id === habit.id
+                );
+                const isCompleted = habitLog?.completed || false;
+                const daysDisplay = getDaysDisplay(habit);
 
-              return (
-                <div
-                  key={habit.id}
-                  style={{
-                    ...styles.habitCard,
-                    borderLeft: `4px solid ${habit.color}`,
-                    opacity: 0.85
-                  }}
-                >
-                  <div style={styles.habitHeader}>
-                    <div style={styles.habitInfo}>
-                      <h3 style={styles.habitName}>{habit.name}</h3>
-                      <p style={styles.habitOwner}>{habit.userDisplayName}님의 습관</p>
+                return (
+                  <div
+                    key={habit.id}
+                    style={{
+                      ...styles.habitCard,
+                      borderLeft: `4px solid ${habit.color}`,
+                      opacity: 0.85
+                    }}
+                  >
+                    <div style={styles.habitHeader}>
+                      <div style={styles.habitInfo}>
+                        <div>
+                          <h3 style={styles.habitName}>{habit.name}</h3>
+                          {daysDisplay && <span style={styles.daysLabel}>({daysDisplay})</span>}
+                        </div>
+                        <p style={styles.habitOwner}>{habit.userDisplayName}님의 습관</p>
+                      </div>
+                      <span
+                        style={{
+                          ...styles.statusBadge,
+                          backgroundColor: isCompleted ? habit.color : '#ddd'
+                        }}
+                      >
+                        {isCompleted ? '✓' : '○'}
+                      </span>
                     </div>
-                    <span
-                      style={{
-                        ...styles.statusBadge,
-                        backgroundColor: isCompleted ? habit.color : '#ddd'
-                      }}
-                    >
-                      {isCompleted ? '✓' : '○'}
-                    </span>
+                    {habit.description && <p style={styles.description}>{habit.description}</p>}
                   </div>
-                  {habit.description && <p style={styles.description}>{habit.description}</p>}
-                </div>
-              );
-            })}
-            {habits.filter(habit => habit.userId !== user.id).length === 0 && (
-              <p style={styles.emptyMessage}>다른 가족 구성원의 습관이 아직 없습니다.</p>
+                );
+              })}
+            {habits.filter(habit => habit.userId !== user.id && isHabitForToday(habit)).length === 0 && (
+              <p style={styles.emptyMessage}>오늘 다른 가족 구성원의 습관이 없습니다.</p>
             )}
           </div>
         </div>
@@ -764,6 +929,33 @@ const styles = {
     border: '1px solid #ddd',
     borderRadius: '5px'
   },
+  habitTypeContainer: {
+    display: 'flex',
+    gap: '20px',
+    marginBottom: '15px'
+  },
+  radioLabel: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '5px',
+    cursor: 'pointer',
+    fontSize: '14px'
+  },
+  daysSelector: {
+    display: 'flex',
+    gap: '8px',
+    flexWrap: 'wrap',
+    marginBottom: '15px'
+  },
+  dayButton: {
+    padding: '8px 12px',
+    border: 'none',
+    borderRadius: '5px',
+    cursor: 'pointer',
+    fontSize: '14px',
+    fontWeight: 'bold',
+    transition: 'all 0.2s'
+  },
   button: {
     padding: '10px 20px',
     backgroundColor: '#007bff',
@@ -819,6 +1011,11 @@ const styles = {
     wordBreak: 'break-word',
     overflowWrap: 'break-word',
     maxWidth: '100%'
+  },
+  daysLabel: {
+    fontSize: '12px',
+    color: '#666',
+    fontWeight: 'normal'
   },
   checkButton: {
     width: '40px',

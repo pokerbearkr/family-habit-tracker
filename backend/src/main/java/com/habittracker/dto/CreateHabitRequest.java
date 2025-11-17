@@ -17,4 +17,8 @@ public class CreateHabitRequest {
 
     @NotBlank(message = "Color is required")
     private String color;
+
+    private String habitType; // DAILY or WEEKLY (defaults to DAILY if not provided)
+
+    private String selectedDays; // Comma-separated day numbers for WEEKLY habits
 }

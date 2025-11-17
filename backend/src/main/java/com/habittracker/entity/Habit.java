@@ -42,6 +42,13 @@ public class Habit {
     @Column(name = "display_order")
     private Integer displayOrder; // Order for displaying habits
 
+    @Column(name = "habit_type", nullable = false)
+    @Builder.Default
+    private String habitType = "DAILY"; // DAILY or WEEKLY
+
+    @Column(name = "selected_days")
+    private String selectedDays; // Comma-separated day numbers (1=Mon, 7=Sun) for WEEKLY habits
+
     @OneToMany(mappedBy = "habit", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private Set<HabitLog> logs = new HashSet<>();
