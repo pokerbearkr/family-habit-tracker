@@ -157,6 +157,60 @@ public class HabitLogService {
         return calculateMonthlyStats(year, month, logs, currentUser.getFamily());
     }
 
+    // Calculate how many target days a habit has in a given month
+    private int calculateTargetDaysForHabit(Habit habit, int year, int month) {
+        LocalDate startDate = LocalDate.of(year, month, 1);
+        int daysInMonth = startDate.lengthOfMonth();
+
+        // If it's a DAILY habit, target is all days in the month
+        if ("DAILY".equals(habit.getHabitType()) || habit.getHabitType() == null) {
+            return daysInMonth;
+        }
+
+        // If it's a WEEKLY habit, count matching days
+        if ("WEEKLY".equals(habit.getHabitType()) && habit.getSelectedDays() != null) {
+            String[] selectedDaysStr = habit.getSelectedDays().split(",");
+            java.util.Set<Integer> selectedDays = new java.util.HashSet<>();
+            for (String day : selectedDaysStr) {
+                selectedDays.add(Integer.parseInt(day.trim()));
+            }
+
+            int count = 0;
+            for (int day = 1; day <= daysInMonth; day++) {
+                LocalDate date = LocalDate.of(year, month, day);
+                int dayOfWeek = date.getDayOfWeek().getValue(); // 1=Mon, 7=Sun
+                if (selectedDays.contains(dayOfWeek)) {
+                    count++;
+                }
+            }
+            return count;
+        }
+
+        // Default to all days if type is unknown
+        return daysInMonth;
+    }
+
+    // Check if a habit should be done on a specific date
+    private boolean isHabitForDate(Habit habit, LocalDate date) {
+        if ("DAILY".equals(habit.getHabitType()) || habit.getHabitType() == null) {
+            return true;
+        }
+
+        if ("WEEKLY".equals(habit.getHabitType()) && habit.getSelectedDays() != null) {
+            String[] selectedDaysStr = habit.getSelectedDays().split(",");
+            int dayOfWeek = date.getDayOfWeek().getValue(); // 1=Mon, 7=Sun
+
+            for (String day : selectedDaysStr) {
+                if (Integer.parseInt(day.trim()) == dayOfWeek) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        return true; // Default to true if type is unknown
+    }
+
     private com.habittracker.dto.MonthlyStatsResponse calculateMonthlyStats(
             int year, int month, List<HabitLog> logs, com.habittracker.entity.Family family) {
 
@@ -165,23 +219,26 @@ public class HabitLogService {
         // Calculate user stats
         java.util.Map<Long, com.habittracker.dto.MonthlyStatsResponse.UserStats> userStatsMap = new java.util.HashMap<>();
         family.getMembers().forEach(user -> {
-            // Count how many habits this user owns
-            long userHabitsCount = family.getHabits().stream()
+            // Get all habits for this user
+            java.util.List<Habit> userHabits = family.getHabits().stream()
                     .filter(habit -> habit.getUser().getId().equals(user.getId()))
-                    .count();
+                    .toList();
+
+            // Calculate total possible days for all user's habits
+            int totalPossible = userHabits.stream()
+                    .mapToInt(habit -> calculateTargetDaysForHabit(habit, year, month))
+                    .sum();
 
             // Count completed logs for this user's habits
             long completedCount = logs.stream()
                     .filter(log -> log.getUser().getId().equals(user.getId()) && log.getCompleted())
                     .count();
 
-            int totalPossible = (int) userHabitsCount * daysInMonth;
-
             userStatsMap.put(user.getId(), new com.habittracker.dto.MonthlyStatsResponse.UserStats(
                     user.getId(),
                     user.getUsername(),
                     user.getDisplayName(),
-                    (int) userHabitsCount,
+                    userHabits.size(),
                     (int) completedCount,
                     totalPossible,
                     totalPossible > 0 ? (completedCount * 100.0 / totalPossible) : 0
@@ -194,8 +251,9 @@ public class HabitLogService {
             long completedCount = logs.stream()
                     .filter(log -> log.getHabit().getId().equals(habit.getId()) && log.getCompleted())
                     .count();
-            // Each habit belongs to one user, so totalPossible = daysInMonth
-            int totalPossible = daysInMonth;
+
+            // Calculate target days based on habit type
+            int totalPossible = calculateTargetDaysForHabit(habit, year, month);
 
             habitStatsMap.put(habit.getId(), new com.habittracker.dto.MonthlyStatsResponse.HabitStats(
                     habit.getId(),
@@ -209,12 +267,15 @@ public class HabitLogService {
 
         // Calculate daily stats
         java.util.Map<String, com.habittracker.dto.MonthlyStatsResponse.DayStats> dailyStatsMap = new java.util.HashMap<>();
-        // Total possible per day = number of habits (each habit belongs to one user)
-        int totalPossiblePerDay = family.getHabits().size();
 
         for (int day = 1; day <= daysInMonth; day++) {
             LocalDate date = LocalDate.of(year, month, day);
             String dateKey = date.toString();
+
+            // Count habits that should be done on this specific day
+            long totalPossiblePerDay = family.getHabits().stream()
+                    .filter(habit -> isHabitForDate(habit, date))
+                    .count();
 
             List<HabitLog> dayLogs = logs.stream()
                     .filter(log -> log.getLogDate().equals(date))
@@ -234,7 +295,7 @@ public class HabitLogService {
 
             dailyStatsMap.put(dateKey, new com.habittracker.dto.MonthlyStatsResponse.DayStats(
                     date,
-                    totalPossiblePerDay,  // 전체 가능한 습관 체크 수 (습관 수 * 가족 구성원 수)
+                    (int) totalPossiblePerDay,
                     (int) completedCount,
                     logSummaries
             ));
