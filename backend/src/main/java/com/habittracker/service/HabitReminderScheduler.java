@@ -94,7 +94,7 @@ public class HabitReminderScheduler {
     }
 
     private boolean isHabitCompleted(Habit habit, User user, LocalDate date) {
-        return habitLogRepository.findByHabitAndUserAndDate(habit, user, date)
+        return habitLogRepository.findByUserAndHabitAndLogDate(user, habit, date)
                 .map(HabitLog::getCompleted)
                 .orElse(false);
     }
