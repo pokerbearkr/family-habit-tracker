@@ -434,7 +434,8 @@ function Dashboard() {
 
   const toggleDaySelection = (dayNumber) => {
     setNewHabit(prev => {
-      const days = [...prev.selectedDays];
+      const currentDays = Array.isArray(prev.selectedDays) ? prev.selectedDays : [];
+      const days = [...currentDays];
       const index = days.indexOf(dayNumber);
       if (index > -1) {
         days.splice(index, 1);
