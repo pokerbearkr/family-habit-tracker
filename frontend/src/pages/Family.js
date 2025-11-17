@@ -192,7 +192,11 @@ function Family() {
               <Button
                 variant="outline"
                 size="icon"
-                onClick={logout}
+                onClick={() => {
+                  if (window.confirm('로그아웃하시겠습니까?')) {
+                    logout();
+                  }
+                }}
                 className="h-10 w-10"
               >
                 <LogOut className="h-5 w-5" />

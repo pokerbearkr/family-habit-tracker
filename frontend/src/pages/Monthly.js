@@ -129,7 +129,11 @@ function Monthly() {
               <Button
                 variant="outline"
                 size="icon"
-                onClick={logout}
+                onClick={() => {
+                  if (window.confirm('로그아웃하시겠습니까?')) {
+                    logout();
+                  }
+                }}
                 className="h-9 w-9"
               >
                 <LogOut className="h-4 w-4" />

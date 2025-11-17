@@ -568,7 +568,11 @@ function Dashboard() {
               <Users className="w-5 h-5" />
             </Button>
             <Button
-              onClick={logout}
+              onClick={() => {
+                if (window.confirm('로그아웃하시겠습니까?')) {
+                  logout();
+                }
+              }}
               variant="outline"
               size="icon"
               title="로그아웃"
