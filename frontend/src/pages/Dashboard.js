@@ -71,6 +71,7 @@ function SortableHabitItem({ habit, userLog, onToggle, onEdit, onDelete, daysDis
               <div
                 {...listeners}
                 className="cursor-grab active:cursor-grabbing mt-1 text-gray-400 hover:text-gray-600"
+                style={{ touchAction: 'none' }}
                 title="드래그하여 순서 변경"
               >
                 <GripVertical className="w-5 h-5" />
@@ -410,7 +411,11 @@ function Dashboard() {
   };
 
   const sensors = useSensors(
-    useSensor(PointerSensor),
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8, // 8px movement required before drag starts
+      },
+    }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     })
