@@ -1,0 +1,48 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="512" height="512" rx="80" fill="#3B82F6"/>
+
+  <!-- Calendar body -->
+  <rect x="96" y="128" width="320" height="288" rx="24" fill="white"/>
+
+  <!-- Calendar header (darker blue) -->
+  <rect x="96" y="128" width="320" height="80" rx="24" fill="#1E40AF"/>
+  <rect x="96" y="184" width="320" height="24" fill="#1E40AF"/>
+
+  <!-- Calendar rings/hangers -->
+  <rect x="160" y="96" width="24" height="64" rx="12" fill="#1E40AF"/>
+  <rect x="328" y="96" width="24" height="64" rx="12" fill="#1E40AF"/>
+
+  <!-- Calendar grid dots (representing dates) -->
+  <!-- Row 1 -->
+  <circle cx="136" cy="248" r="12" fill="#3B82F6"/>
+  <circle cx="186" cy="248" r="12" fill="#3B82F6"/>
+  <circle cx="236" cy="248" r="12" fill="#3B82F6"/>
+  <circle cx="286" cy="248" r="12" fill="#3B82F6"/>
+  <circle cx="336" cy="248" r="12" fill="#3B82F6"/>
+  <circle cx="376" cy="248" r="12" fill="#3B82F6"/>
+
+  <!-- Row 2 -->
+  <circle cx="136" cy="298" r="12" fill="#3B82F6"/>
+  <circle cx="186" cy="298" r="12" fill="#3B82F6"/>
+  <circle cx="236" cy="298" r="12" fill="#3B82F6"/>
+  <circle cx="286" cy="298" r="12" fill="#3B82F6"/>
+  <circle cx="336" cy="298" r="12" fill="#3B82F6"/>
+  <circle cx="376" cy="298" r="12" fill="#3B82F6"/>
+
+  <!-- Row 3 -->
+  <circle cx="136" cy="348" r="12" fill="#3B82F6"/>
+  <circle cx="186" cy="348" r="12" fill="#3B82F6"/>
+  <circle cx="236" cy="348" r="12" fill="#3B82F6"/>
+  <circle cx="286" cy="348" r="12" fill="#3B82F6"/>
+  <circle cx="336" cy="348" r="12" fill="#3B82F6"/>
+  <circle cx="376" cy="348" r="12" fill="#3B82F6"/>
+
+  <!-- Row 4 (partial) -->
+  <circle cx="136" cy="388" r="12" fill="#3B82F6"/>
+  <circle cx="186" cy="388" r="12" fill="#3B82F6"/>
+  <circle cx="236" cy="388" r="12" fill="#3B82F6"/>
+
+  <!-- Highlight today (one red dot) -->
+  <circle cx="286" cy="298" r="14" fill="#EF4444"/>
+</svg>
