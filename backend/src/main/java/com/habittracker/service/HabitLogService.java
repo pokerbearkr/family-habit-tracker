@@ -159,15 +159,28 @@ public class HabitLogService {
 
     // Calculate how many target days a habit has in a given month
     private int calculateTargetDaysForHabit(Habit habit, int year, int month) {
-        LocalDate startDate = LocalDate.of(year, month, 1);
-        int daysInMonth = startDate.lengthOfMonth();
+        LocalDate monthStart = LocalDate.of(year, month, 1);
+        LocalDate monthEnd = monthStart.plusMonths(1).minusDays(1);
 
-        // If it's a DAILY habit, target is all days in the month
-        if ("DAILY".equals(habit.getHabitType()) || habit.getHabitType() == null) {
-            return daysInMonth;
+        // Get the habit creation date (only the date part, not time)
+        LocalDate habitCreationDate = habit.getCreatedAt().toLocalDate();
+
+        // Determine the effective start date (later of month start or habit creation date)
+        LocalDate effectiveStartDate = habitCreationDate.isAfter(monthStart) ? habitCreationDate : monthStart;
+
+        // If habit was created after this month, return 0
+        if (effectiveStartDate.isAfter(monthEnd)) {
+            return 0;
         }
 
-        // If it's a WEEKLY habit, count matching days
+        // If it's a DAILY habit, count days from effective start date to month end
+        if ("DAILY".equals(habit.getHabitType()) || habit.getHabitType() == null) {
+            int daysFromStart = effectiveStartDate.getDayOfMonth();
+            int daysInMonth = monthStart.lengthOfMonth();
+            return daysInMonth - daysFromStart + 1;
+        }
+
+        // If it's a WEEKLY habit, count matching days from effective start date
         if ("WEEKLY".equals(habit.getHabitType()) && habit.getSelectedDays() != null) {
             String[] selectedDaysStr = habit.getSelectedDays().split(",");
             java.util.Set<Integer> selectedDays = new java.util.HashSet<>();
@@ -176,22 +189,31 @@ public class HabitLogService {
             }
 
             int count = 0;
-            for (int day = 1; day <= daysInMonth; day++) {
-                LocalDate date = LocalDate.of(year, month, day);
-                int dayOfWeek = date.getDayOfWeek().getValue(); // 1=Mon, 7=Sun
+            LocalDate currentDate = effectiveStartDate;
+            while (!currentDate.isAfter(monthEnd)) {
+                int dayOfWeek = currentDate.getDayOfWeek().getValue(); // 1=Mon, 7=Sun
                 if (selectedDays.contains(dayOfWeek)) {
                     count++;
                 }
+                currentDate = currentDate.plusDays(1);
             }
             return count;
         }
 
-        // Default to all days if type is unknown
-        return daysInMonth;
+        // Default to counting days from effective start date
+        int daysFromStart = effectiveStartDate.getDayOfMonth();
+        int daysInMonth = monthStart.lengthOfMonth();
+        return daysInMonth - daysFromStart + 1;
     }
 
     // Check if a habit should be done on a specific date
     private boolean isHabitForDate(Habit habit, LocalDate date) {
+        // First check if the date is before the habit was created
+        LocalDate habitCreationDate = habit.getCreatedAt().toLocalDate();
+        if (date.isBefore(habitCreationDate)) {
+            return false; // Habit didn't exist on this date
+        }
+
         if ("DAILY".equals(habit.getHabitType()) || habit.getHabitType() == null) {
             return true;
         }
