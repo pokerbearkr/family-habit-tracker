@@ -912,58 +912,73 @@ const styles = {
   },
   form: {
     display: 'flex',
-    gap: '10px',
+    flexDirection: 'column',
+    gap: 'clamp(12px, 3vw, 15px)',
     marginBottom: '20px',
-    flexWrap: 'wrap'
+    width: '100%',
+    boxSizing: 'border-box'
   },
   input: {
-    flex: 1,
-    minWidth: '200px',
-    padding: '10px',
+    width: '100%',
+    padding: 'clamp(8px, 2vw, 10px)',
     border: '1px solid #ddd',
-    borderRadius: '5px'
+    borderRadius: '5px',
+    fontSize: 'clamp(14px, 3.5vw, 16px)',
+    boxSizing: 'border-box'
   },
   colorInput: {
-    width: '60px',
-    height: '40px',
+    width: 'clamp(50px, 15vw, 60px)',
+    height: 'clamp(36px, 10vw, 40px)',
     border: '1px solid #ddd',
-    borderRadius: '5px'
+    borderRadius: '5px',
+    cursor: 'pointer'
   },
   habitTypeContainer: {
     display: 'flex',
-    gap: '20px',
-    marginBottom: '15px'
+    gap: 'clamp(12px, 3vw, 20px)',
+    marginBottom: '15px',
+    flexWrap: 'wrap',
+    width: '100%'
   },
   radioLabel: {
     display: 'flex',
     alignItems: 'center',
     gap: '5px',
     cursor: 'pointer',
-    fontSize: '14px'
+    fontSize: 'clamp(13px, 3.5vw, 14px)',
+    whiteSpace: 'nowrap'
   },
   daysSelector: {
-    display: 'flex',
-    gap: '8px',
-    flexWrap: 'wrap',
-    marginBottom: '15px'
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(45px, 1fr))',
+    gap: 'clamp(6px, 2vw, 8px)',
+    marginBottom: '15px',
+    width: '100%'
   },
   dayButton: {
-    padding: '8px 12px',
+    padding: 'clamp(8px, 2vw, 10px) clamp(6px, 1.5vw, 8px)',
     border: 'none',
     borderRadius: '5px',
     cursor: 'pointer',
-    fontSize: '14px',
+    fontSize: 'clamp(12px, 3vw, 14px)',
     fontWeight: 'bold',
-    transition: 'all 0.2s'
+    transition: 'all 0.2s',
+    minHeight: '36px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center'
   },
   button: {
-    padding: '10px 20px',
+    padding: 'clamp(10px, 2.5vw, 12px) clamp(16px, 4vw, 20px)',
     backgroundColor: '#007bff',
     color: 'white',
     border: 'none',
     borderRadius: '5px',
     cursor: 'pointer',
-    fontWeight: 'bold'
+    fontWeight: 'bold',
+    fontSize: 'clamp(14px, 3.5vw, 16px)',
+    width: '100%',
+    boxSizing: 'border-box'
   },
   habitsList: {
     display: 'grid',
@@ -1141,13 +1156,17 @@ const styles = {
     textAlign: 'center'
   },
   cancelButton: {
-    padding: '10px 20px',
+    padding: 'clamp(10px, 2.5vw, 12px) clamp(16px, 4vw, 20px)',
     backgroundColor: '#6c757d',
     color: 'white',
     border: 'none',
     borderRadius: '5px',
     cursor: 'pointer',
-    fontWeight: 'bold'
+    fontWeight: 'bold',
+    fontSize: 'clamp(14px, 3.5vw, 16px)',
+    width: '100%',
+    boxSizing: 'border-box',
+    marginTop: '10px'
   },
   card: {
     backgroundColor: 'white',
