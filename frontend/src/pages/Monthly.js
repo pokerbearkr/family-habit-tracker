@@ -131,9 +131,12 @@ function Monthly() {
                 {stats.habitStats.map((habitStat) => (
                   <div key={habitStat.habitId} style={styles.statCard}>
                     <div style={styles.statHeader}>
-                      <h4 style={{ color: habitStat.color }}>
-                        {habitStat.habitName}
-                      </h4>
+                      <div>
+                        <h4 style={{ color: habitStat.color, margin: 0 }}>
+                          {habitStat.habitName}
+                        </h4>
+                        <p style={styles.userName}>{habitStat.displayName}</p>
+                      </div>
                       <span style={styles.percentage}>
                         {habitStat.completionRate.toFixed(1)}%
                       </span>
@@ -339,6 +342,12 @@ const styles = {
     margin: 0,
     fontSize: '14px',
     color: '#666'
+  },
+  userName: {
+    margin: '4px 0 0 0',
+    fontSize: '12px',
+    color: '#888',
+    fontWeight: 'normal'
   },
   calendar: {
     display: 'grid',

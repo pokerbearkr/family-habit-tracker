@@ -259,6 +259,8 @@ public class HabitLogService {
                     habit.getId(),
                     habit.getName(),
                     habit.getColor(),
+                    habit.getUser().getId(),
+                    habit.getUser().getDisplayName(),
                     (int) completedCount,
                     totalPossible,
                     totalPossible > 0 ? (completedCount * 100.0 / totalPossible) : 0

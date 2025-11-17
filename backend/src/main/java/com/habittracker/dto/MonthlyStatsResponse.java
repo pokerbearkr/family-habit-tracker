@@ -38,6 +38,8 @@ public class MonthlyStatsResponse {
         private Long habitId;
         private String habitName;
         private String color;
+        private Long userId;
+        private String displayName;
         private int completedCount;
         private int totalPossible;
         private double completionRate; // percentage
