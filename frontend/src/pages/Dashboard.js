@@ -146,7 +146,15 @@ function Dashboard() {
     typeof Notification !== 'undefined' ? Notification.permission : 'denied'
   );
   const navigate = useNavigate();
-  const today = new Date().toISOString().split('T')[0];
+  // Get today's date in local timezone (not UTC)
+  const getTodayLocal = () => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+  const today = getTodayLocal();
 
   // Define functions first
   const urlBase64ToUint8Array = (base64String) => {
