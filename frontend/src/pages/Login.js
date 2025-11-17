@@ -7,6 +7,7 @@ function Login() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const { login } = useAuth();
 
@@ -57,15 +58,25 @@ function Login() {
 
           <div style={styles.formGroup}>
             <label style={styles.label}>비밀번호</label>
-            <input
-              type="password"
-              name="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              style={styles.input}
-              autoComplete="current-password"
-              required
-            />
+            <div style={styles.passwordContainer}>
+              <input
+                type={showPassword ? "text" : "password"}
+                name="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                style={styles.passwordInput}
+                autoComplete="current-password"
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                style={styles.eyeButton}
+                aria-label="비밀번호 표시 토글"
+              >
+                {showPassword ? '👁️' : '👁️‍🗨️'}
+              </button>
+            </div>
           </div>
 
           <button type="submit" style={styles.button} disabled={loading}>
@@ -139,6 +150,32 @@ const styles = {
     borderRadius: '5px',
     fontSize: '16px',
     boxSizing: 'border-box'
+  },
+  passwordContainer: {
+    position: 'relative',
+    display: 'flex',
+    alignItems: 'center'
+  },
+  passwordInput: {
+    width: '100%',
+    padding: '10px',
+    paddingRight: '45px',
+    border: '1px solid #ddd',
+    borderRadius: '5px',
+    fontSize: '16px',
+    boxSizing: 'border-box'
+  },
+  eyeButton: {
+    position: 'absolute',
+    right: '10px',
+    background: 'none',
+    border: 'none',
+    cursor: 'pointer',
+    fontSize: '20px',
+    padding: '5px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center'
   },
   button: {
     padding: '12px',

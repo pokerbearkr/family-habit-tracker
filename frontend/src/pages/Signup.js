@@ -7,11 +7,14 @@ function Signup() {
     username: '',
     email: '',
     password: '',
+    confirmPassword: '',
     displayName: ''
   });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
   const { signup } = useAuth();
 
@@ -40,6 +43,13 @@ function Signup() {
     if (loading) return;
 
     setError('');
+
+    // Validate password confirmation
+    if (formData.password !== formData.confirmPassword) {
+      setError('비밀번호가 일치하지 않습니다.');
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -124,16 +134,50 @@ function Signup() {
 
           <div style={styles.formGroup}>
             <label style={styles.label}>비밀번호</label>
-            <input
-              type="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              style={styles.input}
-              autoComplete="new-password"
-              required
-              minLength="6"
-            />
+            <div style={styles.passwordContainer}>
+              <input
+                type={showPassword ? "text" : "password"}
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                style={styles.passwordInput}
+                autoComplete="new-password"
+                required
+                minLength="6"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                style={styles.eyeButton}
+                aria-label="비밀번호 표시 토글"
+              >
+                {showPassword ? '👁️' : '👁️‍🗨️'}
+              </button>
+            </div>
+          </div>
+
+          <div style={styles.formGroup}>
+            <label style={styles.label}>비밀번호 확인</label>
+            <div style={styles.passwordContainer}>
+              <input
+                type={showConfirmPassword ? "text" : "password"}
+                name="confirmPassword"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                style={styles.passwordInput}
+                autoComplete="new-password"
+                required
+                minLength="6"
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                style={styles.eyeButton}
+                aria-label="비밀번호 확인 표시 토글"
+              >
+                {showConfirmPassword ? '👁️' : '👁️‍🗨️'}
+              </button>
+            </div>
           </div>
 
           <button type="submit" style={styles.button} disabled={loading}>
@@ -211,6 +255,32 @@ const styles = {
     borderRadius: '5px',
     fontSize: '16px',
     boxSizing: 'border-box'
+  },
+  passwordContainer: {
+    position: 'relative',
+    display: 'flex',
+    alignItems: 'center'
+  },
+  passwordInput: {
+    width: '100%',
+    padding: '10px',
+    paddingRight: '45px',
+    border: '1px solid #ddd',
+    borderRadius: '5px',
+    fontSize: '16px',
+    boxSizing: 'border-box'
+  },
+  eyeButton: {
+    position: 'absolute',
+    right: '10px',
+    background: 'none',
+    border: 'none',
+    cursor: 'pointer',
+    fontSize: '20px',
+    padding: '5px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center'
   },
   button: {
     padding: '12px',
