@@ -34,6 +34,10 @@ public class User {
     @Column(nullable = false)
     private String displayName;
 
+    @Column(nullable = false)
+    @Builder.Default
+    private Boolean enableReminders = true;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "family_id")
     private Family family;

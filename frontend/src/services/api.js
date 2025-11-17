@@ -29,7 +29,10 @@ export const authAPI = {
   login: (username, password) =>
     api.post('/auth/login', { username, password }),
   signup: (username, email, password, displayName) =>
-    api.post('/auth/signup', { username, email, password, displayName })
+    api.post('/auth/signup', { username, email, password, displayName }),
+  getReminderSettings: () => api.get('/auth/settings/reminders'),
+  updateReminderSettings: (enableReminders) =>
+    api.put('/auth/settings/reminders', { enableReminders })
 };
 
 // Family API

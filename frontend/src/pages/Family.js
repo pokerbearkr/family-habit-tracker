@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { familyAPI } from '../services/api';
+import { familyAPI, authAPI } from '../services/api';
 
 function Family() {
   const { user, logout, updateUserFamily } = useAuth();
@@ -11,15 +11,26 @@ function Family() {
   const [newFamilyName, setNewFamilyName] = useState('');
   const [inviteCode, setInviteCode] = useState('');
   const [error, setError] = useState('');
+  const [enableReminders, setEnableReminders] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
+    loadReminderSettings();
     if (user.familyId) {
       loadFamily();
     } else {
       setLoading(false);
     }
   }, [user.familyId]);
+
+  const loadReminderSettings = async () => {
+    try {
+      const response = await authAPI.getReminderSettings();
+      setEnableReminders(response.data.enableReminders);
+    } catch (error) {
+      console.error('Error loading reminder settings:', error);
+    }
+  };
 
   const loadFamily = async () => {
     try {
@@ -104,6 +115,17 @@ function Family() {
     }
   };
 
+  const handleToggleReminders = async () => {
+    try {
+      const newValue = !enableReminders;
+      const response = await authAPI.updateReminderSettings(newValue);
+      setEnableReminders(response.data.enableReminders);
+    } catch (error) {
+      console.error('Error updating reminder settings:', error);
+      alert('알림 설정 변경에 실패했습니다');
+    }
+  };
+
   if (loading) {
     return <div style={styles.container}>로딩 중...</div>;
   }
@@ -143,6 +165,35 @@ function Family() {
                   <span style={styles.username}>@{member.username}</span>
                 </div>
               ))}
+            </div>
+
+            <div style={styles.settingsSection}>
+              <h3 style={styles.settingsTitle}>알림 설정</h3>
+              <div style={styles.settingItem}>
+                <div style={styles.settingInfo}>
+                  <span style={styles.settingLabel}>오후 9시 습관 알림</span>
+                  <span style={styles.settingDescription}>
+                    미완료 습관이 있을 때 알림을 받습니다
+                  </span>
+                </div>
+                <label style={styles.switch}>
+                  <input
+                    type="checkbox"
+                    checked={enableReminders}
+                    onChange={handleToggleReminders}
+                    style={styles.checkbox}
+                  />
+                  <span style={{
+                    ...styles.slider,
+                    backgroundColor: enableReminders ? '#007bff' : '#ccc'
+                  }}>
+                    <span style={{
+                      ...styles.sliderCircle,
+                      transform: enableReminders ? 'translateX(22px)' : 'translateX(0)'
+                    }}></span>
+                  </span>
+                </label>
+              </div>
             </div>
 
             <button onClick={handleLeaveFamily} style={styles.dangerButton}>
@@ -323,6 +374,73 @@ const styles = {
     fontSize: 'clamp(12px, 3vw, 14px)',
     flexShrink: 0,
     whiteSpace: 'nowrap'
+  },
+  settingsSection: {
+    margin: 'clamp(20px, 5vw, 30px) 0',
+    width: '100%',
+    borderTop: '1px solid #eee',
+    paddingTop: 'clamp(15px, 4vw, 20px)'
+  },
+  settingsTitle: {
+    fontSize: 'clamp(16px, 4vw, 18px)',
+    marginBottom: '12px',
+    color: '#333'
+  },
+  settingItem: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 'clamp(10px, 3vw, 15px)',
+    backgroundColor: '#f9f9f9',
+    borderRadius: '8px',
+    gap: '15px'
+  },
+  settingInfo: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '4px',
+    flex: 1
+  },
+  settingLabel: {
+    fontSize: 'clamp(14px, 3.5vw, 16px)',
+    color: '#333',
+    fontWeight: '500'
+  },
+  settingDescription: {
+    fontSize: 'clamp(12px, 3vw, 13px)',
+    color: '#666'
+  },
+  switch: {
+    position: 'relative',
+    display: 'inline-block',
+    width: '50px',
+    height: '28px',
+    flexShrink: 0
+  },
+  checkbox: {
+    opacity: 0,
+    width: 0,
+    height: 0
+  },
+  slider: {
+    position: 'absolute',
+    cursor: 'pointer',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    borderRadius: '28px',
+    transition: '0.3s'
+  },
+  sliderCircle: {
+    position: 'absolute',
+    height: '20px',
+    width: '20px',
+    left: '4px',
+    bottom: '4px',
+    backgroundColor: 'white',
+    borderRadius: '50%',
+    transition: '0.3s'
   },
   section: {
     margin: 'clamp(20px, 5vw, 30px) 0',
