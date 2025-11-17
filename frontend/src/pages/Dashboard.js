@@ -622,8 +622,8 @@ function Dashboard() {
                       onClick={() => toggleDaySelection(day.num)}
                       style={{
                         ...styles.dayButton,
-                        backgroundColor: newHabit.selectedDays.includes(day.num) ? '#007bff' : '#f0f0f0',
-                        color: newHabit.selectedDays.includes(day.num) ? 'white' : '#333'
+                        backgroundColor: newHabit.selectedDays?.includes(day.num) ? '#007bff' : '#f0f0f0',
+                        color: newHabit.selectedDays?.includes(day.num) ? 'white' : '#333'
                       }}
                     >
                       {day.label}
@@ -706,8 +706,8 @@ function Dashboard() {
                       onClick={() => toggleDaySelection(day.num)}
                       style={{
                         ...styles.dayButton,
-                        backgroundColor: newHabit.selectedDays.includes(day.num) ? '#007bff' : '#f0f0f0',
-                        color: newHabit.selectedDays.includes(day.num) ? 'white' : '#333'
+                        backgroundColor: newHabit.selectedDays?.includes(day.num) ? '#007bff' : '#f0f0f0',
+                        color: newHabit.selectedDays?.includes(day.num) ? 'white' : '#333'
                       }}
                     >
                       {day.label}
