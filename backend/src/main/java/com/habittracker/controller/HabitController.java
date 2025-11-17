@@ -1,6 +1,7 @@
 package com.habittracker.controller;
 
 import com.habittracker.dto.CreateHabitRequest;
+import com.habittracker.dto.HabitReorderRequest;
 import com.habittracker.dto.HabitResponse;
 import com.habittracker.entity.Habit;
 import com.habittracker.service.HabitService;
@@ -47,5 +48,19 @@ public class HabitController {
     public ResponseEntity<String> deleteHabit(@PathVariable Long id) {
         habitService.deleteHabit(id);
         return ResponseEntity.ok("Habit deleted successfully");
+    }
+
+    @PutMapping("/{id}/reorder")
+    public ResponseEntity<String> reorderHabit(
+            @PathVariable Long id,
+            @RequestParam String direction) {
+        habitService.reorderHabit(id, direction);
+        return ResponseEntity.ok("Habit reordered successfully");
+    }
+
+    @PutMapping("/reorder-batch")
+    public ResponseEntity<String> reorderHabitsBatch(@RequestBody List<HabitReorderRequest> updates) {
+        habitService.reorderHabitsBatch(updates);
+        return ResponseEntity.ok("Habits reordered successfully");
     }
 }

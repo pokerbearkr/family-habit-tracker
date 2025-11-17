@@ -17,6 +17,7 @@ public class HabitResponse {
     private Long userId;
     private String userName;
     private String userDisplayName;
+    private Integer displayOrder;
 
     public static HabitResponse from(Habit habit) {
         return new HabitResponse(
@@ -27,7 +28,8 @@ public class HabitResponse {
             habit.getFamily() != null ? habit.getFamily().getId() : null,
             habit.getUser() != null ? habit.getUser().getId() : null,
             habit.getUser() != null ? habit.getUser().getUsername() : null,
-            habit.getUser() != null ? habit.getUser().getDisplayName() : null
+            habit.getUser() != null ? habit.getUser().getDisplayName() : null,
+            habit.getDisplayOrder()
         );
     }
 }

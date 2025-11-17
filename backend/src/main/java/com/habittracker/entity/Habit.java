@@ -39,6 +39,9 @@ public class Habit {
     @Column(nullable = false)
     private String color; // Hex color code for UI
 
+    @Column(name = "display_order")
+    private Integer displayOrder; // Order for displaying habits
+
     @OneToMany(mappedBy = "habit", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private Set<HabitLog> logs = new HashSet<>();

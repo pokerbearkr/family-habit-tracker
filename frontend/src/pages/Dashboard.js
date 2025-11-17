@@ -3,6 +3,96 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { habitAPI, habitLogAPI, familyAPI, pushAPI } from '../services/api';
 import websocketService from '../services/websocket';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+
+// SortableHabitItem component for drag and drop
+function SortableHabitItem({ habit, userLog, onToggle, onEdit, onDelete }) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: habit.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+    >
+      <div
+        style={{
+          ...styles.habitCard,
+          borderLeft: `4px solid ${habit.color}`
+        }}
+      >
+        <div style={styles.habitHeader}>
+          <div style={styles.habitTitleContainer}>
+            <div
+              {...listeners}
+              style={styles.dragHandle}
+              title="드래그하여 순서 변경"
+            >
+              ☰
+            </div>
+            <h3 style={styles.habitName}>{habit.name}</h3>
+          </div>
+          <div style={styles.habitActions}>
+            <button
+              onClick={() => onToggle(habit.id)}
+              style={{
+                ...styles.checkButton,
+                backgroundColor: userLog?.completed
+                  ? habit.color
+                  : '#ddd'
+              }}
+            >
+              {userLog?.completed ? '✓' : '○'}
+            </button>
+          </div>
+        </div>
+        {habit.description && <p style={styles.description}>{habit.description}</p>}
+        <div style={styles.habitButtonGroup}>
+          <button
+            onClick={() => onEdit(habit)}
+            style={styles.editButton}
+          >
+            수정
+          </button>
+          <button
+            onClick={() => onDelete(habit.id)}
+            style={styles.deleteButton}
+          >
+            삭제
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function Dashboard() {
   const { user, logout } = useAuth();
@@ -272,6 +362,52 @@ function Dashboard() {
     }
   };
 
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const handleDragEnd = async (event) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      const myHabits = habits
+        .filter(habit => habit.userId === user.id)
+        .sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0));
+
+      const oldIndex = myHabits.findIndex(h => h.id === active.id);
+      const newIndex = myHabits.findIndex(h => h.id === over.id);
+
+      if (oldIndex !== -1 && newIndex !== -1) {
+        const reorderedHabits = arrayMove(myHabits, oldIndex, newIndex);
+
+        // Update displayOrder for all affected habits
+        try {
+          const updates = reorderedHabits.map((habit, index) => ({
+            id: habit.id,
+            displayOrder: index
+          }));
+
+          // Update local state immediately for smooth UX
+          const newHabits = habits.map(habit => {
+            const update = updates.find(u => u.id === habit.id);
+            return update ? { ...habit, displayOrder: update.displayOrder } : habit;
+          });
+          setHabits(newHabits);
+
+          // Send to backend
+          await habitAPI.reorderBatch(updates);
+        } catch (error) {
+          console.error('Error reordering habits:', error);
+          alert('습관 순서 변경에 실패했습니다.');
+          loadData(); // Reload on error
+        }
+      }
+    }
+  };
+
   const handleCancelEdit = () => {
     setEditingHabit(null);
     setNewHabit({ name: '', description: '', color: '#007bff' });
@@ -432,58 +568,44 @@ function Dashboard() {
             </form>
           )}
 
-          <div style={styles.habitsList}>
-            {habits.filter(habit => habit.userId === user.id).map((habit) => {
-              const userLog = logs.find(
-                (log) => log.habit.id === habit.id && log.user.id === user.id
-              );
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext
+              items={habits
+                .filter(habit => habit.userId === user.id)
+                .sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0))
+                .map(h => h.id)}
+              strategy={verticalListSortingStrategy}
+            >
+              <div style={styles.habitsList}>
+                {habits
+                  .filter(habit => habit.userId === user.id)
+                  .sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0))
+                  .map((habit) => {
+                    const userLog = logs.find(
+                      (log) => log.habit.id === habit.id && log.user.id === user.id
+                    );
 
-              return (
-                <div
-                  key={habit.id}
-                  style={{
-                    ...styles.habitCard,
-                    borderLeft: `4px solid ${habit.color}`
-                  }}
-                >
-                  <div style={styles.habitHeader}>
-                    <h3 style={styles.habitName}>{habit.name}</h3>
-                    <div style={styles.habitActions}>
-                      <button
-                        onClick={() => handleToggleHabit(habit.id)}
-                        style={{
-                          ...styles.checkButton,
-                          backgroundColor: userLog?.completed
-                            ? habit.color
-                            : '#ddd'
-                        }}
-                      >
-                        {userLog?.completed ? '✓' : '○'}
-                      </button>
-                    </div>
-                  </div>
-                  {habit.description && <p style={styles.description}>{habit.description}</p>}
-                  <div style={styles.habitButtonGroup}>
-                    <button
-                      onClick={() => handleEditHabit(habit)}
-                      style={styles.editButton}
-                    >
-                      수정
-                    </button>
-                    <button
-                      onClick={() => handleDeleteHabit(habit.id)}
-                      style={styles.deleteButton}
-                    >
-                      삭제
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
-            {habits.filter(habit => habit.userId === user.id).length === 0 && (
-              <p style={styles.emptyMessage}>아직 습관이 없습니다. 새로운 습관을 추가해보세요!</p>
-            )}
-          </div>
+                    return (
+                      <SortableHabitItem
+                        key={habit.id}
+                        habit={habit}
+                        userLog={userLog}
+                        onToggle={handleToggleHabit}
+                        onEdit={handleEditHabit}
+                        onDelete={handleDeleteHabit}
+                      />
+                    );
+                  })}
+                {habits.filter(habit => habit.userId === user.id).length === 0 && (
+                  <p style={styles.emptyMessage}>아직 습관이 없습니다. 새로운 습관을 추가해보세요!</p>
+                )}
+              </div>
+            </SortableContext>
+          </DndContext>
         </div>
 
         {/* Family Members' Habits Section */}
@@ -675,6 +797,21 @@ const styles = {
     flex: 1,
     minWidth: 0,
     overflow: 'hidden'
+  },
+  habitTitleContainer: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    flex: 1,
+    minWidth: 0
+  },
+  dragHandle: {
+    cursor: 'grab',
+    padding: '4px 8px',
+    color: '#999',
+    fontSize: '20px',
+    userSelect: 'none',
+    touchAction: 'none'
   },
   habitName: {
     margin: '0 0 4px 0',
