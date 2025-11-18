@@ -310,8 +310,8 @@ function Dashboard() {
           familyAPI.getMy()
         ]);
 
-        // Check for new habit completions and show notifications
-        if (logs.length > 0) {
+        // Check for new habit completions and show notifications (only for today)
+        if (logs.length > 0 && selectedDate === getTodayLocal()) {
           const newLogs = logsRes.data.filter(newLog =>
             newLog.completed &&
             newLog.user.id !== user.id &&
