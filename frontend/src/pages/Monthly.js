@@ -69,9 +69,9 @@ function Monthly() {
 
   const handleDayClick = (dateKey, dayStat) => {
     const [year, month, day] = dateKey.split('-').map(Number);
-    const date = new Date(year, month - 1, day);
+    const dateObj = new Date(year, month - 1, day);
     setSelectedDayData({
-      date: date,
+      dateObj: dateObj,
       dateKey: dateKey,
       ...dayStat
     });
@@ -444,7 +444,7 @@ function Monthly() {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Calendar className="h-5 w-5 text-blue-600" />
-              {selectedDayData && selectedDayData.date.toLocaleDateString('ko-KR', {
+              {selectedDayData && selectedDayData.dateObj && selectedDayData.dateObj.toLocaleDateString('ko-KR', {
                 year: 'numeric',
                 month: 'long',
                 day: 'numeric',
