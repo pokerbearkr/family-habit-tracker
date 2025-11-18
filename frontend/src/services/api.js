@@ -32,7 +32,8 @@ export const authAPI = {
     api.post('/auth/signup', { username, email, password, displayName }),
   getReminderSettings: () => api.get('/auth/settings/reminders'),
   updateReminderSettings: (enableReminders) =>
-    api.put('/auth/settings/reminders', { enableReminders })
+    api.put('/auth/settings/reminders', { enableReminders }),
+  deleteAccount: () => api.delete('/auth/account')
 };
 
 // Family API
@@ -74,4 +75,10 @@ export const pushAPI = {
   unsubscribe: (endpoint) => api.post('/push/unsubscribe', { endpoint })
 };
 
-export default api;
+// Default export with all API functions
+const apiClient = {
+  ...api,
+  deleteAccount: () => authAPI.deleteAccount()
+};
+
+export default apiClient;

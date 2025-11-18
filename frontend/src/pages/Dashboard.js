@@ -40,7 +40,8 @@ import {
   Circle,
   X,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Settings
 } from 'lucide-react';
 
 // SortableHabitItem component for drag and drop
@@ -623,6 +624,14 @@ function Dashboard() {
               title="가족 관리"
             >
               <Users className="w-5 h-5" />
+            </Button>
+            <Button
+              onClick={() => navigate('/settings')}
+              variant="outline"
+              size="icon"
+              title="설정"
+            >
+              <Settings className="w-5 h-5" />
             </Button>
             <Button
               onClick={() => {

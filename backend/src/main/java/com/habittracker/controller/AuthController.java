@@ -60,4 +60,10 @@ public class AuthController {
 
         return ResponseEntity.ok(Map.of("enableReminders", user.getEnableReminders()));
     }
+
+    @DeleteMapping("/account")
+    public ResponseEntity<String> deleteAccount() {
+        authService.deleteAccount();
+        return ResponseEntity.ok("Account deleted successfully");
+    }
 }

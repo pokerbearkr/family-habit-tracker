@@ -7,6 +7,7 @@ import Dashboard from './pages/Dashboard';
 import Family from './pages/Family';
 import Monthly from './pages/Monthly';
 import PrivacyPolicy from './pages/PrivacyPolicy';
+import Settings from './pages/Settings';
 
 function PrivateRoute({ children }) {
   const { user, loading } = useAuth();
@@ -70,6 +71,14 @@ function App() {
             element={
               <PrivateRoute>
                 <Monthly />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/settings"
+            element={
+              <PrivateRoute>
+                <Settings />
               </PrivateRoute>
             }
           />

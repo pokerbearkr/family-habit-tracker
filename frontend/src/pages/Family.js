@@ -17,7 +17,8 @@ import {
   UserMinus,
   Bell,
   BellOff,
-  Check
+  Check,
+  Settings
 } from 'lucide-react';
 
 function Family() {
@@ -188,6 +189,14 @@ function Family() {
                 className="h-10 w-10"
               >
                 <TrendingUp className="h-5 w-5" />
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => navigate('/settings')}
+                className="h-10 w-10"
+              >
+                <Settings className="h-5 w-5" />
               </Button>
               <Button
                 variant="outline"

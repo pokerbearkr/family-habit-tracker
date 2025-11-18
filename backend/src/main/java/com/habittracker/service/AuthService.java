@@ -80,4 +80,17 @@ public class AuthService {
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
     }
+
+    @Transactional
+    public void deleteAccount() {
+        User currentUser = getCurrentUser();
+
+        // User entity will cascade delete:
+        // - Habits (owned by user)
+        // - HabitLogs (created by user)
+        // - PushSubscriptions (for user)
+        // Family membership will be removed (ManyToOne)
+
+        userRepository.delete(currentUser);
+    }
 }

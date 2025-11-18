@@ -14,7 +14,8 @@ import {
   Calendar,
   BarChart3,
   TrendingUp,
-  Award
+  Award,
+  Settings
 } from 'lucide-react';
 
 function Monthly() {
@@ -125,6 +126,14 @@ function Monthly() {
                 className="h-9 w-9"
               >
                 <Users className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => navigate('/settings')}
+                className="h-9 w-9"
+              >
+                <Settings className="h-4 w-4" />
               </Button>
               <Button
                 variant="outline"
