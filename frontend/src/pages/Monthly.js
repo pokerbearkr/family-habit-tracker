@@ -334,7 +334,9 @@ function Monthly() {
                   {Object.entries(stats.dailyStats)
                     .sort(([a], [b]) => a.localeCompare(b))
                     .map(([dateKey, dayStat]) => {
-                      const date = new Date(dateKey);
+                      // Parse date string directly to avoid timezone issues
+                      const [year, month, day] = dateKey.split('-').map(Number);
+                      const date = new Date(year, month - 1, day); // month is 0-indexed
                       const dayOfWeek = date.getDay();
                       const completionRate =
                         dayStat.totalHabits > 0
