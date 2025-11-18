@@ -141,10 +141,16 @@ function Dashboard() {
   const [family, setFamily] = useState(null);
   const [showAddHabit, setShowAddHabit] = useState(false);
   const [editingHabit, setEditingHabit] = useState(null);
+
+  // Get last used color from localStorage, default to blue if not found
+  const getLastUsedColor = () => {
+    return localStorage.getItem('lastHabitColor') || '#007bff';
+  };
+
   const [newHabit, setNewHabit] = useState({
     name: '',
     description: '',
-    color: '#007bff',
+    color: getLastUsedColor(),
     habitType: 'DAILY',
     selectedDays: []
   });
@@ -377,7 +383,11 @@ function Dashboard() {
         newHabit.habitType,
         selectedDaysStr
       );
-      setNewHabit({ name: '', description: '', color: '#007bff', habitType: 'DAILY', selectedDays: [] });
+
+      // Save the last used color to localStorage
+      localStorage.setItem('lastHabitColor', newHabit.color);
+
+      setNewHabit({ name: '', description: '', color: newHabit.color, habitType: 'DAILY', selectedDays: [] });
       setShowAddHabit(false);
       loadData();
     } catch (error) {
@@ -412,7 +422,11 @@ function Dashboard() {
         newHabit.habitType,
         selectedDaysStr
       );
-      setNewHabit({ name: '', description: '', color: '#007bff', habitType: 'DAILY', selectedDays: [] });
+
+      // Save the last used color to localStorage
+      localStorage.setItem('lastHabitColor', newHabit.color);
+
+      setNewHabit({ name: '', description: '', color: getLastUsedColor(), habitType: 'DAILY', selectedDays: [] });
       setEditingHabit(null);
       loadData();
     } catch (error) {
@@ -485,7 +499,7 @@ function Dashboard() {
 
   const handleCancelEdit = () => {
     setEditingHabit(null);
-    setNewHabit({ name: '', description: '', color: '#007bff', habitType: 'DAILY', selectedDays: [] });
+    setNewHabit({ name: '', description: '', color: getLastUsedColor(), habitType: 'DAILY', selectedDays: [] });
   };
 
   const toggleDaySelection = (dayNumber) => {
@@ -743,7 +757,7 @@ function Dashboard() {
                 onClick={() => {
                   setShowAddHabit(!showAddHabit);
                   setEditingHabit(null);
-                  setNewHabit({ name: '', description: '', color: '#007bff', habitType: 'DAILY', selectedDays: [] });
+                  setNewHabit({ name: '', description: '', color: getLastUsedColor(), habitType: 'DAILY', selectedDays: [] });
                 }}
                 size="sm"
               >
