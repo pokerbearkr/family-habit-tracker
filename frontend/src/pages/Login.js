@@ -44,7 +44,7 @@ function Login() {
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1 text-center">
           <CardTitle className="text-3xl font-bold tracking-tight">
-            가족 습관 트래커
+            그룹 습관 트래커
           </CardTitle>
           <CardDescription className="text-base">
             로그인하여 시작하세요

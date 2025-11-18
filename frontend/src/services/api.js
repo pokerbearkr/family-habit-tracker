@@ -43,7 +43,8 @@ export const familyAPI = {
   create: (name) => api.post('/family/create', { name }),
   join: (inviteCode) => api.post(`/family/join/${inviteCode}`),
   getMy: () => api.get('/family/my'),
-  leave: () => api.post('/family/leave')
+  leave: () => api.post('/family/leave'),
+  updateName: (name) => api.put('/family/name', { name })
 };
 
 // Habit API

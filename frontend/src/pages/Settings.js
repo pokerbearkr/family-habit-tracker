@@ -243,7 +243,7 @@ export default function Settings() {
                   <li>모든 습관 기록</li>
                   <li>습관 완료 데이터</li>
                   <li>계정 정보</li>
-                  <li>가족 구성원 정보 (본인)</li>
+                  <li>그룹 구성원 정보 (본인)</li>
                 </ul>
                 {error && (
                   <div className="p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-md">

@@ -41,7 +41,7 @@ export default function PrivacyPolicy() {
               <ul className="list-disc list-inside space-y-1 text-gray-700">
                 <li>서비스 제공 및 유지관리</li>
                 <li>사용자 인증 및 계정 관리</li>
-                <li>가족 구성원 간 습관 공유 기능 제공</li>
+                <li>그룹 구성원 간 습관 공유 기능 제공</li>
                 <li>습관 완료 시 푸시 알림 전송</li>
                 <li>월간 통계 및 분석 제공</li>
               </ul>

@@ -597,13 +597,13 @@ function Dashboard() {
           <CardHeader>
             <CardTitle className="text-2xl">환영합니다, {user.displayName}님!</CardTitle>
             <CardDescription>
-              습관 추적을 시작하려면 가족을 만들거나 가입해야 합니다.
+              습관 추적을 시작하려면 그룹을 만들거나 가입해야 합니다.
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Button onClick={() => navigate('/family')} className="w-full">
               <Users className="w-4 h-4 mr-2" />
-              가족 관리
+              그룹 관리
             </Button>
           </CardContent>
         </Card>
@@ -635,7 +635,7 @@ function Dashboard() {
               onClick={() => navigate('/family')}
               variant="outline"
               size="icon"
-              title="가족 관리"
+              title="그룹 관리"
             >
               <Users className="w-5 h-5" />
             </Button>
@@ -739,7 +739,7 @@ function Dashboard() {
             <CardContent className="p-4 flex flex-col sm:flex-row items-center justify-between gap-3">
               <div className="flex items-center gap-2 text-sm text-gray-700">
                 <Bell className="w-5 h-5 text-blue-600" />
-                <p>가족 구성원이 습관을 체크하면 알림을 받으시겠어요?</p>
+                <p>그룹 구성원이 습관을 체크하면 알림을 받으시겠어요?</p>
               </div>
               <Button onClick={requestNotificationPermission} size="sm">
                 알림 켜기
@@ -1037,7 +1037,7 @@ function Dashboard() {
         {/* Family Members' Habits Section */}
         <Card>
           <CardHeader>
-            <CardTitle>가족 구성원의 습관</CardTitle>
+            <CardTitle>그룹 구성원의 습관</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
@@ -1097,7 +1097,7 @@ function Dashboard() {
                 <Card className="border-dashed">
                   <CardContent className="p-8 text-center">
                     <Users className="w-12 h-12 mx-auto mb-2 text-gray-400" />
-                    <p className="text-gray-500 italic">오늘 다른 가족 구성원의 습관이 없습니다.</p>
+                    <p className="text-gray-500 italic">오늘 다른 그룹 구성원의 습관이 없습니다.</p>
                   </CardContent>
                 </Card>
               )}

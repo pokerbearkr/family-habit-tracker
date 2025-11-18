@@ -1,6 +1,7 @@
 package com.habittracker.controller;
 
 import com.habittracker.dto.CreateFamilyRequest;
+import com.habittracker.dto.UpdateFamilyNameRequest;
 import com.habittracker.dto.FamilyResponse;
 import com.habittracker.entity.Family;
 import com.habittracker.service.FamilyService;
@@ -38,5 +39,11 @@ public class FamilyController {
     public ResponseEntity<String> leaveFamily() {
         familyService.leaveFamily();
         return ResponseEntity.ok("Successfully left the family");
+    }
+
+    @PutMapping("/name")
+    public ResponseEntity<FamilyResponse> updateFamilyName(@Valid @RequestBody UpdateFamilyNameRequest request) {
+        Family family = familyService.updateFamilyName(request.getName());
+        return ResponseEntity.ok(FamilyResponse.from(family));
     }
 }

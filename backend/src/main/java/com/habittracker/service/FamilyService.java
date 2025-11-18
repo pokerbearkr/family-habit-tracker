@@ -84,6 +84,19 @@ public class FamilyService {
         userRepository.save(currentUser);
     }
 
+    @Transactional
+    public Family updateFamilyName(String newName) {
+        User currentUser = authService.getCurrentUser();
+
+        if (currentUser.getFamily() == null) {
+            throw new RuntimeException("User does not belong to any family");
+        }
+
+        Family family = currentUser.getFamily();
+        family.setName(newName);
+        return familyRepository.save(family);
+    }
+
     private String generateUniqueInviteCode() {
         String inviteCode;
         do {

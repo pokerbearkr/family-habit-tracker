@@ -85,15 +85,15 @@ function Monthly() {
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
         <Card className="w-full max-w-md">
           <CardHeader>
-            <CardTitle className="text-2xl text-center">가족에 가입해주세요</CardTitle>
+            <CardTitle className="text-2xl text-center">그룹에 가입해주세요</CardTitle>
             <CardDescription className="text-center">
-              월간 통계를 보려면 가족에 속해 있어야 합니다.
+              월간 통계를 보려면 그룹에 속해 있어야 합니다.
             </CardDescription>
           </CardHeader>
           <CardContent className="flex justify-center">
             <Button onClick={() => navigate('/family')} className="w-full">
               <Users className="mr-2 h-4 w-4" />
-              가족 관리
+              그룹 관리
             </Button>
           </CardContent>
         </Card>
@@ -207,9 +207,9 @@ function Monthly() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <TrendingUp className="h-5 w-5 text-blue-600" />
-                  가족 구성원별 통계
+                  그룹 구성원별 통계
                 </CardTitle>
-                <CardDescription>이번 달 가족 구성원들의 습관 달성률</CardDescription>
+                <CardDescription>이번 달 그룹 구성원들의 습관 달성률</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">

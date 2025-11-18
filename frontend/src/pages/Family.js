@@ -18,7 +18,9 @@ import {
   Bell,
   BellOff,
   Check,
-  Settings
+  Settings,
+  Edit,
+  X
 } from 'lucide-react';
 
 function Family() {
@@ -31,6 +33,10 @@ function Family() {
   const [error, setError] = useState('');
   const [enableReminders, setEnableReminders] = useState(true);
   const [copied, setCopied] = useState(false);
+  const [editingName, setEditingName] = useState(false);
+  const [editedFamilyName, setEditedFamilyName] = useState('');
+  const [savingName, setSavingName] = useState(false);
+  const [nameError, setNameError] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -82,7 +88,7 @@ function Family() {
       const errorMsg = error.response?.data?.message ||
                       error.response?.data?.error ||
                       (typeof error.response?.data === 'string' ? error.response.data : null) ||
-                      '가족 생성에 실패했습니다';
+                      '그룹 생성에 실패했습니다';
       setError(errorMsg);
       setSubmitting(false);
     }
@@ -108,7 +114,7 @@ function Family() {
       const errorMsg = error.response?.data?.message ||
                       error.response?.data?.error ||
                       (typeof error.response?.data === 'string' ? error.response.data : null) ||
-                      '가족 가입에 실패했습니다';
+                      '그룹 가입에 실패했습니다';
       setError(errorMsg);
       setSubmitting(false);
     }
@@ -117,7 +123,7 @@ function Family() {
   const handleLeaveFamily = async () => {
     if (
       window.confirm(
-        '정말 이 가족을 떠나시겠습니까? 모든 공유 습관에 대한 접근 권한을 잃게 됩니다.'
+        '정말 이 그룹을 떠나시겠습니까? 모든 공유 습관에 대한 접근 권한을 잃게 됩니다.'
       )
     ) {
       try {
@@ -128,7 +134,7 @@ function Family() {
         const errorMsg = error.response?.data?.message ||
                         error.response?.data?.error ||
                         (typeof error.response?.data === 'string' ? error.response.data : null) ||
-                        '가족 떠나기에 실패했습니다';
+                        '그룹 떠나기에 실패했습니다';
         setError(errorMsg);
       }
     }
@@ -155,6 +161,41 @@ function Family() {
     }
   };
 
+  const handleStartEditName = () => {
+    setEditedFamilyName(family?.name || '');
+    setEditingName(true);
+    setNameError('');
+  };
+
+  const handleCancelEditName = () => {
+    setEditingName(false);
+    setEditedFamilyName('');
+    setNameError('');
+  };
+
+  const handleSaveFamilyName = async () => {
+    if (!editedFamilyName.trim()) {
+      setNameError('그룹 이름을 입력해주세요.');
+      return;
+    }
+
+    setSavingName(true);
+    setNameError('');
+
+    try {
+      const response = await familyAPI.updateName(editedFamilyName.trim());
+      setFamily(response.data);
+      updateUserFamily(response.data.id, response.data.name);
+      setEditingName(false);
+      setEditedFamilyName('');
+    } catch (err) {
+      console.error('Error updating family name:', err);
+      setNameError('그룹 이름 변경 중 오류가 발생했습니다. 다시 시도해주세요.');
+    } finally {
+      setSavingName(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
@@ -171,7 +212,7 @@ function Family() {
           <div className="flex justify-between items-center py-4">
             <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
               <Users className="h-6 w-6 text-indigo-600" />
-              가족 관리
+              그룹 관리
             </h1>
             <div className="flex gap-2">
               <Button
@@ -222,8 +263,61 @@ function Family() {
             {/* Family Info Card */}
             <Card className="shadow-lg">
               <CardHeader>
-                <CardTitle className="text-3xl">{family.name}</CardTitle>
-                <CardDescription>가족 정보 및 설정</CardDescription>
+                <div className="flex items-center justify-between">
+                  {editingName ? (
+                    <div className="flex-1 space-y-2">
+                      <Input
+                        value={editedFamilyName}
+                        onChange={(e) => setEditedFamilyName(e.target.value)}
+                        placeholder="그룹 이름 입력"
+                        disabled={savingName}
+                        className="text-2xl font-bold h-12"
+                        onKeyPress={(e) => {
+                          if (e.key === 'Enter') {
+                            handleSaveFamilyName();
+                          }
+                        }}
+                      />
+                      {nameError && (
+                        <p className="text-sm text-red-600">{nameError}</p>
+                      )}
+                      <div className="flex gap-2">
+                        <Button
+                          size="sm"
+                          onClick={handleSaveFamilyName}
+                          disabled={savingName}
+                        >
+                          <Check className="h-4 w-4 mr-1" />
+                          {savingName ? '저장 중...' : '저장'}
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={handleCancelEditName}
+                          disabled={savingName}
+                        >
+                          <X className="h-4 w-4 mr-1" />
+                          취소
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <CardTitle className="text-3xl">{family.name}</CardTitle>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={handleStartEditName}
+                        className="h-8 px-2"
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                    </>
+                  )}
+                </div>
+                {!editingName && (
+                  <CardDescription>그룹 정보 및 설정</CardDescription>
+                )}
               </CardHeader>
               <CardContent className="space-y-6">
                 {/* Invite Code Section */}
@@ -251,7 +345,7 @@ function Family() {
                     </Button>
                   </div>
                   <p className="text-sm text-gray-600 mt-3">
-                    가족 구성원과 이 코드를 공유하세요
+                    그룹 구성원과 이 코드를 공유하세요
                   </p>
                 </div>
 
@@ -260,7 +354,7 @@ function Family() {
                   <div className="flex items-center gap-2 mb-4">
                     <Users className="h-5 w-5 text-gray-600" />
                     <h3 className="text-lg font-semibold text-gray-900">
-                      가족 구성원
+                      그룹 구성원
                     </h3>
                     <Badge variant="secondary" className="ml-auto">
                       {family.members?.length || 0}명
@@ -348,7 +442,7 @@ function Family() {
                     onClick={handleLeaveFamily}
                   >
                     <UserMinus className="mr-2 h-4 w-4" />
-                    가족 떠나기
+                    그룹 떠나기
                   </Button>
                 </div>
               </CardContent>
@@ -359,9 +453,9 @@ function Family() {
             {/* Create or Join Family */}
             <Card className="shadow-lg">
               <CardHeader>
-                <CardTitle className="text-2xl">가족 만들기 또는 가입하기</CardTitle>
+                <CardTitle className="text-2xl">그룹 만들기 또는 가입하기</CardTitle>
                 <CardDescription>
-                  가족을 생성하거나 초대 코드로 기존 가족에 가입하세요
+                  그룹을 생성하거나 초대 코드로 기존 그룹에 가입하세요
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
@@ -376,16 +470,16 @@ function Family() {
                   <div className="flex items-center gap-2">
                     <UserPlus className="h-5 w-5 text-indigo-600" />
                     <h3 className="text-lg font-semibold text-gray-900">
-                      새 가족 만들기
+                      새 그룹 만들기
                     </h3>
                   </div>
                   <form onSubmit={handleCreateFamily} className="space-y-4">
                     <div className="space-y-2">
-                      <Label htmlFor="familyName">가족 이름</Label>
+                      <Label htmlFor="familyName">그룹 이름</Label>
                       <Input
                         id="familyName"
                         type="text"
-                        placeholder="예: 우리 가족"
+                        placeholder="예: 우리 그룹"
                         value={newFamilyName}
                         onChange={(e) => setNewFamilyName(e.target.value)}
                         required
@@ -420,7 +514,7 @@ function Family() {
                   <div className="flex items-center gap-2">
                     <Users className="h-5 w-5 text-indigo-600" />
                     <h3 className="text-lg font-semibold text-gray-900">
-                      기존 가족 가입하기
+                      기존 그룹 가입하기
                     </h3>
                   </div>
                   <form onSubmit={handleJoinFamily} className="space-y-4">
