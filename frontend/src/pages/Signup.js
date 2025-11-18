@@ -223,6 +223,14 @@ function Signup() {
               {loading ? '가입 중...' : '회원가입'}
             </Button>
 
+            <p className="text-center text-xs text-muted-foreground mt-4">
+              회원가입 시{' '}
+              <Link to="/privacy-policy" className="text-primary hover:underline font-medium">
+                개인정보 처리방침
+              </Link>
+              에 동의하는 것으로 간주됩니다.
+            </p>
+
             <p className="text-center text-sm text-muted-foreground">
               이미 계정이 있으신가요?{' '}
               <Link to="/login" className="text-primary hover:underline font-medium">

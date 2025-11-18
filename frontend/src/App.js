@@ -6,6 +6,7 @@ import Signup from './pages/Signup';
 import Dashboard from './pages/Dashboard';
 import Family from './pages/Family';
 import Monthly from './pages/Monthly';
+import PrivacyPolicy from './pages/PrivacyPolicy';
 
 function PrivateRoute({ children }) {
   const { user, loading } = useAuth();
@@ -72,6 +73,7 @@ function App() {
               </PrivateRoute>
             }
           />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/" element={<Navigate to="/dashboard" />} />
         </Routes>
       </AuthProvider>
