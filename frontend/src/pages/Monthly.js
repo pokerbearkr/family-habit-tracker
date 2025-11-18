@@ -5,7 +5,7 @@ import { habitLogAPI } from '../services/api';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../components/ui/dialog';
 import {
   Home,
   Users,
@@ -18,7 +18,8 @@ import {
   Award,
   Settings,
   Check,
-  X
+  X,
+  AlertTriangle
 } from 'lucide-react';
 
 function Monthly() {
@@ -32,6 +33,7 @@ function Monthly() {
   });
   const [selectedDayData, setSelectedDayData] = useState(null);
   const [showDayDialog, setShowDayDialog] = useState(false);
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false);
 
   useEffect(() => {
     loadMonthlyStats();
@@ -154,11 +156,7 @@ function Monthly() {
               <Button
                 variant="outline"
                 size="icon"
-                onClick={() => {
-                  if (window.confirm('로그아웃하시겠습니까?')) {
-                    logout();
-                  }
-                }}
+                onClick={() => setShowLogoutDialog(true)}
                 className="h-9 w-9"
               >
                 <LogOut className="h-4 w-4" />
@@ -531,6 +529,37 @@ function Monthly() {
               </div>
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Logout Confirmation Dialog */}
+      <Dialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-amber-600" />
+              로그아웃
+            </DialogTitle>
+            <DialogDescription>
+              정말 로그아웃하시겠습니까?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button
+              variant="outline"
+              onClick={() => setShowLogoutDialog(false)}
+            >
+              취소
+            </Button>
+            <Button
+              onClick={() => {
+                logout();
+                navigate('/login');
+              }}
+            >
+              로그아웃
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

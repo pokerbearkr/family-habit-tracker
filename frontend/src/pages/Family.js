@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { familyAPI, authAPI } from '../services/api';
+import toast, { Toaster } from 'react-hot-toast';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Input } from '../components/ui/input';
@@ -40,6 +41,7 @@ function Family() {
   const [savingName, setSavingName] = useState(false);
   const [nameError, setNameError] = useState('');
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
+  const [showLeaveDialog, setShowLeaveDialog] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -123,23 +125,23 @@ function Family() {
     }
   };
 
-  const handleLeaveFamily = async () => {
-    if (
-      window.confirm(
-        '정말 이 그룹을 떠나시겠습니까? 모든 공유 습관에 대한 접근 권한을 잃게 됩니다.'
-      )
-    ) {
-      try {
-        await familyAPI.leave();
-        window.location.reload();
-      } catch (error) {
-        console.error('Leave family error:', error);
-        const errorMsg = error.response?.data?.message ||
-                        error.response?.data?.error ||
-                        (typeof error.response?.data === 'string' ? error.response.data : null) ||
-                        '그룹 떠나기에 실패했습니다';
-        setError(errorMsg);
-      }
+  const handleLeaveFamily = () => {
+    setShowLeaveDialog(true);
+  };
+
+  const confirmLeaveFamily = async () => {
+    try {
+      await familyAPI.leave();
+      setShowLeaveDialog(false);
+      window.location.reload();
+    } catch (error) {
+      console.error('Leave family error:', error);
+      const errorMsg = error.response?.data?.message ||
+                      error.response?.data?.error ||
+                      (typeof error.response?.data === 'string' ? error.response.data : null) ||
+                      '그룹 떠나기에 실패했습니다';
+      setError(errorMsg);
+      setShowLeaveDialog(false);
     }
   };
 
@@ -150,7 +152,7 @@ function Family() {
       setEnableReminders(response.data.enableReminders);
     } catch (error) {
       console.error('Error updating reminder settings:', error);
-      alert('알림 설정 변경에 실패했습니다');
+      toast.error('알림 설정 변경에 실패했습니다');
     }
   };
 
@@ -209,6 +211,7 @@ function Family() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+      <Toaster position="top-right" />
       {/* Header */}
       <header className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -573,6 +576,46 @@ function Family() {
               }}
             >
               로그아웃
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Leave Family Confirmation Dialog */}
+      <Dialog open={showLeaveDialog} onOpenChange={setShowLeaveDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-red-600">
+              <AlertTriangle className="h-5 w-5" />
+              그룹 떠나기
+            </DialogTitle>
+            <DialogDescription className="pt-3">
+              <p className="font-medium mb-2">정말 이 그룹을 떠나시겠습니까?</p>
+              <p className="text-sm text-gray-600">
+                모든 공유 습관에 대한 접근 권한을 잃게 됩니다. 이 작업은 되돌릴 수 없습니다.
+              </p>
+              {error && (
+                <div className="mt-3 p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-md">
+                  {error}
+                </div>
+              )}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowLeaveDialog(false);
+                setError('');
+              }}
+            >
+              취소
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={confirmLeaveFamily}
+            >
+              그룹 떠나기
             </Button>
           </DialogFooter>
         </DialogContent>

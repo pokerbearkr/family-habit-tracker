@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { habitAPI, habitLogAPI, familyAPI, pushAPI } from '../services/api';
 import websocketService from '../services/websocket';
+import toast, { Toaster } from 'react-hot-toast';
 import {
   DndContext,
   closestCenter,
@@ -435,7 +436,7 @@ function Dashboard() {
       loadData();
     } catch (error) {
       console.error('Error updating habit:', error);
-      alert('습관 수정에 실패했습니다: ' + (error.response?.data?.message || error.message));
+      toast.error('습관 수정에 실패했습니다: ' + (error.response?.data?.message || error.message));
     }
   };
 
@@ -454,7 +455,7 @@ function Dashboard() {
       loadData();
     } catch (error) {
       console.error('Error deleting habit:', error);
-      alert('습관 삭제에 실패했습니다: ' + (error.response?.data?.message || error.message));
+      toast.error('습관 삭제에 실패했습니다: ' + (error.response?.data?.message || error.message));
     }
   };
 
@@ -501,7 +502,7 @@ function Dashboard() {
           await habitAPI.reorderBatch(updates);
         } catch (error) {
           console.error('Error reordering habits:', error);
-          alert('습관 순서 변경에 실패했습니다.');
+          toast.error('습관 순서 변경에 실패했습니다.');
           loadData(); // Reload on error
         }
       }
@@ -624,6 +625,7 @@ function Dashboard() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+      <Toaster position="top-right" />
       {/* Header */}
       <header className="bg-white shadow-sm border-b sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center gap-4">
