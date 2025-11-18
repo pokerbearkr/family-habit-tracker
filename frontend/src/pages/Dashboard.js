@@ -677,18 +677,18 @@ function Dashboard() {
               >
                 <ChevronLeft className="h-5 w-5" />
               </Button>
-              <div className="flex items-center justify-center gap-2 flex-1 relative">
+              <label className="flex items-center justify-center gap-2 flex-1 cursor-pointer">
                 <Calendar className="h-5 w-5 text-blue-600" />
                 <input
                   type="date"
                   value={selectedDate}
                   onChange={(e) => setSelectedDate(e.target.value)}
-                  className="absolute inset-0 opacity-0 cursor-pointer"
+                  className="sr-only"
                 />
-                <h2 className="text-lg sm:text-xl font-semibold text-center cursor-pointer">
+                <h2 className="text-lg sm:text-xl font-semibold text-center">
                   {formatSelectedDate()}
                 </h2>
-              </div>
+              </label>
               <Button
                 variant="outline"
                 size="icon"
