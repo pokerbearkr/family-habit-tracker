@@ -1159,10 +1159,10 @@ function Dashboard() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <LogOut className="h-5 w-5" />
+              <AlertTriangle className="h-5 w-5 text-amber-600" />
               로그아웃
             </DialogTitle>
-            <DialogDescription className="pt-3">
+            <DialogDescription>
               정말 로그아웃하시겠습니까?
             </DialogDescription>
           </DialogHeader>
