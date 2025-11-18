@@ -3,16 +3,57 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
+import { Input } from '../components/ui/input';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../components/ui/dialog';
-import { ArrowLeft, Trash2, AlertTriangle, User, Mail, Shield } from 'lucide-react';
+import { ArrowLeft, Trash2, AlertTriangle, User, Mail, Shield, Edit, Check, X } from 'lucide-react';
 import api from '../services/api';
+import { authAPI } from '../services/api';
 
 export default function Settings() {
   const navigate = useNavigate();
-  const { user, logout } = useAuth();
+  const { user, logout, updateUser } = useAuth();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState('');
+  const [editingName, setEditingName] = useState(false);
+  const [newDisplayName, setNewDisplayName] = useState('');
+  const [savingName, setSavingName] = useState(false);
+  const [nameError, setNameError] = useState('');
+
+  const handleStartEditName = () => {
+    setNewDisplayName(user?.displayName || '');
+    setEditingName(true);
+    setNameError('');
+  };
+
+  const handleCancelEditName = () => {
+    setEditingName(false);
+    setNewDisplayName('');
+    setNameError('');
+  };
+
+  const handleSaveDisplayName = async () => {
+    if (!newDisplayName.trim()) {
+      setNameError('이름을 입력해주세요.');
+      return;
+    }
+
+    setSavingName(true);
+    setNameError('');
+
+    try {
+      const response = await authAPI.updateDisplayName(newDisplayName.trim());
+      // Update user in context
+      updateUser({ ...user, displayName: response.data.displayName });
+      setEditingName(false);
+      setNewDisplayName('');
+    } catch (err) {
+      console.error('Error updating display name:', err);
+      setNameError('이름 변경 중 오류가 발생했습니다. 다시 시도해주세요.');
+    } finally {
+      setSavingName(false);
+    }
+  };
 
   const handleDeleteAccount = async () => {
     setDeleting(true);
@@ -53,13 +94,65 @@ export default function Settings() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-              <User className="h-5 w-5 text-gray-600" />
-              <div>
+            {/* Display Name - Editable */}
+            <div className="p-3 bg-gray-50 rounded-lg">
+              <div className="flex items-center justify-between mb-2">
                 <p className="text-sm text-gray-500">사용자 이름</p>
-                <p className="font-medium">{user?.displayName}</p>
+                {!editingName && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleStartEditName}
+                    className="h-8 px-2"
+                  >
+                    <Edit className="h-4 w-4" />
+                  </Button>
+                )}
               </div>
+              {editingName ? (
+                <div className="space-y-2">
+                  <Input
+                    value={newDisplayName}
+                    onChange={(e) => setNewDisplayName(e.target.value)}
+                    placeholder="새 이름 입력"
+                    disabled={savingName}
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter') {
+                        handleSaveDisplayName();
+                      }
+                    }}
+                  />
+                  {nameError && (
+                    <p className="text-sm text-red-600">{nameError}</p>
+                  )}
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      onClick={handleSaveDisplayName}
+                      disabled={savingName}
+                      className="flex-1"
+                    >
+                      <Check className="h-4 w-4 mr-1" />
+                      {savingName ? '저장 중...' : '저장'}
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={handleCancelEditName}
+                      disabled={savingName}
+                      className="flex-1"
+                    >
+                      <X className="h-4 w-4 mr-1" />
+                      취소
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <p className="font-medium">{user?.displayName}</p>
+              )}
             </div>
+
+            {/* Email - Read Only */}
             <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
               <Mail className="h-5 w-5 text-gray-600" />
               <div>

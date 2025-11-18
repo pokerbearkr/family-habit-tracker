@@ -61,6 +61,16 @@ public class AuthController {
         return ResponseEntity.ok(Map.of("enableReminders", user.getEnableReminders()));
     }
 
+    @PutMapping("/profile/display-name")
+    public ResponseEntity<Map<String, String>> updateDisplayName(@RequestBody Map<String, String> request) {
+        String newDisplayName = request.get("displayName");
+        if (newDisplayName == null || newDisplayName.trim().isEmpty()) {
+            throw new RuntimeException("Display name cannot be empty");
+        }
+        User updatedUser = authService.updateDisplayName(newDisplayName.trim());
+        return ResponseEntity.ok(Map.of("displayName", updatedUser.getDisplayName()));
+    }
+
     @DeleteMapping("/account")
     public ResponseEntity<String> deleteAccount() {
         authService.deleteAccount();

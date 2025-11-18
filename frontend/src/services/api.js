@@ -33,6 +33,8 @@ export const authAPI = {
   getReminderSettings: () => api.get('/auth/settings/reminders'),
   updateReminderSettings: (enableReminders) =>
     api.put('/auth/settings/reminders', { enableReminders }),
+  updateDisplayName: (displayName) =>
+    api.put('/auth/profile/display-name', { displayName }),
   deleteAccount: () => api.delete('/auth/account')
 };
 

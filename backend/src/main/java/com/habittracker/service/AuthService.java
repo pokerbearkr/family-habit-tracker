@@ -82,6 +82,13 @@ public class AuthService {
     }
 
     @Transactional
+    public User updateDisplayName(String newDisplayName) {
+        User currentUser = getCurrentUser();
+        currentUser.setDisplayName(newDisplayName);
+        return userRepository.save(currentUser);
+    }
+
+    @Transactional
     public void deleteAccount() {
         User currentUser = getCurrentUser();
 
