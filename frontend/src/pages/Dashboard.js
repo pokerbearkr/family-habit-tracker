@@ -258,7 +258,7 @@ function Dashboard() {
     if (!user.familyId) return;
 
     const interval = setInterval(() => {
-      loadData();
+      loadData(true); // Pass true to enable notification checks
     }, 30000); // 30 seconds
 
     return () => clearInterval(interval);
@@ -300,7 +300,7 @@ function Dashboard() {
     }
   };
 
-  const loadData = async () => {
+  const loadData = async (checkForNotifications = false) => {
     try {
       setError('');
       if (user.familyId) {
@@ -310,8 +310,9 @@ function Dashboard() {
           familyAPI.getMy()
         ]);
 
-        // Check for new habit completions and show notifications (only for today)
-        if (logs.length > 0 && selectedDate === getTodayLocal()) {
+        // Check for new habit completions and show notifications
+        // Only when explicitly checking (polling) and viewing today's date
+        if (checkForNotifications && logs.length > 0 && selectedDate === getTodayLocal()) {
           const newLogs = logsRes.data.filter(newLog =>
             newLog.completed &&
             newLog.user.id !== user.id &&
