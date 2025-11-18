@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../co
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../components/ui/dialog';
-import { ArrowLeft, Trash2, AlertTriangle, User, Mail, Shield, Edit, Check, X, Coffee, Copy } from 'lucide-react';
+import { ArrowLeft, Trash2, AlertTriangle, User, Mail, Shield, Edit, Check, X, Coffee, ExternalLink } from 'lucide-react';
 import api from '../services/api';
 import { authAPI } from '../services/api';
 
@@ -19,15 +19,6 @@ export default function Settings() {
   const [newDisplayName, setNewDisplayName] = useState('');
   const [savingName, setSavingName] = useState(false);
   const [nameError, setNameError] = useState('');
-  const [copied, setCopied] = useState(false);
-
-  const handleCopyAccount = () => {
-    const accountNumber = '279602-0409-1424';
-    navigator.clipboard.writeText(accountNumber).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    });
-  };
 
   const handleStartEditName = () => {
     setNewDisplayName(user?.displayName || '');
@@ -202,41 +193,15 @@ export default function Settings() {
               이 앱이 도움이 되셨나요? 커피 한 잔으로 응원해주세요!
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="p-4 bg-white rounded-lg border border-amber-200">
-              <p className="text-sm text-gray-600 mb-2">계좌번호</p>
-              <div className="flex items-center justify-between gap-3">
-                <div>
-                  <p className="font-mono font-bold text-lg text-gray-900">
-                    279602-04-091424
-                  </p>
-                  <p className="text-sm text-gray-600 mt-1">
-                    국민은행 오동원
-                  </p>
-                </div>
-                <Button
-                  variant={copied ? "default" : "outline"}
-                  size="sm"
-                  onClick={handleCopyAccount}
-                  className={copied ? "bg-green-600 hover:bg-green-700" : ""}
-                >
-                  {copied ? (
-                    <>
-                      <Check className="h-4 w-4 mr-1" />
-                      복사됨
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="h-4 w-4 mr-1" />
-                      복사
-                    </>
-                  )}
-                </Button>
-              </div>
-            </div>
-            <p className="text-xs text-gray-500 text-center">
-              토스나 카카오페이에서 계좌번호를 붙여넣으세요
-            </p>
+          <CardContent>
+            <Button
+              className="w-full bg-amber-500 hover:bg-amber-600 text-white"
+              onClick={() => window.open('https://buymeacoffee.com/programtuna', '_blank')}
+            >
+              <Coffee className="h-4 w-4 mr-2" />
+              커피 한 잔 사주기
+              <ExternalLink className="h-4 w-4 ml-2" />
+            </Button>
           </CardContent>
         </Card>
 
