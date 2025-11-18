@@ -511,7 +511,7 @@ function Monthly() {
                               </p>
                             </div>
                             <p className="text-xs text-gray-500 mt-0.5">
-                              {log.displayName}
+                              {log.userName}
                             </p>
                           </div>
                         </div>
