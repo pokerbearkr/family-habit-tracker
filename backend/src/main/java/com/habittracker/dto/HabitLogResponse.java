@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
@@ -17,6 +18,7 @@ public class HabitLogResponse {
     private LocalDate logDate;
     private Boolean completed;
     private String note;
+    private LocalDateTime completedAt;
 
     @Data
     @NoArgsConstructor
@@ -42,6 +44,7 @@ public class HabitLogResponse {
         response.setLogDate(log.getLogDate());
         response.setCompleted(log.getCompleted());
         response.setNote(log.getNote());
+        response.setCompletedAt(log.getCompletedAt());
 
         if (log.getHabit() != null) {
             response.setHabit(new HabitSummary(

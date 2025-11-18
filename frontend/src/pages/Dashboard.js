@@ -86,6 +86,11 @@ function SortableHabitItem({ habit, userLog, onToggle, onEdit, onDelete, daysDis
                 {habit.description && (
                   <p className="text-sm text-gray-600 mt-2 break-words">{habit.description}</p>
                 )}
+                {userLog?.completed && userLog?.completedAt && (
+                  <p className="text-xs text-gray-500 mt-1">
+                    ✓ {new Date(userLog.completedAt).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}
+                  </p>
+                )}
               </div>
             </div>
             <Button
@@ -956,6 +961,11 @@ function Dashboard() {
                             </p>
                             {habit.description && (
                               <p className="text-sm text-gray-500 break-words">{habit.description}</p>
+                            )}
+                            {isCompleted && habitLog?.completedAt && (
+                              <p className="text-xs text-gray-500 mt-1">
+                                ✓ {new Date(habitLog.completedAt).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}
+                              </p>
                             )}
                           </div>
                           <div

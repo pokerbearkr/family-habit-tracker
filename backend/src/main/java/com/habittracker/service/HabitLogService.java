@@ -46,6 +46,12 @@ public class HabitLogService {
             // Update existing log
             existingLog.setCompleted(request.getCompleted());
             existingLog.setNote(request.getNote());
+            // Update completedAt timestamp when marking as completed
+            if (request.getCompleted()) {
+                existingLog.setCompletedAt(java.time.LocalDateTime.now());
+            } else {
+                existingLog.setCompletedAt(null);
+            }
             savedLog = habitLogRepository.save(existingLog);
         } else {
             // Create new log
@@ -56,6 +62,10 @@ public class HabitLogService {
                     .completed(request.getCompleted())
                     .note(request.getNote())
                     .build();
+            // Set completedAt timestamp if completed
+            if (request.getCompleted()) {
+                habitLog.setCompletedAt(java.time.LocalDateTime.now());
+            }
             savedLog = habitLogRepository.save(habitLog);
         }
 
