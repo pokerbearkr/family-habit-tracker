@@ -100,7 +100,7 @@ export default function PrivacyPolicy() {
               <h2 className="text-xl font-semibold mb-3">8. 개인정보 보호책임자</h2>
               <div className="text-gray-700">
                 <p className="mb-2">개인정보 처리에 관한 문의사항이 있으시면 아래로 연락해 주시기 바랍니다:</p>
-                <p className="font-medium">이메일: [이메일 주소를 입력하세요]</p>
+                <p className="font-medium">이메일: omj1010@naver.com</p>
               </div>
             </section>
 
