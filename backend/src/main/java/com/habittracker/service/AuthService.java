@@ -27,29 +27,38 @@ public class AuthService {
 
     @Transactional
     public JwtResponse login(LoginRequest loginRequest) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword())
-        );
+        // Check if user exists first
+        if (!userRepository.existsByUsername(loginRequest.getUsername())) {
+            throw new RuntimeException("존재하지 않는 아이디입니다.");
+        }
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        String jwt = jwtUtils.generateJwtToken(authentication);
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword())
+            );
 
-        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-        User user = userRepository.findByUsername(userDetails.getUsername())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            String jwt = jwtUtils.generateJwtToken(authentication);
 
-        Long familyId = user.getFamily() != null ? user.getFamily().getId() : null;
-        String familyName = user.getFamily() != null ? user.getFamily().getName() : null;
+            UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+            User user = userRepository.findByUsername(userDetails.getUsername())
+                    .orElseThrow(() -> new RuntimeException("User not found"));
 
-        return new JwtResponse(
-                jwt,
-                user.getId(),
-                user.getUsername(),
-                user.getEmail(),
-                user.getDisplayName(),
-                familyId,
-                familyName
-        );
+            Long familyId = user.getFamily() != null ? user.getFamily().getId() : null;
+            String familyName = user.getFamily() != null ? user.getFamily().getName() : null;
+
+            return new JwtResponse(
+                    jwt,
+                    user.getId(),
+                    user.getUsername(),
+                    user.getEmail(),
+                    user.getDisplayName(),
+                    familyId,
+                    familyName
+            );
+        } catch (org.springframework.security.authentication.BadCredentialsException e) {
+            throw new RuntimeException("비밀번호가 틀렸습니다.");
+        }
     }
 
     @Transactional

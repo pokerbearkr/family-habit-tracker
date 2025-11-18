@@ -23,9 +23,14 @@ public class AuthController {
     private final UserRepository userRepository;
 
     @PostMapping("/login")
-    public ResponseEntity<JwtResponse> login(@Valid @RequestBody LoginRequest loginRequest) {
-        JwtResponse response = authService.login(loginRequest);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest loginRequest) {
+        try {
+            JwtResponse response = authService.login(loginRequest);
+            return ResponseEntity.ok(response);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(401)
+                    .body(Map.of("error", e.getMessage()));
+        }
     }
 
     @PostMapping("/signup")
