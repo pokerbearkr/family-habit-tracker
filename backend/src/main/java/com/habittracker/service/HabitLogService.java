@@ -167,10 +167,11 @@ public class HabitLogService {
         return calculateMonthlyStats(year, month, logs, currentUser.getFamily());
     }
 
-    // Calculate how many target days a habit has in a given month
+    // Calculate how many target days a habit has in a given month (up to today)
     private int calculateTargetDaysForHabit(Habit habit, int year, int month) {
         LocalDate monthStart = LocalDate.of(year, month, 1);
         LocalDate monthEnd = monthStart.plusMonths(1).minusDays(1);
+        LocalDate today = LocalDate.now();
 
         // Get the habit creation date (only the date part, not time)
         LocalDate habitCreationDate = habit.getCreatedAt().toLocalDate();
@@ -178,19 +179,20 @@ public class HabitLogService {
         // Determine the effective start date (later of month start or habit creation date)
         LocalDate effectiveStartDate = habitCreationDate.isAfter(monthStart) ? habitCreationDate : monthStart;
 
-        // If habit was created after this month, return 0
-        if (effectiveStartDate.isAfter(monthEnd)) {
+        // Determine the effective end date (earlier of month end or today)
+        LocalDate effectiveEndDate = today.isBefore(monthEnd) ? today : monthEnd;
+
+        // If habit was created after the effective end date, return 0
+        if (effectiveStartDate.isAfter(effectiveEndDate)) {
             return 0;
         }
 
-        // If it's a DAILY habit, count days from effective start date to month end
+        // If it's a DAILY habit, count days from effective start date to effective end date
         if ("DAILY".equals(habit.getHabitType()) || habit.getHabitType() == null) {
-            int daysFromStart = effectiveStartDate.getDayOfMonth();
-            int daysInMonth = monthStart.lengthOfMonth();
-            return daysInMonth - daysFromStart + 1;
+            return (int) java.time.temporal.ChronoUnit.DAYS.between(effectiveStartDate, effectiveEndDate) + 1;
         }
 
-        // If it's a WEEKLY habit, count matching days from effective start date
+        // If it's a WEEKLY habit, count matching days from effective start date to effective end date
         if ("WEEKLY".equals(habit.getHabitType()) && habit.getSelectedDays() != null) {
             String[] selectedDaysStr = habit.getSelectedDays().split(",");
             java.util.Set<Integer> selectedDays = new java.util.HashSet<>();
@@ -200,7 +202,7 @@ public class HabitLogService {
 
             int count = 0;
             LocalDate currentDate = effectiveStartDate;
-            while (!currentDate.isAfter(monthEnd)) {
+            while (!currentDate.isAfter(effectiveEndDate)) {
                 int dayOfWeek = currentDate.getDayOfWeek().getValue(); // 1=Mon, 7=Sun
                 if (selectedDays.contains(dayOfWeek)) {
                     count++;
@@ -210,18 +212,22 @@ public class HabitLogService {
             return count;
         }
 
-        // Default to counting days from effective start date
-        int daysFromStart = effectiveStartDate.getDayOfMonth();
-        int daysInMonth = monthStart.lengthOfMonth();
-        return daysInMonth - daysFromStart + 1;
+        // Default to counting days from effective start date to effective end date
+        return (int) java.time.temporal.ChronoUnit.DAYS.between(effectiveStartDate, effectiveEndDate) + 1;
     }
 
-    // Check if a habit should be done on a specific date
+    // Check if a habit should be done on a specific date (up to today)
     private boolean isHabitForDate(Habit habit, LocalDate date) {
         // First check if the date is before the habit was created
         LocalDate habitCreationDate = habit.getCreatedAt().toLocalDate();
         if (date.isBefore(habitCreationDate)) {
             return false; // Habit didn't exist on this date
+        }
+
+        // Don't count future dates
+        LocalDate today = LocalDate.now();
+        if (date.isAfter(today)) {
+            return false; // Don't count future dates in statistics
         }
 
         if ("DAILY".equals(habit.getHabitType()) || habit.getHabitType() == null) {
