@@ -5,6 +5,7 @@ import { habitLogAPI } from '../services/api';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../components/ui/dialog';
 import {
   Home,
   Users,
@@ -15,7 +16,9 @@ import {
   BarChart3,
   TrendingUp,
   Award,
-  Settings
+  Settings,
+  Check,
+  X
 } from 'lucide-react';
 
 function Monthly() {
@@ -27,6 +30,8 @@ function Monthly() {
     year: new Date().getFullYear(),
     month: new Date().getMonth() + 1
   });
+  const [selectedDayData, setSelectedDayData] = useState(null);
+  const [showDayDialog, setShowDayDialog] = useState(false);
 
   useEffect(() => {
     loadMonthlyStats();
@@ -60,6 +65,17 @@ function Monthly() {
       'ko-KR',
       { year: 'numeric', month: 'long' }
     );
+  };
+
+  const handleDayClick = (dateKey, dayStat) => {
+    const [year, month, day] = dateKey.split('-').map(Number);
+    const date = new Date(year, month - 1, day);
+    setSelectedDayData({
+      date: date,
+      dateKey: dateKey,
+      ...dayStat
+    });
+    setShowDayDialog(true);
   };
 
   const weekDays = ['일', '월', '화', '수', '목', '금', '토'];
@@ -384,6 +400,7 @@ function Monthly() {
                             gridColumnStart: date.getDate() === 1 ? dayOfWeek + 1 : 'auto'
                           }}
                           title={`${dayStat.completedCount}/${dayStat.totalHabits} 완료 (${completionRate.toFixed(1)}%)`}
+                          onClick={() => handleDayClick(dateKey, dayStat)}
                         >
                           <div className={`font-bold text-xs sm:text-base ${textColorClass}`}>
                             {date.getDate()}
@@ -420,6 +437,97 @@ function Monthly() {
           </>
         )}
       </main>
+
+      {/* Day Detail Dialog */}
+      <Dialog open={showDayDialog} onOpenChange={setShowDayDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Calendar className="h-5 w-5 text-blue-600" />
+              {selectedDayData && selectedDayData.date.toLocaleDateString('ko-KR', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                weekday: 'short'
+              })}
+            </DialogTitle>
+          </DialogHeader>
+
+          {selectedDayData && (
+            <div className="space-y-4">
+              {/* Summary */}
+              <div className="p-4 bg-gray-50 rounded-lg">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm text-gray-600">완료율</span>
+                  <Badge variant={
+                    selectedDayData.totalHabits > 0 && (selectedDayData.completedCount / selectedDayData.totalHabits * 100) >= 80
+                      ? 'default'
+                      : selectedDayData.totalHabits > 0 && (selectedDayData.completedCount / selectedDayData.totalHabits * 100) >= 50
+                      ? 'secondary'
+                      : 'outline'
+                  }>
+                    {selectedDayData.totalHabits > 0
+                      ? `${((selectedDayData.completedCount / selectedDayData.totalHabits) * 100).toFixed(1)}%`
+                      : '0%'
+                    }
+                  </Badge>
+                </div>
+                <div className="text-2xl font-bold text-gray-900">
+                  {selectedDayData.completedCount} / {selectedDayData.totalHabits}
+                </div>
+                <p className="text-sm text-gray-600 mt-1">
+                  {selectedDayData.completedCount}개 완료, {selectedDayData.totalHabits - selectedDayData.completedCount}개 미완료
+                </p>
+              </div>
+
+              {/* Habit List */}
+              <div className="space-y-2">
+                <h3 className="font-semibold text-sm text-gray-700">습관 목록</h3>
+                {selectedDayData.logs && selectedDayData.logs.length > 0 ? (
+                  <div className="space-y-2 max-h-64 overflow-y-auto">
+                    {selectedDayData.logs.map((log, index) => (
+                      <div
+                        key={index}
+                        className={`p-3 rounded-lg border transition-colors ${
+                          log.completed
+                            ? 'bg-green-50 border-green-200'
+                            : 'bg-gray-50 border-gray-200'
+                        }`}
+                      >
+                        <div className="flex items-start gap-3">
+                          <div className="mt-0.5">
+                            {log.completed ? (
+                              <Check className="h-5 w-5 text-green-600" />
+                            ) : (
+                              <X className="h-5 w-5 text-gray-400" />
+                            )}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2">
+                              <p className={`font-medium ${
+                                log.completed ? 'text-green-900' : 'text-gray-700'
+                              }`}>
+                                {log.habitName}
+                              </p>
+                            </div>
+                            <p className="text-xs text-gray-500 mt-0.5">
+                              {log.displayName}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm text-gray-500 text-center py-4">
+                    이 날짜에 기록된 습관이 없습니다.
+                  </p>
+                )}
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
