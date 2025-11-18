@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../co
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { Badge } from '../components/ui/badge';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../components/ui/dialog';
 import {
   Home,
   TrendingUp,
@@ -20,7 +21,8 @@ import {
   Check,
   Settings,
   Edit,
-  X
+  X,
+  AlertTriangle
 } from 'lucide-react';
 
 function Family() {
@@ -37,6 +39,7 @@ function Family() {
   const [editedFamilyName, setEditedFamilyName] = useState('');
   const [savingName, setSavingName] = useState(false);
   const [nameError, setNameError] = useState('');
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -242,11 +245,7 @@ function Family() {
               <Button
                 variant="outline"
                 size="icon"
-                onClick={() => {
-                  if (window.confirm('로그아웃하시겠습니까?')) {
-                    logout();
-                  }
-                }}
+                onClick={() => setShowLogoutDialog(true)}
                 className="h-10 w-10"
               >
                 <LogOut className="h-5 w-5" />
@@ -547,6 +546,37 @@ function Family() {
           </div>
         )}
       </main>
+
+      {/* Logout Confirmation Dialog */}
+      <Dialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-amber-600" />
+              로그아웃
+            </DialogTitle>
+            <DialogDescription>
+              정말 로그아웃하시겠습니까?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button
+              variant="outline"
+              onClick={() => setShowLogoutDialog(false)}
+            >
+              취소
+            </Button>
+            <Button
+              onClick={() => {
+                logout();
+                navigate('/login');
+              }}
+            >
+              로그아웃
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

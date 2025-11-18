@@ -41,7 +41,8 @@ import {
   X,
   ChevronLeft,
   ChevronRight,
-  Settings
+  Settings,
+  AlertTriangle
 } from 'lucide-react';
 
 // SortableHabitItem component for drag and drop
@@ -119,7 +120,7 @@ function SortableHabitItem({ habit, userLog, onToggle, onEdit, onDelete, daysDis
               수정
             </Button>
             <Button
-              onClick={() => onDelete(habit.id)}
+              onClick={() => onDelete(habit)}
               variant="outline"
               size="sm"
               className="flex-1 text-red-600 hover:text-red-700 hover:bg-red-50"
@@ -159,6 +160,9 @@ function Dashboard() {
   const [notificationPermission, setNotificationPermission] = useState(
     typeof Notification !== 'undefined' ? Notification.permission : 'denied'
   );
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [habitToDelete, setHabitToDelete] = useState(null);
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false);
   const navigate = useNavigate();
 
   // Get today's date in local timezone (not UTC)
@@ -435,15 +439,22 @@ function Dashboard() {
     }
   };
 
-  const handleDeleteHabit = async (habitId) => {
-    if (window.confirm('정말 이 습관을 삭제하시겠습니까?')) {
-      try {
-        await habitAPI.delete(habitId);
-        loadData();
-      } catch (error) {
-        console.error('Error deleting habit:', error);
-        alert('습관 삭제에 실패했습니다: ' + (error.response?.data?.message || error.message));
-      }
+  const handleDeleteHabit = (habit) => {
+    setHabitToDelete(habit);
+    setShowDeleteDialog(true);
+  };
+
+  const confirmDeleteHabit = async () => {
+    if (!habitToDelete) return;
+
+    try {
+      await habitAPI.delete(habitToDelete.id);
+      setShowDeleteDialog(false);
+      setHabitToDelete(null);
+      loadData();
+    } catch (error) {
+      console.error('Error deleting habit:', error);
+      alert('습관 삭제에 실패했습니다: ' + (error.response?.data?.message || error.message));
     }
   };
 
@@ -648,11 +659,7 @@ function Dashboard() {
               <Settings className="w-5 h-5" />
             </Button>
             <Button
-              onClick={() => {
-                if (window.confirm('로그아웃하시겠습니까?')) {
-                  logout();
-                }
-              }}
+              onClick={() => setShowLogoutDialog(true)}
               variant="outline"
               size="icon"
               title="로그아웃"
@@ -1105,6 +1112,76 @@ function Dashboard() {
           </CardContent>
         </Card>
       </main>
+
+      {/* Delete Habit Dialog */}
+      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-red-600">
+              <AlertTriangle className="h-5 w-5" />
+              습관 삭제
+            </DialogTitle>
+            <DialogDescription className="pt-3">
+              {habitToDelete && (
+                <>
+                  <p className="font-medium mb-2">"{habitToDelete.name}" 습관을 삭제하시겠습니까?</p>
+                  <p className="text-sm text-gray-600">
+                    이 작업은 되돌릴 수 없으며, 모든 기록이 함께 삭제됩니다.
+                  </p>
+                </>
+              )}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowDeleteDialog(false);
+                setHabitToDelete(null);
+              }}
+            >
+              취소
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={confirmDeleteHabit}
+            >
+              삭제
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Logout Dialog */}
+      <Dialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <LogOut className="h-5 w-5" />
+              로그아웃
+            </DialogTitle>
+            <DialogDescription className="pt-3">
+              정말 로그아웃하시겠습니까?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button
+              variant="outline"
+              onClick={() => setShowLogoutDialog(false)}
+            >
+              취소
+            </Button>
+            <Button
+              onClick={() => {
+                logout();
+                setShowLogoutDialog(false);
+              }}
+            >
+              로그아웃
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
