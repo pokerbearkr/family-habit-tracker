@@ -38,7 +38,9 @@ import {
   TrendingUp,
   Bell,
   Circle,
-  X
+  X,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 
 // SortableHabitItem component for drag and drop
@@ -151,6 +153,7 @@ function Dashboard() {
     typeof Notification !== 'undefined' ? Notification.permission : 'denied'
   );
   const navigate = useNavigate();
+
   // Get today's date in local timezone (not UTC)
   const getTodayLocal = () => {
     const now = new Date();
@@ -159,7 +162,9 @@ function Dashboard() {
     const day = String(now.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
   };
-  const today = getTodayLocal();
+
+  // Selected date state (starts with today)
+  const [selectedDate, setSelectedDate] = useState(getTodayLocal());
 
   // Define functions first
   const urlBase64ToUint8Array = (base64String) => {
@@ -237,6 +242,9 @@ function Dashboard() {
 
   useEffect(() => {
     loadData();
+  }, [selectedDate]); // Reload data when selected date changes
+
+  useEffect(() => {
     // Request notification permission and subscribe on mount
     requestNotificationPermission();
     // Also try to subscribe if already granted
@@ -298,7 +306,7 @@ function Dashboard() {
       if (user.familyId) {
         const [habitsRes, logsRes, familyRes] = await Promise.all([
           habitAPI.getAll(),
-          habitLogAPI.getFamilyLogs(today),
+          habitLogAPI.getFamilyLogs(selectedDate),
           familyAPI.getMy()
         ]);
 
@@ -343,7 +351,7 @@ function Dashboard() {
     try {
       await habitLogAPI.log(
         habitId,
-        today,
+        selectedDate,
         existingLog ? !existingLog.completed : true,
         ''
       );
@@ -492,15 +500,50 @@ function Dashboard() {
     });
   };
 
-  // Check if a habit should be shown today
+  // Date navigation functions
+  const changeDate = (days) => {
+    const [year, month, day] = selectedDate.split('-').map(Number);
+    const date = new Date(year, month - 1, day);
+    date.setDate(date.getDate() + days);
+
+    const newYear = date.getFullYear();
+    const newMonth = String(date.getMonth() + 1).padStart(2, '0');
+    const newDay = String(date.getDate()).padStart(2, '0');
+    setSelectedDate(`${newYear}-${newMonth}-${newDay}`);
+  };
+
+  const goToToday = () => {
+    setSelectedDate(getTodayLocal());
+  };
+
+  const formatSelectedDate = () => {
+    const [year, month, day] = selectedDate.split('-').map(Number);
+    const date = new Date(year, month - 1, day);
+    const today = getTodayLocal();
+
+    if (selectedDate === today) {
+      return '오늘';
+    }
+
+    return date.toLocaleDateString('ko-KR', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      weekday: 'short'
+    });
+  };
+
+  // Check if a habit should be shown for selected date
   const isHabitForToday = (habit) => {
     if (habit.habitType === 'DAILY' || !habit.habitType) {
       return true; // Daily habits always show
     }
 
     if (habit.habitType === 'WEEKLY' && habit.selectedDays) {
-      const todayDayOfWeek = new Date().getDay(); // 0=Sun, 1=Mon, ..., 6=Sat
-      const adjustedDay = todayDayOfWeek === 0 ? 7 : todayDayOfWeek; // Convert to 1=Mon, 7=Sun
+      const [year, month, day] = selectedDate.split('-').map(Number);
+      const date = new Date(year, month - 1, day);
+      const dayOfWeek = date.getDay(); // 0=Sun, 1=Mon, ..., 6=Sat
+      const adjustedDay = dayOfWeek === 0 ? 7 : dayOfWeek; // Convert to 1=Mon, 7=Sun
       const selectedDaysArray = habit.selectedDays.split(',').map(d => parseInt(d));
       return selectedDaysArray.includes(adjustedDay);
     }
@@ -621,6 +664,43 @@ function Dashboard() {
             </CardContent>
           </Card>
         )}
+
+        {/* Date Selector */}
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between gap-4">
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => changeDate(-1)}
+                className="h-10 w-10 shrink-0"
+              >
+                <ChevronLeft className="h-5 w-5" />
+              </Button>
+              <div className="flex items-center justify-center gap-2 flex-1">
+                <Calendar className="h-5 w-5 text-blue-600" />
+                <h2 className="text-lg sm:text-xl font-semibold text-center">
+                  {formatSelectedDate()}
+                </h2>
+              </div>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => changeDate(1)}
+                className="h-10 w-10 shrink-0"
+              >
+                <ChevronRight className="h-5 w-5" />
+              </Button>
+            </div>
+            {selectedDate !== getTodayLocal() && (
+              <div className="mt-3 text-center">
+                <Button onClick={goToToday} variant="outline" size="sm">
+                  오늘로 이동
+                </Button>
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
         {/* Notification Permission Banner */}
         {notificationPermission !== 'granted' && notificationPermission !== 'denied' && (
