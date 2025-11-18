@@ -248,7 +248,7 @@ function Monthly() {
                         <div className="h-2.5 bg-gray-200 rounded-full overflow-hidden">
                           <div
                             className="h-full bg-gradient-to-r from-blue-500 to-blue-600 transition-all duration-500 ease-out rounded-full"
-                            style={{ width: `${userStat.completionRate}%` }}
+                            style={{ width: `${Math.min(userStat.completionRate, 100)}%` }}
                           />
                         </div>
                       </div>
@@ -311,7 +311,7 @@ function Monthly() {
                             className="h-full transition-all duration-500 ease-out rounded-full"
                             style={{
                               backgroundColor: habitStat.color,
-                              width: `${habitStat.completionRate}%`
+                              width: `${Math.min(habitStat.completionRate, 100)}%`
                             }}
                           />
                         </div>

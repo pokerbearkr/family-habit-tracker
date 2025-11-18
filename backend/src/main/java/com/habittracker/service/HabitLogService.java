@@ -267,9 +267,11 @@ public class HabitLogService {
                     .mapToInt(habit -> calculateTargetDaysForHabit(habit, year, month))
                     .sum();
 
-            // Count completed logs for this user's habits
+            // Count completed logs for this user's habits (only on scheduled days)
             long completedCount = logs.stream()
-                    .filter(log -> log.getUser().getId().equals(user.getId()) && log.getCompleted())
+                    .filter(log -> log.getUser().getId().equals(user.getId())
+                            && log.getCompleted()
+                            && isHabitForDate(log.getHabit(), log.getLogDate()))
                     .count();
 
             userStatsMap.put(user.getId(), new com.habittracker.dto.MonthlyStatsResponse.UserStats(
@@ -286,8 +288,11 @@ public class HabitLogService {
         // Calculate habit stats
         java.util.Map<Long, com.habittracker.dto.MonthlyStatsResponse.HabitStats> habitStatsMap = new java.util.HashMap<>();
         family.getHabits().forEach(habit -> {
+            // Only count completions on days when the habit was actually scheduled
             long completedCount = logs.stream()
-                    .filter(log -> log.getHabit().getId().equals(habit.getId()) && log.getCompleted())
+                    .filter(log -> log.getHabit().getId().equals(habit.getId())
+                            && log.getCompleted()
+                            && isHabitForDate(habit, log.getLogDate()))
                     .count();
 
             // Calculate target days based on habit type
