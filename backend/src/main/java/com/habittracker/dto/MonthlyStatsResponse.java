@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -64,5 +65,6 @@ public class MonthlyStatsResponse {
         private Long userId;
         private String userName;
         private boolean completed;
+        private LocalDateTime completedAt;
     }
 }

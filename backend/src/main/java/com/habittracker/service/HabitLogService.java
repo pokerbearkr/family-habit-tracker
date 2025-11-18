@@ -321,17 +321,35 @@ public class HabitLogService {
                     .filter(log -> log.getLogDate().equals(date))
                     .toList();
 
-            List<com.habittracker.dto.MonthlyStatsResponse.HabitLogSummary> logSummaries = dayLogs.stream()
-                    .map(log -> new com.habittracker.dto.MonthlyStatsResponse.HabitLogSummary(
-                            log.getHabit().getId(),
-                            log.getHabit().getName(),
-                            log.getUser().getId(),
-                            log.getUser().getDisplayName(),
-                            log.getCompleted()
-                    ))
+            // Get all habits that should be done on this date
+            List<Habit> habitsForDate = family.getHabits().stream()
+                    .filter(habit -> isHabitForDate(habit, date))
                     .toList();
 
-            long completedCount = dayLogs.stream().filter(HabitLog::getCompleted).count();
+            // Create log summaries for all habits (including uncompleted ones)
+            List<com.habittracker.dto.MonthlyStatsResponse.HabitLogSummary> logSummaries = habitsForDate.stream()
+                    .map(habit -> {
+                        // Find log for this habit on this date
+                        HabitLog log = dayLogs.stream()
+                                .filter(l -> l.getHabit().getId().equals(habit.getId()))
+                                .findFirst()
+                                .orElse(null);
+
+                        boolean completed = log != null && log.getCompleted();
+                        java.time.LocalDateTime completedAt = log != null ? log.getCompletedAt() : null;
+
+                        return new com.habittracker.dto.MonthlyStatsResponse.HabitLogSummary(
+                                habit.getId(),
+                                habit.getName(),
+                                habit.getUser().getId(),
+                                habit.getUser().getDisplayName(),
+                                completed,
+                                completedAt
+                        );
+                    })
+                    .toList();
+
+            long completedCount = logSummaries.stream().filter(com.habittracker.dto.MonthlyStatsResponse.HabitLogSummary::isCompleted).count();
 
             dailyStatsMap.put(dateKey, new com.habittracker.dto.MonthlyStatsResponse.DayStats(
                     date,

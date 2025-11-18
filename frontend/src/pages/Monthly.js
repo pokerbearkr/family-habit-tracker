@@ -512,6 +512,11 @@ function Monthly() {
                             </div>
                             <p className="text-xs text-gray-500 mt-0.5">
                               {log.userName}
+                              {log.completed && log.completedAt && (
+                                <span className="ml-2 text-gray-400">
+                                  • {new Date(log.completedAt).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}
+                                </span>
+                              )}
                             </p>
                           </div>
                         </div>
