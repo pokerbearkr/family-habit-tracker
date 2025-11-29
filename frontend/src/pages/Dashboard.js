@@ -1231,42 +1231,41 @@ function Dashboard() {
           setMemoExistingLog(null);
         }
       }}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-[calc(100vw-2rem)] sm:max-w-md mx-auto">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
+            <DialogTitle className="flex items-center gap-2 text-base">
               <Check className="h-5 w-5 text-green-600" />
               습관 체크
             </DialogTitle>
-            <DialogDescription>
+            <DialogDescription className="text-sm">
               {memoHabit && (
                 <span className="font-medium text-gray-900">"{memoHabit.name}"</span>
               )}
-              을(를) 완료하셨네요! 메모를 남겨보세요.
+              {" "}완료! 메모를 남겨보세요.
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-4 py-2">
-            <div className="space-y-2">
-              <Label htmlFor="memo-text">메모 (선택사항)</Label>
-              <Textarea
-                id="memo-text"
-                placeholder="오늘의 기록을 남겨보세요..."
-                value={memoText}
-                onChange={(e) => setMemoText(e.target.value)}
-                rows={3}
-                className="resize-none"
-              />
-            </div>
+          <div className="py-2">
+            <Textarea
+              id="memo-text"
+              placeholder="오늘의 기록 (선택사항)"
+              value={memoText}
+              onChange={(e) => setMemoText(e.target.value)}
+              rows={2}
+              className="resize-none text-base"
+            />
           </div>
-          <DialogFooter className="gap-2 sm:gap-0">
+          <DialogFooter className="flex-col sm:flex-row gap-2">
             <Button
               variant="outline"
               onClick={() => handleMemoSubmit(false)}
+              className="w-full sm:w-auto"
             >
               메모 없이 체크
             </Button>
             <Button
               onClick={() => handleMemoSubmit(true)}
               style={{ backgroundColor: memoHabit?.color }}
+              className="w-full sm:w-auto"
             >
               <MessageSquare className="w-4 h-4 mr-1" />
               저장
