@@ -342,6 +342,7 @@ public class HabitLogService {
 
                         boolean completed = log != null && log.getCompleted();
                         java.time.LocalDateTime completedAt = log != null ? log.getCompletedAt() : null;
+                        String note = log != null ? log.getNote() : null;
 
                         return new com.habittracker.dto.MonthlyStatsResponse.HabitLogSummary(
                                 habit.getId(),
@@ -349,7 +350,8 @@ public class HabitLogService {
                                 habit.getUser().getId(),
                                 habit.getUser().getDisplayName(),
                                 completed,
-                                completedAt
+                                completedAt,
+                                note
                         );
                     })
                     .toList();

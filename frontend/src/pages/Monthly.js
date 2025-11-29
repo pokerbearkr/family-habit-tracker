@@ -19,7 +19,8 @@ import {
   Settings,
   Check,
   X,
-  AlertTriangle
+  AlertTriangle,
+  MessageSquare
 } from 'lucide-react';
 
 function Monthly() {
@@ -516,6 +517,12 @@ function Monthly() {
                                 </span>
                               )}
                             </p>
+                            {log.note && (
+                              <div className="flex items-start gap-1 mt-2 p-2 bg-white/60 rounded border border-gray-100">
+                                <MessageSquare className="w-3 h-3 text-gray-400 mt-0.5 flex-shrink-0" />
+                                <p className="text-xs text-gray-600 break-words">{log.note}</p>
+                              </div>
+                            )}
                           </div>
                         </div>
                       </div>

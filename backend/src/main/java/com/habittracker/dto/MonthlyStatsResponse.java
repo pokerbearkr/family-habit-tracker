@@ -66,5 +66,6 @@ public class MonthlyStatsResponse {
         private String userName;
         private boolean completed;
         private LocalDateTime completedAt;
+        private String note;
     }
 }

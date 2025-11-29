@@ -43,7 +43,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Settings,
-  AlertTriangle
+  AlertTriangle,
+  MessageSquare
 } from 'lucide-react';
 
 // SortableHabitItem component for drag and drop
@@ -95,6 +96,12 @@ function SortableHabitItem({ habit, userLog, onToggle, onEdit, onDelete, daysDis
                   <p className="text-xs text-gray-500 mt-1">
                     ✓ {new Date(userLog.completedAt).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}
                   </p>
+                )}
+                {userLog?.note && (
+                  <div className="flex items-start gap-1 mt-2 p-2 bg-gray-50 rounded-md">
+                    <MessageSquare className="w-3 h-3 text-gray-400 mt-0.5 flex-shrink-0" />
+                    <p className="text-xs text-gray-600 break-words">{userLog.note}</p>
+                  </div>
                 )}
               </div>
             </div>
@@ -164,6 +171,10 @@ function Dashboard() {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [habitToDelete, setHabitToDelete] = useState(null);
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
+  const [showMemoDialog, setShowMemoDialog] = useState(false);
+  const [memoHabit, setMemoHabit] = useState(null);
+  const [memoText, setMemoText] = useState('');
+  const [memoExistingLog, setMemoExistingLog] = useState(null);
   const navigate = useNavigate();
 
   // Get today's date in local timezone (not UTC)
@@ -360,17 +371,43 @@ function Dashboard() {
     const existingLog = logs.find(
       (log) => log.habit.id === habitId && log.user.id === user.id
     );
+    const habit = habits.find(h => h.id === habitId);
+
+    if (!existingLog?.completed) {
+      // 체크하려고 할 때 - 메모 다이얼로그 열기
+      setMemoHabit(habit);
+      setMemoText(existingLog?.note || '');
+      setMemoExistingLog(existingLog);
+      setShowMemoDialog(true);
+    } else {
+      // 체크 해제할 때 - 바로 토글
+      try {
+        await habitLogAPI.log(habitId, selectedDate, false, existingLog?.note || '');
+        loadData();
+      } catch (error) {
+        console.error('Error toggling habit:', error);
+      }
+    }
+  };
+
+  const handleMemoSubmit = async (withMemo = true) => {
+    if (!memoHabit) return;
 
     try {
       await habitLogAPI.log(
-        habitId,
+        memoHabit.id,
         selectedDate,
-        existingLog ? !existingLog.completed : true,
-        ''
+        true,
+        withMemo ? memoText : ''
       );
+      setShowMemoDialog(false);
+      setMemoHabit(null);
+      setMemoText('');
+      setMemoExistingLog(null);
       loadData();
     } catch (error) {
-      console.error('Error toggling habit:', error);
+      console.error('Error logging habit:', error);
+      toast.error('습관 체크에 실패했습니다.');
     }
   };
 
@@ -1180,6 +1217,59 @@ function Dashboard() {
               }}
             >
               로그아웃
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Memo Dialog */}
+      <Dialog open={showMemoDialog} onOpenChange={(open) => {
+        if (!open) {
+          setShowMemoDialog(false);
+          setMemoHabit(null);
+          setMemoText('');
+          setMemoExistingLog(null);
+        }
+      }}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Check className="h-5 w-5 text-green-600" />
+              습관 체크
+            </DialogTitle>
+            <DialogDescription>
+              {memoHabit && (
+                <span className="font-medium text-gray-900">"{memoHabit.name}"</span>
+              )}
+              을(를) 완료하셨네요! 메모를 남겨보세요.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div className="space-y-2">
+              <Label htmlFor="memo-text">메모 (선택사항)</Label>
+              <Textarea
+                id="memo-text"
+                placeholder="오늘의 기록을 남겨보세요..."
+                value={memoText}
+                onChange={(e) => setMemoText(e.target.value)}
+                rows={3}
+                className="resize-none"
+              />
+            </div>
+          </div>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button
+              variant="outline"
+              onClick={() => handleMemoSubmit(false)}
+            >
+              메모 없이 체크
+            </Button>
+            <Button
+              onClick={() => handleMemoSubmit(true)}
+              style={{ backgroundColor: memoHabit?.color }}
+            >
+              <MessageSquare className="w-4 h-4 mr-1" />
+              저장
             </Button>
           </DialogFooter>
         </DialogContent>
