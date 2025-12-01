@@ -44,10 +44,13 @@ public class Habit {
 
     @Column(name = "habit_type", nullable = false)
     @Builder.Default
-    private String habitType = "DAILY"; // DAILY or WEEKLY
+    private String habitType = "DAILY"; // DAILY, WEEKLY, or WEEKLY_COUNT
 
     @Column(name = "selected_days")
     private String selectedDays; // Comma-separated day numbers (1=Mon, 7=Sun) for WEEKLY habits
+
+    @Column(name = "weekly_target")
+    private Integer weeklyTarget; // Target count per week for WEEKLY_COUNT habits
 
     @OneToMany(mappedBy = "habit", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default

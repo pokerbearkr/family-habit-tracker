@@ -48,7 +48,7 @@ import {
 } from 'lucide-react';
 
 // SortableHabitItem component for drag and drop
-function SortableHabitItem({ habit, userLog, onToggle, onEdit, onDelete, daysDisplay }) {
+function SortableHabitItem({ habit, userLog, onToggle, onEdit, onDelete, daysDisplay, weeklyProgress }) {
   const {
     attributes,
     listeners,
@@ -87,6 +87,14 @@ function SortableHabitItem({ habit, userLog, onToggle, onEdit, onDelete, daysDis
                 {daysDisplay && (
                   <Badge variant="outline" className="mt-1 text-xs">
                     {daysDisplay}
+                  </Badge>
+                )}
+                {weeklyProgress && (
+                  <Badge
+                    variant={weeklyProgress.completed >= weeklyProgress.target ? "default" : "secondary"}
+                    className="mt-1 ml-1 text-xs"
+                  >
+                    이번 주 {weeklyProgress.completed}/{weeklyProgress.target}
                   </Badge>
                 )}
                 {habit.description && (
@@ -147,6 +155,7 @@ function Dashboard() {
   const { user, logout } = useAuth();
   const [habits, setHabits] = useState([]);
   const [logs, setLogs] = useState([]);
+  const [weeklyLogs, setWeeklyLogs] = useState([]);
   const [family, setFamily] = useState(null);
   const [showAddHabit, setShowAddHabit] = useState(false);
   const [editingHabit, setEditingHabit] = useState(null);
@@ -161,7 +170,8 @@ function Dashboard() {
     description: '',
     color: getLastUsedColor(),
     habitType: 'DAILY',
-    selectedDays: []
+    selectedDays: [],
+    weeklyTarget: 3
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -176,6 +186,28 @@ function Dashboard() {
   const [memoText, setMemoText] = useState('');
   const [memoExistingLog, setMemoExistingLog] = useState(null);
   const navigate = useNavigate();
+
+  // Get this week's start (Monday) and end (Sunday) dates
+  const getWeekRange = () => {
+    const now = new Date();
+    const dayOfWeek = now.getDay(); // 0=Sun, 1=Mon, ..., 6=Sat
+    const diffToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+
+    const monday = new Date(now);
+    monday.setDate(now.getDate() + diffToMonday);
+
+    const sunday = new Date(monday);
+    sunday.setDate(monday.getDate() + 6);
+
+    const formatDate = (d) => {
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    };
+
+    return { start: formatDate(monday), end: formatDate(sunday) };
+  };
 
   // Get today's date in local timezone (not UTC)
   const getTodayLocal = () => {
@@ -327,10 +359,12 @@ function Dashboard() {
     try {
       setError('');
       if (user.familyId) {
-        const [habitsRes, logsRes, familyRes] = await Promise.all([
+        const weekRange = getWeekRange();
+        const [habitsRes, logsRes, familyRes, weeklyLogsRes] = await Promise.all([
           habitAPI.getAll(),
           habitLogAPI.getFamilyLogs(selectedDate),
-          familyAPI.getMy()
+          familyAPI.getMy(),
+          habitLogAPI.getFamilyLogsRange(weekRange.start, weekRange.end)
         ]);
 
         // Check for new habit completions and show notifications
@@ -352,6 +386,7 @@ function Dashboard() {
 
         setHabits(habitsRes.data);
         setLogs(logsRes.data);
+        setWeeklyLogs(weeklyLogsRes.data);
         setFamily(familyRes.data);
       }
     } catch (error) {
@@ -418,18 +453,21 @@ function Dashboard() {
         ? newHabit.selectedDays.join(',')
         : null;
 
+      const weeklyTarget = newHabit.habitType === 'WEEKLY_COUNT' ? newHabit.weeklyTarget : null;
+
       await habitAPI.create(
         newHabit.name,
         newHabit.description,
         newHabit.color,
         newHabit.habitType,
-        selectedDaysStr
+        selectedDaysStr,
+        weeklyTarget
       );
 
       // Save the last used color to localStorage
       localStorage.setItem('lastHabitColor', newHabit.color);
 
-      setNewHabit({ name: '', description: '', color: newHabit.color, habitType: 'DAILY', selectedDays: [] });
+      setNewHabit({ name: '', description: '', color: newHabit.color, habitType: 'DAILY', selectedDays: [], weeklyTarget: 3 });
       setShowAddHabit(false);
       loadData();
     } catch (error) {
@@ -444,7 +482,8 @@ function Dashboard() {
       description: habit.description || '',
       color: habit.color,
       habitType: habit.habitType || 'DAILY',
-      selectedDays: habit.selectedDays ? habit.selectedDays.split(',').map(d => parseInt(d)) : []
+      selectedDays: habit.selectedDays ? habit.selectedDays.split(',').map(d => parseInt(d)) : [],
+      weeklyTarget: habit.weeklyTarget || 3
     });
     setShowAddHabit(false);
   };
@@ -456,19 +495,22 @@ function Dashboard() {
         ? newHabit.selectedDays.join(',')
         : null;
 
+      const weeklyTarget = newHabit.habitType === 'WEEKLY_COUNT' ? newHabit.weeklyTarget : null;
+
       await habitAPI.update(
         editingHabit.id,
         newHabit.name,
         newHabit.description,
         newHabit.color,
         newHabit.habitType,
-        selectedDaysStr
+        selectedDaysStr,
+        weeklyTarget
       );
 
       // Save the last used color to localStorage
       localStorage.setItem('lastHabitColor', newHabit.color);
 
-      setNewHabit({ name: '', description: '', color: getLastUsedColor(), habitType: 'DAILY', selectedDays: [] });
+      setNewHabit({ name: '', description: '', color: getLastUsedColor(), habitType: 'DAILY', selectedDays: [], weeklyTarget: 3 });
       setEditingHabit(null);
       loadData();
     } catch (error) {
@@ -604,6 +646,10 @@ function Dashboard() {
       return true; // Daily habits always show
     }
 
+    if (habit.habitType === 'WEEKLY_COUNT') {
+      return true; // Weekly count habits can be done any day
+    }
+
     if (habit.habitType === 'WEEKLY' && habit.selectedDays) {
       const [year, month, day] = selectedDate.split('-').map(Number);
       const date = new Date(year, month - 1, day);
@@ -618,6 +664,10 @@ function Dashboard() {
 
   // Get display text for selected days
   const getDaysDisplay = (habit) => {
+    if (habit.habitType === 'WEEKLY_COUNT' && habit.weeklyTarget) {
+      return `주 ${habit.weeklyTarget}회`;
+    }
+
     if (habit.habitType !== 'WEEKLY' || !habit.selectedDays) {
       return null;
     }
@@ -861,7 +911,7 @@ function Dashboard() {
 
                     <div className="space-y-2">
                       <Label>습관 유형</Label>
-                      <div className="flex gap-4">
+                      <div className="flex flex-wrap gap-3">
                         <label className="flex items-center gap-2 cursor-pointer">
                           <input
                             type="radio"
@@ -880,7 +930,17 @@ function Dashboard() {
                             onChange={(e) => setNewHabit({ ...newHabit, habitType: e.target.value })}
                             className="w-4 h-4"
                           />
-                          <span>주간 (요일 선택)</span>
+                          <span>요일 지정</span>
+                        </label>
+                        <label className="flex items-center gap-2 cursor-pointer">
+                          <input
+                            type="radio"
+                            value="WEEKLY_COUNT"
+                            checked={newHabit.habitType === 'WEEKLY_COUNT'}
+                            onChange={(e) => setNewHabit({ ...newHabit, habitType: e.target.value })}
+                            className="w-4 h-4"
+                          />
+                          <span>주 N회</span>
                         </label>
                       </div>
                     </div>
@@ -909,6 +969,24 @@ function Dashboard() {
                               {day.label}
                             </Button>
                           ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {newHabit.habitType === 'WEEKLY_COUNT' && (
+                      <div className="space-y-2">
+                        <Label>주간 목표 횟수</Label>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm text-gray-600">주</span>
+                          <Input
+                            type="number"
+                            min="1"
+                            max="7"
+                            value={newHabit.weeklyTarget}
+                            onChange={(e) => setNewHabit({ ...newHabit, weeklyTarget: parseInt(e.target.value) || 1 })}
+                            className="w-20"
+                          />
+                          <span className="text-sm text-gray-600">회</span>
                         </div>
                       </div>
                     )}
@@ -966,7 +1044,7 @@ function Dashboard() {
 
                   <div className="space-y-2">
                     <Label>습관 유형</Label>
-                    <div className="flex gap-4">
+                    <div className="flex flex-wrap gap-3">
                       <label className="flex items-center gap-2 cursor-pointer">
                         <input
                           type="radio"
@@ -985,7 +1063,17 @@ function Dashboard() {
                           onChange={(e) => setNewHabit({ ...newHabit, habitType: e.target.value })}
                           className="w-4 h-4"
                         />
-                        <span>주간 (요일 선택)</span>
+                        <span>요일 지정</span>
+                      </label>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="radio"
+                          value="WEEKLY_COUNT"
+                          checked={newHabit.habitType === 'WEEKLY_COUNT'}
+                          onChange={(e) => setNewHabit({ ...newHabit, habitType: e.target.value })}
+                          className="w-4 h-4"
+                        />
+                        <span>주 N회</span>
                       </label>
                     </div>
                   </div>
@@ -1014,6 +1102,24 @@ function Dashboard() {
                             {day.label}
                           </Button>
                         ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {newHabit.habitType === 'WEEKLY_COUNT' && (
+                    <div className="space-y-2">
+                      <Label>주간 목표 횟수</Label>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-gray-600">주</span>
+                        <Input
+                          type="number"
+                          min="1"
+                          max="7"
+                          value={newHabit.weeklyTarget}
+                          onChange={(e) => setNewHabit({ ...newHabit, weeklyTarget: parseInt(e.target.value) || 1 })}
+                          className="w-20"
+                        />
+                        <span className="text-sm text-gray-600">회</span>
                       </div>
                     </div>
                   )}
@@ -1054,6 +1160,18 @@ function Dashboard() {
                       );
                       const daysDisplay = getDaysDisplay(habit);
 
+                      // Calculate weekly progress for WEEKLY_COUNT habits
+                      let weeklyProgress = null;
+                      if (habit.habitType === 'WEEKLY_COUNT' && habit.weeklyTarget) {
+                        const completedThisWeek = weeklyLogs.filter(
+                          (log) => log.habit.id === habit.id && log.user.id === user.id && log.completed
+                        ).length;
+                        weeklyProgress = {
+                          completed: completedThisWeek,
+                          target: habit.weeklyTarget
+                        };
+                      }
+
                       return (
                         <SortableHabitItem
                           key={habit.id}
@@ -1063,6 +1181,7 @@ function Dashboard() {
                           onEdit={handleEditHabit}
                           onDelete={handleDeleteHabit}
                           daysDisplay={daysDisplay}
+                          weeklyProgress={weeklyProgress}
                         />
                       );
                     })}

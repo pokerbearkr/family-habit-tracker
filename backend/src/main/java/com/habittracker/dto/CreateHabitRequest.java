@@ -18,7 +18,9 @@ public class CreateHabitRequest {
     @NotBlank(message = "Color is required")
     private String color;
 
-    private String habitType; // DAILY or WEEKLY (defaults to DAILY if not provided)
+    private String habitType; // DAILY, WEEKLY, or WEEKLY_COUNT (defaults to DAILY if not provided)
 
     private String selectedDays; // Comma-separated day numbers for WEEKLY habits
+
+    private Integer weeklyTarget; // Target count per week for WEEKLY_COUNT habits
 }

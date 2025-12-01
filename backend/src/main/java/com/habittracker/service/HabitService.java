@@ -45,6 +45,7 @@ public class HabitService {
                 .displayOrder(newOrder)
                 .habitType(habitType)
                 .selectedDays(request.getSelectedDays())
+                .weeklyTarget(request.getWeeklyTarget())
                 .build();
 
         return habitRepository.save(habit);
@@ -81,6 +82,7 @@ public class HabitService {
             habit.setHabitType(request.getHabitType());
         }
         habit.setSelectedDays(request.getSelectedDays());
+        habit.setWeeklyTarget(request.getWeeklyTarget());
 
         return habitRepository.save(habit);
     }

@@ -20,6 +20,7 @@ public class HabitResponse {
     private Integer displayOrder;
     private String habitType;
     private String selectedDays;
+    private Integer weeklyTarget;
 
     public static HabitResponse from(Habit habit) {
         return new HabitResponse(
@@ -33,7 +34,8 @@ public class HabitResponse {
             habit.getUser() != null ? habit.getUser().getDisplayName() : null,
             habit.getDisplayOrder(),
             habit.getHabitType(),
-            habit.getSelectedDays()
+            habit.getSelectedDays(),
+            habit.getWeeklyTarget()
         );
     }
 }

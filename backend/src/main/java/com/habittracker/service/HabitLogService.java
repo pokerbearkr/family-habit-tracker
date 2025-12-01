@@ -212,6 +212,13 @@ public class HabitLogService {
             return count;
         }
 
+        // If it's a WEEKLY_COUNT habit, calculate based on number of weeks × weeklyTarget
+        if ("WEEKLY_COUNT".equals(habit.getHabitType()) && habit.getWeeklyTarget() != null) {
+            int days = (int) java.time.temporal.ChronoUnit.DAYS.between(effectiveStartDate, effectiveEndDate) + 1;
+            int weeks = (days + 6) / 7; // Round up to include partial weeks
+            return weeks * habit.getWeeklyTarget();
+        }
+
         // Default to counting days from effective start date to effective end date
         return (int) java.time.temporal.ChronoUnit.DAYS.between(effectiveStartDate, effectiveEndDate) + 1;
     }
@@ -244,6 +251,11 @@ public class HabitLogService {
                 }
             }
             return false;
+        }
+
+        // WEEKLY_COUNT habits can be done on any day
+        if ("WEEKLY_COUNT".equals(habit.getHabitType())) {
+            return true;
         }
 
         return true; // Default to true if type is unknown
