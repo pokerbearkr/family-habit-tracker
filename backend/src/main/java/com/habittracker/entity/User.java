@@ -38,6 +38,10 @@ public class User {
     @Builder.Default
     private Boolean enableReminders = true;
 
+    @Column(name = "reminder_time")
+    @Builder.Default
+    private String reminderTime = "21:00"; // HH:mm format, default 9 PM
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "family_id")
     private Family family;

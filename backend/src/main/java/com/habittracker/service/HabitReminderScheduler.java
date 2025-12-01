@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,14 +33,17 @@ public class HabitReminderScheduler {
         this.pushNotificationService = pushNotificationService;
     }
 
-    // 매일 오후 9시에 실행 (cron: 초 분 시 일 월 요일)
-    // 0 0 21 * * * = 매일 21시 0분 0초
+    // 매 시간 정각에 실행 (cron: 초 분 시 일 월 요일)
+    // 0 0 * * * * = 매 시간 0분 0초
     @Transactional(readOnly = true)
-    @Scheduled(cron = "0 0 21 * * *", zone = "Asia/Seoul")
+    @Scheduled(cron = "0 0 * * * *", zone = "Asia/Seoul")
     public void sendDailyReminders() {
-        System.out.println("=== 오후 9시 습관 알림 스케줄러 실행 ===");
+        LocalTime now = LocalTime.now(ZoneId.of("Asia/Seoul"));
+        String currentHour = String.format("%02d:00", now.getHour());
 
-        LocalDate today = LocalDate.now();
+        System.out.println(String.format("=== %s 습관 알림 스케줄러 실행 ===", currentHour));
+
+        LocalDate today = LocalDate.now(ZoneId.of("Asia/Seoul"));
 
         // 모든 습관 가져오기
         List<Habit> allHabits = habitRepository.findAll();
@@ -49,7 +54,15 @@ public class HabitReminderScheduler {
                 .forEach((user, userHabits) -> {
                     // 알림 설정이 꺼져 있으면 스킵
                     if (user.getEnableReminders() == null || !user.getEnableReminders()) {
-                        System.out.println(String.format("알림 스킵: %s (알림 설정 꺼짐)", user.getDisplayName()));
+                        return;
+                    }
+
+                    // 사용자의 알림 시간 확인 (기본값 21:00)
+                    String userReminderTime = user.getReminderTime() != null ? user.getReminderTime() : "21:00";
+                    String userReminderHour = userReminderTime.split(":")[0] + ":00";
+
+                    // 현재 시간이 사용자의 알림 시간이 아니면 스킵
+                    if (!currentHour.equals(userReminderHour)) {
                         return;
                     }
 

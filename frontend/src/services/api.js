@@ -31,8 +31,8 @@ export const authAPI = {
   signup: (username, email, password, displayName) =>
     api.post('/auth/signup', { username, email, password, displayName }),
   getReminderSettings: () => api.get('/auth/settings/reminders'),
-  updateReminderSettings: (enableReminders) =>
-    api.put('/auth/settings/reminders', { enableReminders }),
+  updateReminderSettings: (settings) =>
+    api.put('/auth/settings/reminders', settings),
   updateDisplayName: (displayName) =>
     api.put('/auth/profile/display-name', { displayName }),
   deleteAccount: () => api.delete('/auth/account')

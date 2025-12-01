@@ -40,30 +40,42 @@ public class AuthController {
     }
 
     @PutMapping("/settings/reminders")
-    public ResponseEntity<Map<String, Boolean>> updateReminderSettings(
+    public ResponseEntity<Map<String, Object>> updateReminderSettings(
             Authentication authentication,
-            @RequestBody Map<String, Boolean> settings
+            @RequestBody Map<String, Object> settings
     ) {
         String username = authentication.getName();
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        Boolean enableReminders = settings.get("enableReminders");
-        if (enableReminders != null) {
-            user.setEnableReminders(enableReminders);
-            userRepository.save(user);
+        if (settings.containsKey("enableReminders")) {
+            user.setEnableReminders((Boolean) settings.get("enableReminders"));
         }
+        if (settings.containsKey("reminderTime")) {
+            String reminderTime = (String) settings.get("reminderTime");
+            // Validate format HH:mm
+            if (reminderTime != null && reminderTime.matches("^([01]?[0-9]|2[0-3]):[0-5][0-9]$")) {
+                user.setReminderTime(reminderTime);
+            }
+        }
+        userRepository.save(user);
 
-        return ResponseEntity.ok(Map.of("enableReminders", user.getEnableReminders()));
+        return ResponseEntity.ok(Map.of(
+                "enableReminders", user.getEnableReminders(),
+                "reminderTime", user.getReminderTime() != null ? user.getReminderTime() : "21:00"
+        ));
     }
 
     @GetMapping("/settings/reminders")
-    public ResponseEntity<Map<String, Boolean>> getReminderSettings(Authentication authentication) {
+    public ResponseEntity<Map<String, Object>> getReminderSettings(Authentication authentication) {
         String username = authentication.getName();
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        return ResponseEntity.ok(Map.of("enableReminders", user.getEnableReminders()));
+        return ResponseEntity.ok(Map.of(
+                "enableReminders", user.getEnableReminders(),
+                "reminderTime", user.getReminderTime() != null ? user.getReminderTime() : "21:00"
+        ));
     }
 
     @PutMapping("/profile/display-name")

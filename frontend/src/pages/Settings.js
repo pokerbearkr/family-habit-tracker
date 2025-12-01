@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../components/ui/dialog';
-import { ArrowLeft, Trash2, AlertTriangle, User, Mail, Shield, Edit, Check, X, Coffee, ExternalLink } from 'lucide-react';
+import { ArrowLeft, Trash2, AlertTriangle, User, Mail, Shield, Edit, Check, X, Coffee, ExternalLink, Bell, Clock } from 'lucide-react';
 import api from '../services/api';
 import { authAPI } from '../services/api';
 
@@ -19,6 +19,53 @@ export default function Settings() {
   const [newDisplayName, setNewDisplayName] = useState('');
   const [savingName, setSavingName] = useState(false);
   const [nameError, setNameError] = useState('');
+
+  // Reminder settings
+  const [enableReminders, setEnableReminders] = useState(true);
+  const [reminderTime, setReminderTime] = useState('21:00');
+  const [loadingReminders, setLoadingReminders] = useState(true);
+  const [savingReminders, setSavingReminders] = useState(false);
+
+  // Load reminder settings on mount
+  useEffect(() => {
+    const loadReminderSettings = async () => {
+      try {
+        const response = await authAPI.getReminderSettings();
+        setEnableReminders(response.data.enableReminders);
+        setReminderTime(response.data.reminderTime || '21:00');
+      } catch (err) {
+        console.error('Error loading reminder settings:', err);
+      } finally {
+        setLoadingReminders(false);
+      }
+    };
+    loadReminderSettings();
+  }, []);
+
+  const handleReminderToggle = async () => {
+    setSavingReminders(true);
+    try {
+      const newValue = !enableReminders;
+      await authAPI.updateReminderSettings({ enableReminders: newValue });
+      setEnableReminders(newValue);
+    } catch (err) {
+      console.error('Error updating reminder settings:', err);
+    } finally {
+      setSavingReminders(false);
+    }
+  };
+
+  const handleReminderTimeChange = async (newTime) => {
+    setSavingReminders(true);
+    try {
+      await authAPI.updateReminderSettings({ reminderTime: newTime });
+      setReminderTime(newTime);
+    } catch (err) {
+      console.error('Error updating reminder time:', err);
+    } finally {
+      setSavingReminders(false);
+    }
+  };
 
   const handleStartEditName = () => {
     setNewDisplayName(user?.displayName || '');
@@ -160,6 +207,79 @@ export default function Settings() {
                 <p className="font-medium">{user?.email}</p>
               </div>
             </div>
+          </CardContent>
+        </Card>
+
+        {/* Notification Settings */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Bell className="h-5 w-5" />
+              알림 설정
+            </CardTitle>
+            <CardDescription>
+              미완료 습관 알림을 받을 시간을 설정하세요
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {loadingReminders ? (
+              <div className="text-center text-gray-500 py-2">로딩 중...</div>
+            ) : (
+              <>
+                {/* Enable/Disable Toggle */}
+                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div className="flex items-center gap-2">
+                    <Bell className="h-5 w-5 text-gray-600" />
+                    <span>습관 알림 받기</span>
+                  </div>
+                  <button
+                    onClick={handleReminderToggle}
+                    disabled={savingReminders}
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                      enableReminders ? 'bg-blue-600' : 'bg-gray-300'
+                    } ${savingReminders ? 'opacity-50' : ''}`}
+                  >
+                    <span
+                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                        enableReminders ? 'translate-x-6' : 'translate-x-1'
+                      }`}
+                    />
+                  </button>
+                </div>
+
+                {/* Reminder Time Selection */}
+                {enableReminders && (
+                  <div className="p-3 bg-gray-50 rounded-lg">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Clock className="h-5 w-5 text-gray-600" />
+                      <span>알림 시간</span>
+                    </div>
+                    <select
+                      value={reminderTime.split(':')[0]}
+                      onChange={(e) => handleReminderTimeChange(`${e.target.value}:00`)}
+                      disabled={savingReminders}
+                      className="w-full p-2 border rounded-lg bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    >
+                      {Array.from({ length: 24 }, (_, i) => {
+                        const hour = i.toString().padStart(2, '0');
+                        const displayHour = i === 0 ? '오전 12시' :
+                                           i < 12 ? `오전 ${i}시` :
+                                           i === 12 ? '오후 12시' :
+                                           `오후 ${i - 12}시`;
+                        return (
+                          <option key={hour} value={hour}>
+                            {displayHour}
+                          </option>
+                        );
+                      })}
+                    </select>
+                    <p className="text-sm text-gray-500 mt-2">
+                      선택한 시간에 미완료 습관이 있으면 알림을 받습니다
+                    </p>
+                  </div>
+                )}
+              </>
+            )}
           </CardContent>
         </Card>
 
