@@ -8,6 +8,8 @@ import com.habittracker.repository.HabitLogRepository;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import org.springframework.transaction.annotation.Transactional;
+
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -31,6 +33,7 @@ public class HabitReminderScheduler {
 
     // 매일 오후 9시에 실행 (cron: 초 분 시 일 월 요일)
     // 0 0 21 * * * = 매일 21시 0분 0초
+    @Transactional(readOnly = true)
     @Scheduled(cron = "0 0 21 * * *", zone = "Asia/Seoul")
     public void sendDailyReminders() {
         System.out.println("=== 오후 9시 습관 알림 스케줄러 실행 ===");
