@@ -35,10 +35,9 @@ import {
   GripVertical,
   Calendar,
   Users,
-  LogOut,
+  DoorOpen,
   TrendingUp,
   Bell,
-  Circle,
   X,
   ChevronLeft,
   ChevronRight,
@@ -193,7 +192,7 @@ function SortableHabitItem({ habit, userLog, onToggle, onEdit, onDelete, daysDis
                   : 'border-figma-black-10 bg-white text-figma-black-40 hover:border-figma-blue-100'
               }`}
             >
-              {userLog?.completed ? <Check className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
+              <Check className="w-4 h-4" />
             </button>
           </div>
         </div>
@@ -851,12 +850,10 @@ function Dashboard() {
               </button>
               <button
                 onClick={() => navigate('/family')}
-                className="w-12 h-12 flex items-center justify-center rounded-2xl border border-figma-black-10 bg-white hover:bg-figma-black-10 transition-colors relative"
+                className="w-12 h-12 flex items-center justify-center rounded-2xl border border-figma-black-10 bg-white hover:bg-figma-black-10 transition-colors"
+                title="그룹"
               >
-                <Bell className="w-5 h-5 text-figma-black-60" />
-                {notificationPermission !== 'granted' && (
-                  <span className="absolute top-2 right-2 w-2 h-2 bg-figma-red rounded-full"></span>
-                )}
+                <Users className="w-5 h-5 text-figma-black-60" />
               </button>
             </div>
           </div>
@@ -873,10 +870,10 @@ function Dashboard() {
             </div>
             <button
               onClick={() => setShowLogoutDialog(true)}
-              className="w-10 h-10 bg-figma-info rounded-full flex items-center justify-center"
+              className="w-10 h-10 bg-figma-black-10 rounded-full flex items-center justify-center hover:bg-figma-black-20 transition-colors"
               title="로그아웃"
             >
-              <span className="text-xl">😊</span>
+              <DoorOpen className="w-5 h-5 text-figma-black-60" />
             </button>
           </div>
         </div>
@@ -1155,8 +1152,16 @@ function Dashboard() {
                           type="number"
                           min="1"
                           max="7"
-                          value={newHabit.weeklyTarget}
-                          onChange={(e) => setNewHabit({ ...newHabit, weeklyTarget: parseInt(e.target.value) || 1 })}
+                          value={newHabit.weeklyTarget || ''}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            setNewHabit({ ...newHabit, weeklyTarget: val === '' ? '' : Math.min(7, Math.max(1, parseInt(val) || 1)) });
+                          }}
+                          onBlur={(e) => {
+                            if (!newHabit.weeklyTarget) {
+                              setNewHabit({ ...newHabit, weeklyTarget: 3 });
+                            }
+                          }}
                           className="w-20 rounded-xl border-figma-black-10"
                         />
                         <span className="text-sm text-figma-black-60">회</span>
@@ -1328,8 +1333,16 @@ function Dashboard() {
                           type="number"
                           min="1"
                           max="7"
-                          value={newHabit.weeklyTarget}
-                          onChange={(e) => setNewHabit({ ...newHabit, weeklyTarget: parseInt(e.target.value) || 1 })}
+                          value={newHabit.weeklyTarget || ''}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            setNewHabit({ ...newHabit, weeklyTarget: val === '' ? '' : Math.min(7, Math.max(1, parseInt(val) || 1)) });
+                          }}
+                          onBlur={(e) => {
+                            if (!newHabit.weeklyTarget) {
+                              setNewHabit({ ...newHabit, weeklyTarget: 3 });
+                            }
+                          }}
                           className="w-20"
                         />
                         <span className="text-sm text-gray-600">회</span>
@@ -1504,7 +1517,7 @@ function Dashboard() {
                             : 'bg-figma-black-10 text-figma-black-40'
                         }`}
                       >
-                        {isCompleted ? <Check className="w-4 h-4" /> : <Circle className="w-4 h-4" />}
+                        <Check className="w-4 h-4" />
                       </div>
                     </div>
                   </div>

@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import {
   Home,
   Users,
-  LogOut,
+  DoorOpen,
   ChevronLeft,
   ChevronRight,
   Calendar,
@@ -154,10 +154,10 @@ function Monthly() {
             </div>
             <button
               onClick={() => setShowLogoutDialog(true)}
-              className="w-10 h-10 bg-figma-info rounded-full flex items-center justify-center"
+              className="w-10 h-10 bg-figma-black-10 rounded-full flex items-center justify-center hover:bg-figma-black-20 transition-colors"
               title="로그아웃"
             >
-              <span className="text-xl">📈</span>
+              <DoorOpen className="w-5 h-5 text-figma-black-60" />
             </button>
           </div>
         </div>
