@@ -51,24 +51,24 @@ module.exports = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        // Figma Design Colors
+        // Figma Design Colors (with dark mode support via CSS variables)
         figma: {
           blue: {
-            10: "#EBECFF",
-            40: "#AFB4FF",
-            100: "#3843FF",
+            10: "hsl(var(--blue-10))",
+            40: "hsl(var(--blue-40))",
+            100: "hsl(var(--blue-100))",
           },
           black: {
-            10: "#EAECF0",
-            20: "#CDCDD0",
-            40: "#9B9BA1",
-            60: "#686873",
-            100: "#040415",
+            10: "hsl(var(--black-10))",
+            20: "hsl(var(--black-20))",
+            40: "hsl(var(--black-40))",
+            60: "hsl(var(--black-60))",
+            100: "hsl(var(--black-100))",
           },
-          green: "#3BA935",
-          red: "#E3524F",
-          info: "#DDF2FC",
-          bg: "#F6F9FF",
+          green: "hsl(var(--success))",
+          red: "hsl(var(--destructive))",
+          info: "hsl(var(--info-blue))",
+          bg: "hsl(var(--background))",
         },
       },
       borderRadius: {

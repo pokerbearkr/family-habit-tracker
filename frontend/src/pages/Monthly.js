@@ -82,7 +82,7 @@ function Monthly() {
   if (!user.familyId) {
     return (
       <div className="min-h-screen bg-figma-bg flex items-center justify-center p-4">
-        <div className="w-full max-w-md bg-white rounded-3xl p-6 shadow-figma text-center">
+        <div className="w-full max-w-md bg-white dark:bg-gray-800 rounded-3xl p-6 shadow-figma text-center">
           <div className="w-16 h-16 bg-gradient-to-br from-[#6B73FF] to-[#3843FF] rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-figma">
             <Users className="h-8 w-8 text-white" />
           </div>
@@ -116,26 +116,26 @@ function Monthly() {
   return (
     <div className="min-h-screen bg-figma-bg pb-8">
       {/* Header - Dashboard style */}
-      <header className="bg-white border-b border-figma-black-10 sticky top-0 z-50">
+      <header className="bg-white dark:bg-gray-800 border-b border-figma-black-10 sticky top-0 z-50">
         <div className="max-w-lg mx-auto px-6 py-4">
           {/* Top Row - Icons */}
           <div className="flex justify-between items-center mb-4">
             <button
               onClick={() => navigate('/dashboard')}
-              className="w-12 h-12 flex items-center justify-center rounded-2xl border border-figma-black-10 bg-white hover:bg-figma-black-10 transition-colors"
+              className="w-12 h-12 flex items-center justify-center rounded-2xl border border-figma-black-10 bg-white dark:bg-gray-800 hover:bg-figma-black-10 transition-colors"
             >
               <Home className="w-5 h-5 text-figma-black-60" />
             </button>
             <div className="flex gap-2">
               <button
                 onClick={() => navigate('/settings')}
-                className="w-12 h-12 flex items-center justify-center rounded-2xl border border-figma-black-10 bg-white hover:bg-figma-black-10 transition-colors"
+                className="w-12 h-12 flex items-center justify-center rounded-2xl border border-figma-black-10 bg-white dark:bg-gray-800 hover:bg-figma-black-10 transition-colors"
               >
                 <Settings className="w-5 h-5 text-figma-black-60" />
               </button>
               <button
                 onClick={() => navigate('/family')}
-                className="w-12 h-12 flex items-center justify-center rounded-2xl border border-figma-black-10 bg-white hover:bg-figma-black-10 transition-colors"
+                className="w-12 h-12 flex items-center justify-center rounded-2xl border border-figma-black-10 bg-white dark:bg-gray-800 hover:bg-figma-black-10 transition-colors"
               >
                 <Users className="w-5 h-5 text-figma-black-60" />
               </button>
@@ -169,7 +169,7 @@ function Monthly() {
         <div className="flex items-center justify-between gap-4">
           <button
             onClick={() => changeMonth(-1)}
-            className="w-12 h-12 flex items-center justify-center rounded-2xl border border-figma-black-10 bg-white hover:bg-figma-black-10 transition-colors"
+            className="w-12 h-12 flex items-center justify-center rounded-2xl border border-figma-black-10 bg-white dark:bg-gray-800 hover:bg-figma-black-10 transition-colors"
           >
             <ChevronLeft className="h-5 w-5 text-figma-black-60" />
           </button>
@@ -183,7 +183,7 @@ function Monthly() {
           </div>
           <button
             onClick={() => changeMonth(1)}
-            className="w-12 h-12 flex items-center justify-center rounded-2xl border border-figma-black-10 bg-white hover:bg-figma-black-10 transition-colors"
+            className="w-12 h-12 flex items-center justify-center rounded-2xl border border-figma-black-10 bg-white dark:bg-gray-800 hover:bg-figma-black-10 transition-colors"
           >
             <ChevronRight className="h-5 w-5 text-figma-black-60" />
           </button>
@@ -192,7 +192,7 @@ function Monthly() {
         {stats && (
           <>
             {/* User Stats */}
-            <div className="bg-white border border-figma-black-10 rounded-2xl p-4">
+            <div className="bg-white dark:bg-gray-800 border border-figma-black-10 rounded-2xl p-4">
               <div className="flex items-center gap-2 mb-3">
                 <TrendingUp className="h-4 w-4 text-figma-blue-100" />
                 <h3 className="text-sm font-medium text-figma-black-100">그룹 구성원별 통계</h3>
@@ -246,7 +246,7 @@ function Monthly() {
             </div>
 
             {/* Habit Stats */}
-            <div className="bg-white border border-figma-black-10 rounded-2xl p-4">
+            <div className="bg-white dark:bg-gray-800 border border-figma-black-10 rounded-2xl p-4">
               <div className="flex items-center gap-2 mb-3">
                 <Award className="h-4 w-4 text-figma-blue-100" />
                 <h3 className="text-sm font-medium text-figma-black-100">습관별 통계</h3>
@@ -299,7 +299,7 @@ function Monthly() {
             </div>
 
             {/* Calendar View */}
-            <div className="bg-white border border-figma-black-10 rounded-2xl p-4">
+            <div className="bg-white dark:bg-gray-800 border border-figma-black-10 rounded-2xl p-4">
               <div className="flex items-center gap-2 mb-3">
                 <Calendar className="h-4 w-4 text-figma-blue-100" />
                 <h3 className="text-sm font-medium text-figma-black-100">월간 캘린더</h3>
@@ -484,7 +484,7 @@ function Monthly() {
                               )}
                             </p>
                             {log.note && (
-                              <div className="flex items-start gap-1 mt-2 p-2 bg-white rounded-xl">
+                              <div className="flex items-start gap-1 mt-2 p-2 bg-white dark:bg-gray-800 rounded-xl">
                                 <MessageSquare className="w-3 h-3 text-figma-black-40 mt-0.5 flex-shrink-0" />
                                 <p className="text-xs text-figma-black-60 break-words">{log.note}</p>
                               </div>

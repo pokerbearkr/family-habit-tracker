@@ -54,7 +54,7 @@ function Login() {
         </div>
 
         {/* Login Card */}
-        <div className="bg-white rounded-3xl p-6 shadow-figma">
+        <div className="bg-white dark:bg-gray-800 rounded-3xl p-6 shadow-figma">
           {error && (
             <div className="mb-4 p-3 text-sm text-figma-red bg-red-50 border border-red-100 rounded-2xl">
               {error}

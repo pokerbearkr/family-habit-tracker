@@ -1,15 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import { Input } from '../components/ui/input';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../components/ui/dialog';
-import { Trash2, AlertTriangle, User, Mail, Shield, Edit, Check, X, Coffee, ExternalLink, Bell, Clock, Home, TrendingUp, Users } from 'lucide-react';
+import { Trash2, AlertTriangle, User, Mail, Shield, Edit, Check, X, Coffee, ExternalLink, Bell, Clock, Home, TrendingUp, Users, Moon, Sun, Monitor } from 'lucide-react';
 import api from '../services/api';
 import { authAPI } from '../services/api';
 
 export default function Settings() {
   const navigate = useNavigate();
   const { user, logout, updateUser } = useAuth();
+  const { isDark, setTheme } = useTheme();
+  const [themeMode, setThemeMode] = useState(() => {
+    const saved = localStorage.getItem('theme');
+    return saved || 'system';
+  });
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState('');
@@ -114,29 +120,34 @@ export default function Settings() {
     }
   };
 
+  const handleThemeChange = (mode) => {
+    setThemeMode(mode);
+    setTheme(mode);
+  };
+
   return (
     <div className="min-h-screen bg-figma-bg pb-8">
       {/* Header - Dashboard style */}
-      <header className="bg-white border-b border-figma-black-10 sticky top-0 z-50">
+      <header className="bg-white dark:bg-gray-800 border-b border-figma-black-10 sticky top-0 z-50">
         <div className="max-w-lg mx-auto px-6 py-4">
           {/* Top Row - Icons */}
           <div className="flex justify-between items-center mb-4">
             <button
               onClick={() => navigate('/dashboard')}
-              className="w-12 h-12 flex items-center justify-center rounded-2xl border border-figma-black-10 bg-white hover:bg-figma-black-10 transition-colors"
+              className="w-12 h-12 flex items-center justify-center rounded-2xl border border-figma-black-10 bg-white dark:bg-gray-800 hover:bg-figma-black-10 transition-colors"
             >
               <Home className="w-5 h-5 text-figma-black-60" />
             </button>
             <div className="flex gap-2">
               <button
                 onClick={() => navigate('/monthly')}
-                className="w-12 h-12 flex items-center justify-center rounded-2xl border border-figma-black-10 bg-white hover:bg-figma-black-10 transition-colors"
+                className="w-12 h-12 flex items-center justify-center rounded-2xl border border-figma-black-10 bg-white dark:bg-gray-800 hover:bg-figma-black-10 transition-colors"
               >
                 <TrendingUp className="w-5 h-5 text-figma-black-60" />
               </button>
               <button
                 onClick={() => navigate('/family')}
-                className="w-12 h-12 flex items-center justify-center rounded-2xl border border-figma-black-10 bg-white hover:bg-figma-black-10 transition-colors"
+                className="w-12 h-12 flex items-center justify-center rounded-2xl border border-figma-black-10 bg-white dark:bg-gray-800 hover:bg-figma-black-10 transition-colors"
               >
                 <Users className="w-5 h-5 text-figma-black-60" />
               </button>
@@ -157,7 +168,7 @@ export default function Settings() {
 
       <div className="max-w-lg mx-auto px-6 py-4 space-y-4">
         {/* Account Info */}
-        <div className="bg-white border border-figma-black-10 rounded-2xl p-4">
+        <div className="bg-white dark:bg-gray-800 border border-figma-black-10 rounded-2xl p-4">
           <div className="flex items-center gap-2 mb-4">
             <User className="h-5 w-5 text-figma-blue-100" />
             <h2 className="font-semibold text-figma-black-100">계정 정보</h2>
@@ -230,7 +241,7 @@ export default function Settings() {
         </div>
 
         {/* Notification Settings */}
-        <div className="bg-white border border-figma-black-10 rounded-2xl p-4">
+        <div className="bg-white dark:bg-gray-800 border border-figma-black-10 rounded-2xl p-4">
           <div className="flex items-center gap-2 mb-2">
             <Bell className="h-4 w-4 text-figma-blue-100" />
             <h2 className="text-sm font-medium text-figma-black-100">알림 설정</h2>
@@ -265,7 +276,7 @@ export default function Settings() {
                     <span
                       className={`
                         pointer-events-none inline-block h-6 w-6 transform rounded-full
-                        bg-white shadow-sm transition duration-200 ease-in-out mt-0.5 ml-0.5
+                        bg-white dark:bg-gray-800 shadow-sm transition duration-200 ease-in-out mt-0.5 ml-0.5
                         ${enableReminders ? 'translate-x-5' : 'translate-x-0'}
                       `}
                     />
@@ -284,7 +295,7 @@ export default function Settings() {
                     value={reminderTime.split(':')[0]}
                     onChange={(e) => handleReminderTimeChange(`${e.target.value}:00`)}
                     disabled={savingReminders}
-                    className="w-full p-3 border border-figma-black-10 rounded-xl bg-white focus:ring-2 focus:ring-figma-blue-100 focus:border-figma-blue-100 text-figma-black-100"
+                    className="w-full p-3 border border-figma-black-10 rounded-xl bg-white dark:bg-gray-800 focus:ring-2 focus:ring-figma-blue-100 focus:border-figma-blue-100 text-figma-black-100"
                   >
                     {Array.from({ length: 24 }, (_, i) => {
                       const hour = i.toString().padStart(2, '0');
@@ -308,15 +319,70 @@ export default function Settings() {
           )}
         </div>
 
+        {/* Theme Settings */}
+        <div className="bg-white dark:bg-gray-800 border border-figma-black-10 dark:border-gray-700 rounded-2xl p-4">
+          <div className="flex items-center gap-2 mb-2">
+            {isDark ? <Moon className="h-4 w-4 text-figma-blue-100" /> : <Sun className="h-4 w-4 text-figma-blue-100" />}
+            <h2 className="text-sm font-medium text-figma-black-100 dark:text-white">테마 설정</h2>
+          </div>
+          <p className="text-sm text-figma-black-40 dark:text-gray-400 mb-4">
+            앱의 테마를 선택하세요
+          </p>
+
+          <div className="grid grid-cols-3 gap-2">
+            <button
+              onClick={() => handleThemeChange('light')}
+              className={`flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all ${
+                themeMode === 'light'
+                  ? 'border-figma-blue-100 bg-figma-blue-10'
+                  : 'border-figma-black-10 dark:border-gray-600 hover:border-figma-black-20'
+              }`}
+            >
+              <Sun className={`h-5 w-5 ${themeMode === 'light' ? 'text-figma-blue-100' : 'text-figma-black-40 dark:text-gray-400'}`} />
+              <span className={`text-xs font-medium ${themeMode === 'light' ? 'text-figma-blue-100' : 'text-figma-black-60 dark:text-gray-300'}`}>
+                라이트
+              </span>
+            </button>
+
+            <button
+              onClick={() => handleThemeChange('dark')}
+              className={`flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all ${
+                themeMode === 'dark'
+                  ? 'border-figma-blue-100 bg-figma-blue-10 dark:bg-blue-900/30'
+                  : 'border-figma-black-10 dark:border-gray-600 hover:border-figma-black-20'
+              }`}
+            >
+              <Moon className={`h-5 w-5 ${themeMode === 'dark' ? 'text-figma-blue-100' : 'text-figma-black-40 dark:text-gray-400'}`} />
+              <span className={`text-xs font-medium ${themeMode === 'dark' ? 'text-figma-blue-100' : 'text-figma-black-60 dark:text-gray-300'}`}>
+                다크
+              </span>
+            </button>
+
+            <button
+              onClick={() => handleThemeChange('system')}
+              className={`flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all ${
+                themeMode === 'system'
+                  ? 'border-figma-blue-100 bg-figma-blue-10 dark:bg-blue-900/30'
+                  : 'border-figma-black-10 dark:border-gray-600 hover:border-figma-black-20'
+              }`}
+            >
+              <Monitor className={`h-5 w-5 ${themeMode === 'system' ? 'text-figma-blue-100' : 'text-figma-black-40 dark:text-gray-400'}`} />
+              <span className={`text-xs font-medium ${themeMode === 'system' ? 'text-figma-blue-100' : 'text-figma-black-60 dark:text-gray-300'}`}>
+                시스템
+              </span>
+            </button>
+          </div>
+        </div>
+
         {/* Privacy */}
-        <div className="bg-white border border-figma-black-10 rounded-2xl p-4">
+        <div className="bg-white dark:bg-gray-800 border border-figma-black-10 dark:border-gray-700 rounded-2xl p-4">
           <div className="flex items-center gap-2 mb-3">
             <Shield className="h-4 w-4 text-figma-blue-100" />
-            <h2 className="text-sm font-medium text-figma-black-100">개인정보 보호</h2>
+            <h2 className="text-sm font-medium text-figma-black-100 dark:text-white">개인정보 보호</h2>
           </div>
           <button
             onClick={() => navigate('/privacy-policy')}
-            className="w-full h-11 border border-figma-black-10 text-figma-black-100 text-sm font-medium rounded-xl hover:bg-figma-bg transition-colors"
+            className="w-full h-11 border border-figma-black-10 dark:border-gray-600 text-figma-black-100 dark:text-white text-sm font-medium rounded-xl hover:bg-figma-bg dark:hover:bg-gray-700 transition-colors"
           >
             개인정보 처리방침 보기
           </button>
@@ -342,7 +408,7 @@ export default function Settings() {
         </div>
 
         {/* Danger Zone */}
-        <div className="bg-white rounded-2xl p-4 border border-red-200">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 border border-red-200">
           <div className="flex items-center gap-2 mb-2">
             <AlertTriangle className="h-4 w-4 text-figma-red" />
             <h2 className="text-sm font-medium text-figma-red">위험 영역</h2>

@@ -182,26 +182,26 @@ function Family() {
       <Toaster position="top-right" />
 
       {/* Header - Dashboard style */}
-      <header className="bg-white border-b border-figma-black-10 sticky top-0 z-50">
+      <header className="bg-white dark:bg-gray-800 border-b border-figma-black-10 sticky top-0 z-50">
         <div className="max-w-lg mx-auto px-6 py-4">
           {/* Top Row - Icons */}
           <div className="flex justify-between items-center mb-4">
             <button
               onClick={() => navigate('/dashboard')}
-              className="w-12 h-12 flex items-center justify-center rounded-2xl border border-figma-black-10 bg-white hover:bg-figma-black-10 transition-colors"
+              className="w-12 h-12 flex items-center justify-center rounded-2xl border border-figma-black-10 bg-white dark:bg-gray-800 hover:bg-figma-black-10 transition-colors"
             >
               <Home className="w-5 h-5 text-figma-black-60" />
             </button>
             <div className="flex gap-2">
               <button
                 onClick={() => navigate('/monthly')}
-                className="w-12 h-12 flex items-center justify-center rounded-2xl border border-figma-black-10 bg-white hover:bg-figma-black-10 transition-colors"
+                className="w-12 h-12 flex items-center justify-center rounded-2xl border border-figma-black-10 bg-white dark:bg-gray-800 hover:bg-figma-black-10 transition-colors"
               >
                 <TrendingUp className="w-5 h-5 text-figma-black-60" />
               </button>
               <button
                 onClick={() => navigate('/settings')}
-                className="w-12 h-12 flex items-center justify-center rounded-2xl border border-figma-black-10 bg-white hover:bg-figma-black-10 transition-colors"
+                className="w-12 h-12 flex items-center justify-center rounded-2xl border border-figma-black-10 bg-white dark:bg-gray-800 hover:bg-figma-black-10 transition-colors"
               >
                 <Settings className="w-5 h-5 text-figma-black-60" />
               </button>
@@ -234,7 +234,7 @@ function Family() {
         {family ? (
           <div className="space-y-4">
             {/* Family Info Card */}
-            <div className="bg-white border border-figma-black-10 rounded-2xl p-4">
+            <div className="bg-white dark:bg-gray-800 border border-figma-black-10 rounded-2xl p-4">
               {/* Family Name */}
               <div className="mb-4">
                 {editingName ? (
@@ -297,7 +297,7 @@ function Family() {
                   </p>
                   <button
                     onClick={handleCopyInviteCode}
-                    className="p-2.5 bg-white/20 rounded-xl hover:bg-white/30 transition-colors"
+                    className="p-2.5 bg-white dark:bg-gray-800/20 rounded-xl hover:bg-white dark:bg-gray-800/30 transition-colors"
                   >
                     {copied ? (
                       <Check className="h-5 w-5 text-white" />
@@ -361,7 +361,7 @@ function Family() {
         ) : (
           <div className="space-y-4">
             {/* Create or Join Family Card */}
-            <div className="bg-white border border-figma-black-10 rounded-2xl p-4">
+            <div className="bg-white dark:bg-gray-800 border border-figma-black-10 rounded-2xl p-4">
               <div className="text-center mb-5">
                 <div className="w-14 h-14 bg-gradient-to-br from-[#6B73FF] to-[#3843FF] rounded-2xl flex items-center justify-center mx-auto mb-3">
                   <Users className="h-7 w-7 text-white" />
@@ -429,7 +429,7 @@ function Family() {
                   <div className="w-full border-t border-figma-black-10"></div>
                 </div>
                 <div className="relative flex justify-center text-sm">
-                  <span className="px-4 bg-white text-figma-black-40 text-xs font-medium">
+                  <span className="px-4 bg-white dark:bg-gray-800 text-figma-black-40 text-xs font-medium">
                     또는
                   </span>
                 </div>

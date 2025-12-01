@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { ThemeProvider } from './context/ThemeContext';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Dashboard from './pages/Dashboard';
@@ -31,9 +32,10 @@ function PublicRoute({ children }) {
 
 function App() {
   return (
-    <Router>
-      <AuthProvider>
-        <Routes>
+    <ThemeProvider>
+      <Router>
+        <AuthProvider>
+          <Routes>
           <Route
             path="/login"
             element={
@@ -82,11 +84,12 @@ function App() {
               </PrivateRoute>
             }
           />
-          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-          <Route path="/" element={<Navigate to="/dashboard" />} />
-        </Routes>
-      </AuthProvider>
-    </Router>
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+            <Route path="/" element={<Navigate to="/dashboard" />} />
+          </Routes>
+        </AuthProvider>
+      </Router>
+    </ThemeProvider>
   );
 }
 

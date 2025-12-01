@@ -79,7 +79,7 @@ function Signup() {
   if (success) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-figma-bg p-4">
-        <div className="w-full max-w-md bg-white rounded-3xl p-8 shadow-figma text-center">
+        <div className="w-full max-w-md bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-figma text-center">
           <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <CheckCircle2 className="h-8 w-8 text-figma-green" />
           </div>
@@ -111,7 +111,7 @@ function Signup() {
         </div>
 
         {/* Signup Card */}
-        <div className="bg-white rounded-3xl p-6 shadow-figma">
+        <div className="bg-white dark:bg-gray-800 rounded-3xl p-6 shadow-figma">
           {error && (
             <div className="mb-4 p-3 text-sm text-figma-red bg-red-50 border border-red-100 rounded-2xl">
               {error}

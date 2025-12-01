@@ -114,7 +114,7 @@ function SortableHabitItem({ habit, userLog, onToggle, onEdit, onDelete, daysDis
       style={style}
       {...attributes}
     >
-      <div className="bg-white border border-figma-black-10 rounded-2xl p-4 hover:shadow-figma transition-all duration-200">
+      <div className="bg-white dark:bg-gray-800 border border-figma-black-10 rounded-2xl p-4 hover:shadow-figma transition-all duration-200">
         <div className="flex items-center gap-3">
           {/* Drag Handle */}
           <div
@@ -174,13 +174,13 @@ function SortableHabitItem({ habit, userLog, onToggle, onEdit, onDelete, daysDis
           <div className="flex items-center gap-2">
             <button
               onClick={() => onEdit(habit)}
-              className="w-9 h-9 flex items-center justify-center rounded-xl border border-figma-black-10 bg-white text-figma-black-40 hover:bg-figma-black-10 transition-colors"
+              className="w-9 h-9 flex items-center justify-center rounded-xl border border-figma-black-10 bg-white dark:bg-gray-800 text-figma-black-40 hover:bg-figma-black-10 transition-colors"
             >
               <Edit className="w-4 h-4" />
             </button>
             <button
               onClick={() => onDelete(habit)}
-              className="w-9 h-9 flex items-center justify-center rounded-xl border border-figma-black-10 bg-white text-figma-red hover:bg-red-50 transition-colors"
+              className="w-9 h-9 flex items-center justify-center rounded-xl border border-figma-black-10 bg-white dark:bg-gray-800 text-figma-red hover:bg-red-50 transition-colors"
             >
               <Trash2 className="w-4 h-4" />
             </button>
@@ -189,7 +189,7 @@ function SortableHabitItem({ habit, userLog, onToggle, onEdit, onDelete, daysDis
               className={`w-9 h-9 flex items-center justify-center rounded-xl border transition-all ${
                 userLog?.completed
                   ? 'bg-figma-green border-figma-green text-white'
-                  : 'border-figma-black-10 bg-white text-figma-black-40 hover:border-figma-blue-100'
+                  : 'border-figma-black-10 bg-white dark:bg-gray-800 text-figma-black-40 hover:border-figma-blue-100'
               }`}
             >
               <Check className="w-4 h-4" />
@@ -802,7 +802,7 @@ function Dashboard() {
   if (!user.familyId) {
     return (
       <div className="min-h-screen bg-figma-bg flex items-center justify-center p-4">
-        <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-figma">
+        <div className="bg-white dark:bg-gray-800 rounded-3xl p-8 max-w-md w-full shadow-figma">
           <div className="text-center mb-6">
             <div className="w-16 h-16 bg-figma-blue-10 rounded-full flex items-center justify-center mx-auto mb-4">
               <Users className="w-8 h-8 text-figma-blue-100" />
@@ -831,26 +831,26 @@ function Dashboard() {
       <Toaster position="top-right" />
 
       {/* Figma-style Header */}
-      <header className="bg-white border-b border-figma-black-10 sticky top-0 z-50">
+      <header className="bg-white dark:bg-gray-800 border-b border-figma-black-10 sticky top-0 z-50">
         <div className="max-w-lg mx-auto px-6 py-4">
           {/* Top Row - Icons */}
           <div className="flex justify-between items-center mb-4">
             <button
               onClick={() => navigate('/monthly')}
-              className="w-12 h-12 flex items-center justify-center rounded-2xl border border-figma-black-10 bg-white hover:bg-figma-black-10 transition-colors"
+              className="w-12 h-12 flex items-center justify-center rounded-2xl border border-figma-black-10 bg-white dark:bg-gray-800 hover:bg-figma-black-10 transition-colors"
             >
               <Calendar className="w-5 h-5 text-figma-black-60" />
             </button>
             <div className="flex gap-2">
               <button
                 onClick={() => navigate('/settings')}
-                className="w-12 h-12 flex items-center justify-center rounded-2xl border border-figma-black-10 bg-white hover:bg-figma-black-10 transition-colors relative"
+                className="w-12 h-12 flex items-center justify-center rounded-2xl border border-figma-black-10 bg-white dark:bg-gray-800 hover:bg-figma-black-10 transition-colors relative"
               >
                 <Settings className="w-5 h-5 text-figma-black-60" />
               </button>
               <button
                 onClick={() => navigate('/family')}
-                className="w-12 h-12 flex items-center justify-center rounded-2xl border border-figma-black-10 bg-white hover:bg-figma-black-10 transition-colors"
+                className="w-12 h-12 flex items-center justify-center rounded-2xl border border-figma-black-10 bg-white dark:bg-gray-800 hover:bg-figma-black-10 transition-colors"
                 title="그룹"
               >
                 <Users className="w-5 h-5 text-figma-black-60" />
@@ -889,12 +889,12 @@ function Dashboard() {
         )}
 
         {/* Figma-style Horizontal Date Picker with Week Navigation */}
-        <div className="bg-white border border-figma-black-10 rounded-2xl p-3">
+        <div className="bg-white dark:bg-gray-800 border border-figma-black-10 rounded-2xl p-3">
           {/* Week Navigation Header */}
           <div className="flex items-center justify-between mb-3">
             <button
               onClick={() => changeWeek(-1)}
-              className="w-8 h-8 flex items-center justify-center rounded-xl border border-figma-black-10 bg-white hover:bg-figma-black-10 transition-colors"
+              className="w-8 h-8 flex items-center justify-center rounded-xl border border-figma-black-10 bg-white dark:bg-gray-800 hover:bg-figma-black-10 transition-colors"
             >
               <ChevronLeft className="w-4 h-4 text-figma-black-60" />
             </button>
@@ -913,7 +913,7 @@ function Dashboard() {
             </div>
             <button
               onClick={() => changeWeek(1)}
-              className="w-8 h-8 flex items-center justify-center rounded-xl border border-figma-black-10 bg-white hover:bg-figma-black-10 transition-colors"
+              className="w-8 h-8 flex items-center justify-center rounded-xl border border-figma-black-10 bg-white dark:bg-gray-800 hover:bg-figma-black-10 transition-colors"
             >
               <ChevronRight className="w-4 h-4 text-figma-black-60" />
             </button>
@@ -1011,7 +1011,7 @@ function Dashboard() {
           <div className="space-y-3">
             {/* Add Habit Form - Figma Style */}
             {showAddHabit && (
-              <div className="bg-white border border-figma-black-10 rounded-2xl p-4">
+              <div className="bg-white dark:bg-gray-800 border border-figma-black-10 rounded-2xl p-4">
                 <form onSubmit={handleAddHabit} className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="habit-name" className="text-xs font-medium text-figma-black-40 uppercase tracking-wide">습관 이름</Label>
@@ -1044,12 +1044,12 @@ function Dashboard() {
                         <button
                           type="button"
                           onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                          className="w-14 h-14 rounded-xl border border-figma-black-10 flex items-center justify-center text-2xl bg-white hover:bg-figma-black-10 transition-colors cursor-pointer"
+                          className="w-14 h-14 rounded-xl border border-figma-black-10 flex items-center justify-center text-2xl bg-white dark:bg-gray-800 hover:bg-figma-black-10 transition-colors cursor-pointer"
                         >
                           {newHabit.emoji}
                         </button>
                         {showEmojiPicker && (
-                          <div className="absolute top-16 left-0 z-50 bg-white border border-figma-black-10 rounded-xl p-3 shadow-lg w-64">
+                          <div className="absolute top-16 left-0 z-50 bg-white dark:bg-gray-800 border border-figma-black-10 rounded-xl p-3 shadow-lg w-64">
                             <div className="grid grid-cols-7 gap-1">
                               {['✨', '💧', '🏃', '📚', '💪', '🧘', '😴',
                                 '🍎', '💊', '🎯', '✍️', '🎨', '🎵', '🧹',
@@ -1103,7 +1103,7 @@ function Dashboard() {
                           onClick={() => setNewHabit({ ...newHabit, habitType: type.value })}
                           className={`flex-1 py-2 px-3 rounded-xl text-sm font-medium transition-all ${
                             newHabit.habitType === type.value
-                              ? 'bg-white text-figma-black-100 shadow-figma'
+                              ? 'bg-white dark:bg-gray-800 text-figma-black-100 shadow-figma'
                               : 'text-figma-black-60 hover:text-figma-black-100'
                           }`}
                         >
@@ -1133,7 +1133,7 @@ function Dashboard() {
                             className={`w-full py-2 rounded-xl text-sm font-medium transition-all ${
                               newHabit.selectedDays?.includes(day.num)
                                 ? 'bg-figma-blue-100 text-white'
-                                : 'bg-white border border-figma-black-10 text-figma-black-60 hover:border-figma-blue-40'
+                                : 'bg-white dark:bg-gray-800 border border-figma-black-10 text-figma-black-60 hover:border-figma-blue-40'
                             }`}
                           >
                             {day.label}
@@ -1217,12 +1217,12 @@ function Dashboard() {
                         <button
                           type="button"
                           onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                          className="w-12 h-12 rounded-xl border border-figma-black-10 flex items-center justify-center text-xl bg-white hover:bg-figma-black-10 transition-colors cursor-pointer"
+                          className="w-12 h-12 rounded-xl border border-figma-black-10 flex items-center justify-center text-xl bg-white dark:bg-gray-800 hover:bg-figma-black-10 transition-colors cursor-pointer"
                         >
                           {newHabit.emoji}
                         </button>
                         {showEmojiPicker && (
-                          <div className="absolute top-14 left-0 z-50 bg-white border border-figma-black-10 rounded-xl p-3 shadow-lg w-64">
+                          <div className="absolute top-14 left-0 z-50 bg-white dark:bg-gray-800 border border-figma-black-10 rounded-xl p-3 shadow-lg w-64">
                             <div className="grid grid-cols-7 gap-1">
                               {['✨', '💧', '🏃', '📚', '💪', '🧘', '😴',
                                 '🍎', '💊', '🎯', '✍️', '🎨', '🎵', '🧹',
@@ -1412,7 +1412,7 @@ function Dashboard() {
                       );
                     })}
                   {habits.filter(habit => habit.userId === user.id && isHabitForToday(habit)).length === 0 && (
-                    <div className="bg-white border border-dashed border-figma-black-20 rounded-2xl p-8 text-center">
+                    <div className="bg-white dark:bg-gray-800 border border-dashed border-figma-black-20 rounded-2xl p-8 text-center">
                       <div className="w-12 h-12 bg-figma-blue-10 rounded-full flex items-center justify-center mx-auto mb-3">
                         <Calendar className="w-6 h-6 text-figma-blue-100" />
                       </div>
@@ -1458,7 +1458,7 @@ function Dashboard() {
                 return (
                   <div
                     key={habit.id}
-                    className="bg-white border border-figma-black-10 rounded-2xl p-4"
+                    className="bg-white dark:bg-gray-800 border border-figma-black-10 rounded-2xl p-4"
                   >
                     <div className="flex items-center gap-3">
                       {/* Progress Circle with Emoji */}
@@ -1524,7 +1524,7 @@ function Dashboard() {
                 );
               })}
             {habits.filter(habit => habit.userId !== user.id && isHabitForToday(habit)).length === 0 && (
-              <div className="bg-white border border-dashed border-figma-black-20 rounded-2xl p-8 text-center">
+              <div className="bg-white dark:bg-gray-800 border border-dashed border-figma-black-20 rounded-2xl p-8 text-center">
                 <div className="w-12 h-12 bg-figma-blue-10 rounded-full flex items-center justify-center mx-auto mb-3">
                   <Users className="w-6 h-6 text-figma-blue-100" />
                 </div>

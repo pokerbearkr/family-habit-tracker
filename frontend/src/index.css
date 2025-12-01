@@ -36,31 +36,44 @@
     --black-10: 220 27% 92%; /* #EAECF0 */
     --black-20: 240 3% 81%; /* #CDCDD0 */
     --black-40: 240 3% 61%; /* #9B9BA1 */
-    --black-60: 240 5% 49%; /* #686873 */
+    --black-60: 240 5% 43%; /* #686873 */
     --black-100: 240 69% 5%; /* #040415 */
-    --info-blue: 197 90% 91%; /* #DDF2FC */
+    --info-blue: 197 90% 93%; /* #DDF2FC */
   }
 
   .dark {
-    --background: 240 69% 5%;
-    --foreground: 0 0% 100%;
-    --card: 240 30% 10%;
-    --card-foreground: 0 0% 100%;
-    --popover: 240 30% 10%;
-    --popover-foreground: 0 0% 100%;
+    --background: 240 10% 8%;
+    --foreground: 0 0% 95%;
+    --card: 240 10% 12%;
+    --card-foreground: 0 0% 95%;
+    --popover: 240 10% 12%;
+    --popover-foreground: 0 0% 95%;
     --primary: 236 100% 61%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 240 30% 15%;
-    --secondary-foreground: 0 0% 100%;
-    --muted: 240 30% 15%;
+    --secondary: 240 10% 18%;
+    --secondary-foreground: 0 0% 95%;
+    --muted: 240 10% 18%;
     --muted-foreground: 240 3% 61%;
-    --accent: 240 30% 15%;
+    --accent: 240 10% 18%;
     --accent-foreground: 236 100% 83%;
     --destructive: 1 72% 50%;
     --destructive-foreground: 0 0% 100%;
-    --border: 240 30% 20%;
-    --input: 240 30% 20%;
+    --success: 116 52% 44%;
+    --success-foreground: 0 0% 100%;
+    --border: 240 10% 22%;
+    --input: 240 10% 22%;
     --ring: 236 100% 61%;
+
+    /* Dark mode Figma Colors */
+    --blue-10: 240 30% 20%;
+    --blue-40: 236 100% 70%;
+    --blue-100: 236 100% 65%;
+    --black-10: 240 10% 22%;
+    --black-20: 240 10% 30%;
+    --black-40: 240 5% 55%;
+    --black-60: 240 5% 70%;
+    --black-100: 0 0% 95%;
+    --info-blue: 240 30% 20%;
   }
 }
 
