@@ -180,6 +180,12 @@ function SortableHabitItem({ habit, userLog, onToggle, onEdit, onDelete, daysDis
               <Edit className="w-4 h-4" />
             </button>
             <button
+              onClick={() => onDelete(habit)}
+              className="w-9 h-9 flex items-center justify-center rounded-xl border border-figma-black-10 bg-white text-figma-red hover:bg-red-50 transition-colors"
+            >
+              <Trash2 className="w-4 h-4" />
+            </button>
+            <button
               onClick={() => onToggle(habit.id)}
               className={`w-9 h-9 flex items-center justify-center rounded-xl border transition-all ${
                 userLog?.completed
@@ -502,12 +508,8 @@ function Dashboard() {
 
       const weeklyTarget = newHabit.habitType === 'WEEKLY_COUNT' ? newHabit.weeklyTarget : null;
 
-      // Prepend emoji to name if not already included
-      const nameHasEmoji = newHabit.name.match(/[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/gu);
-      const habitName = nameHasEmoji ? newHabit.name : `${newHabit.emoji} ${newHabit.name}`;
-
       await habitAPI.create(
-        habitName,
+        newHabit.name,
         newHabit.description,
         newHabit.color,
         newHabit.habitType,
@@ -1061,7 +1063,9 @@ function Dashboard() {
                                   key={emoji}
                                   type="button"
                                   onClick={() => {
-                                    setNewHabit({ ...newHabit, emoji });
+                                    // Replace existing emoji at start or prepend new emoji
+                                    const nameWithoutEmoji = newHabit.name.replace(/^[\u{1F300}-\u{1F9FF}][\s]?|^[\u{2600}-\u{26FF}][\s]?|^[\u{2700}-\u{27BF}][\s]?/gu, '');
+                                    setNewHabit({ ...newHabit, emoji, name: `${emoji} ${nameWithoutEmoji}`.trim() });
                                     setShowEmojiPicker(false);
                                   }}
                                   className="w-8 h-8 flex items-center justify-center text-xl hover:bg-figma-black-10 rounded-lg transition-colors"
@@ -1201,15 +1205,54 @@ function Dashboard() {
                       rows={2}
                     />
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="edit-habit-color">색상</Label>
-                    <Input
-                      id="edit-habit-color"
-                      type="color"
-                      value={newHabit.color}
-                      onChange={(e) => setNewHabit({ ...newHabit, color: e.target.value })}
-                      className="h-10 w-20"
-                    />
+                  <div className="flex gap-4">
+                    <div className="space-y-2">
+                      <Label>아이콘</Label>
+                      <div className="relative">
+                        <button
+                          type="button"
+                          onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                          className="w-12 h-12 rounded-xl border border-figma-black-10 flex items-center justify-center text-xl bg-white hover:bg-figma-black-10 transition-colors cursor-pointer"
+                        >
+                          {newHabit.emoji}
+                        </button>
+                        {showEmojiPicker && (
+                          <div className="absolute top-14 left-0 z-50 bg-white border border-figma-black-10 rounded-xl p-3 shadow-lg w-64">
+                            <div className="grid grid-cols-7 gap-1">
+                              {['✨', '💧', '🏃', '📚', '💪', '🧘', '😴',
+                                '🍎', '💊', '🎯', '✍️', '🎨', '🎵', '🧹',
+                                '🌅', '🌙', '☀️', '🔥', '💡', '🎮', '📱',
+                                '💰', '🛒', '🚗', '✈️', '🏠', '👨‍👩‍👧', '❤️',
+                                '🙏', '😊', '🎉', '⭐', '🌟', '💎', '🏆'].map((emoji) => (
+                                <button
+                                  key={emoji}
+                                  type="button"
+                                  onClick={() => {
+                                    // Replace existing emoji at start or prepend new emoji
+                                    const nameWithoutEmoji = newHabit.name.replace(/^[\u{1F300}-\u{1F9FF}][\s]?|^[\u{2600}-\u{26FF}][\s]?|^[\u{2700}-\u{27BF}][\s]?/gu, '');
+                                    setNewHabit({ ...newHabit, emoji, name: `${emoji} ${nameWithoutEmoji}`.trim() });
+                                    setShowEmojiPicker(false);
+                                  }}
+                                  className="w-8 h-8 flex items-center justify-center text-xl hover:bg-figma-black-10 rounded-lg transition-colors"
+                                >
+                                  {emoji}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="edit-habit-color">색상</Label>
+                      <Input
+                        id="edit-habit-color"
+                        type="color"
+                        value={newHabit.color}
+                        onChange={(e) => setNewHabit({ ...newHabit, color: e.target.value })}
+                        className="h-12 w-12 rounded-xl p-1 cursor-pointer"
+                      />
+                    </div>
                   </div>
 
                   <div className="space-y-2">
