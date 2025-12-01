@@ -149,7 +149,7 @@ function SortableHabitItem({ habit, userLog, onToggle, onEdit, onDelete, daysDis
                   habit.currentStreak >= 7 ? 'bg-amber-100 text-amber-700' :
                   'bg-figma-blue-10 text-figma-blue-100'
                 }`}>
-                  🔥 {habit.currentStreak}일
+                  🔥 {habit.currentStreak}{habit.habitType === 'WEEKLY_COUNT' ? '주' : '일'}
                 </span>
               )}
             </div>
@@ -1387,7 +1387,7 @@ function Dashboard() {
                               habit.currentStreak >= 7 ? 'bg-amber-100 text-amber-700' :
                               'bg-figma-blue-10 text-figma-blue-100'
                             }`}>
-                              🔥 {habit.currentStreak}일
+                              🔥 {habit.currentStreak}{habit.habitType === 'WEEKLY_COUNT' ? '주' : '일'}
                             </span>
                           )}
                           {daysDisplay && (
@@ -1404,6 +1404,12 @@ function Dashboard() {
                             </span>
                           )}
                         </p>
+                        {habitLog?.note && (
+                          <div className="flex items-start gap-1 mt-2 p-2 bg-figma-black-10 rounded-lg">
+                            <MessageSquare className="w-3 h-3 text-figma-black-40 mt-0.5 flex-shrink-0" />
+                            <p className="text-xs text-figma-black-60 break-words">{habitLog.note}</p>
+                          </div>
+                        )}
                       </div>
 
                       {/* Status Indicator */}
