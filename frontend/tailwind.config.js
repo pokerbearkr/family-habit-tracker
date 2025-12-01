@@ -31,6 +31,10 @@ module.exports = {
           DEFAULT: "hsl(var(--destructive))",
           foreground: "hsl(var(--destructive-foreground))",
         },
+        success: {
+          DEFAULT: "hsl(var(--success))",
+          foreground: "hsl(var(--success-foreground))",
+        },
         muted: {
           DEFAULT: "hsl(var(--muted))",
           foreground: "hsl(var(--muted-foreground))",
@@ -47,11 +51,37 @@ module.exports = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        // Figma Design Colors
+        figma: {
+          blue: {
+            10: "#EBECFF",
+            40: "#AFB4FF",
+            100: "#3843FF",
+          },
+          black: {
+            10: "#EAECF0",
+            20: "#CDCDD0",
+            40: "#9B9BA1",
+            60: "#686873",
+            100: "#040415",
+          },
+          green: "#3BA935",
+          red: "#E3524F",
+          info: "#DDF2FC",
+          bg: "#F6F9FF",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+        xl: "1rem",
+        "2xl": "1.5rem",
+        "3xl": "2rem",
+        "4xl": "3rem",
+      },
+      boxShadow: {
+        figma: "58px 26px 68px 0px rgba(35, 44, 93, 0.06)",
       },
       keyframes: {
         "accordion-down": {

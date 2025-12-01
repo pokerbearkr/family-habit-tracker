@@ -1,13 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { familyAPI, authAPI } from '../services/api';
-import toast, { Toaster } from 'react-hot-toast';
-import { Button } from '../components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
+import { familyAPI } from '../services/api';
+import { Toaster } from 'react-hot-toast';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
-import { Badge } from '../components/ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../components/ui/dialog';
 import {
   Home,
@@ -17,8 +14,6 @@ import {
   Copy,
   UserPlus,
   UserMinus,
-  Bell,
-  BellOff,
   Check,
   Settings,
   Edit,
@@ -34,7 +29,6 @@ function Family() {
   const [newFamilyName, setNewFamilyName] = useState('');
   const [inviteCode, setInviteCode] = useState('');
   const [error, setError] = useState('');
-  const [enableReminders, setEnableReminders] = useState(true);
   const [copied, setCopied] = useState(false);
   const [editingName, setEditingName] = useState(false);
   const [editedFamilyName, setEditedFamilyName] = useState('');
@@ -45,22 +39,12 @@ function Family() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    loadReminderSettings();
     if (user.familyId) {
       loadFamily();
     } else {
       setLoading(false);
     }
   }, [user.familyId]);
-
-  const loadReminderSettings = async () => {
-    try {
-      const response = await authAPI.getReminderSettings();
-      setEnableReminders(response.data.enableReminders);
-    } catch (error) {
-      console.error('Error loading reminder settings:', error);
-    }
-  };
 
   const loadFamily = async () => {
     try {
@@ -75,8 +59,6 @@ function Family() {
 
   const handleCreateFamily = async (e) => {
     e.preventDefault();
-
-    // Prevent duplicate submissions
     if (submitting) return;
 
     setError('');
@@ -84,9 +66,7 @@ function Family() {
 
     try {
       const response = await familyAPI.create(newFamilyName);
-      // Update user data via AuthContext
       updateUserFamily(response.data.id, response.data.name);
-      // Navigate to dashboard
       navigate('/dashboard');
     } catch (error) {
       console.error('Create family error:', error);
@@ -101,8 +81,6 @@ function Family() {
 
   const handleJoinFamily = async (e) => {
     e.preventDefault();
-
-    // Prevent duplicate submissions
     if (submitting) return;
 
     setError('');
@@ -110,9 +88,7 @@ function Family() {
 
     try {
       const response = await familyAPI.join(inviteCode);
-      // Update user data via AuthContext
       updateUserFamily(response.data.id, response.data.name);
-      // Navigate to dashboard
       navigate('/dashboard');
     } catch (error) {
       console.error('Join family error:', error);
@@ -142,17 +118,6 @@ function Family() {
                       '그룹 떠나기에 실패했습니다';
       setError(errorMsg);
       setShowLeaveDialog(false);
-    }
-  };
-
-  const handleToggleReminders = async () => {
-    try {
-      const newValue = !enableReminders;
-      const response = await authAPI.updateReminderSettings(newValue);
-      setEnableReminders(response.data.enableReminders);
-    } catch (error) {
-      console.error('Error updating reminder settings:', error);
-      toast.error('알림 설정 변경에 실패했습니다');
     }
   };
 
@@ -203,420 +168,390 @@ function Family() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
-        <div className="text-lg font-medium text-gray-700">로딩 중...</div>
+      <div className="min-h-screen bg-figma-bg flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-figma-blue-100 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-figma-black-40">로딩 중...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+    <div className="min-h-screen bg-figma-bg pb-8">
       <Toaster position="top-right" />
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-              <Users className="h-6 w-6 text-indigo-600" />
-              그룹 관리
-            </h1>
+
+      {/* Header - Dashboard style */}
+      <header className="bg-white border-b border-figma-black-10 sticky top-0 z-50">
+        <div className="max-w-lg mx-auto px-6 py-4">
+          {/* Top Row - Icons */}
+          <div className="flex justify-between items-center mb-4">
+            <button
+              onClick={() => navigate('/dashboard')}
+              className="w-12 h-12 flex items-center justify-center rounded-2xl border border-figma-black-10 bg-white hover:bg-figma-black-10 transition-colors"
+            >
+              <Home className="w-5 h-5 text-figma-black-60" />
+            </button>
             <div className="flex gap-2">
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => navigate('/dashboard')}
-                className="h-10 w-10"
-              >
-                <Home className="h-5 w-5" />
-              </Button>
-              <Button
-                variant="outline"
-                size="icon"
+              <button
                 onClick={() => navigate('/monthly')}
-                className="h-10 w-10"
+                className="w-12 h-12 flex items-center justify-center rounded-2xl border border-figma-black-10 bg-white hover:bg-figma-black-10 transition-colors"
               >
-                <TrendingUp className="h-5 w-5" />
-              </Button>
-              <Button
-                variant="outline"
-                size="icon"
+                <TrendingUp className="w-5 h-5 text-figma-black-60" />
+              </button>
+              <button
                 onClick={() => navigate('/settings')}
-                className="h-10 w-10"
+                className="w-12 h-12 flex items-center justify-center rounded-2xl border border-figma-black-10 bg-white hover:bg-figma-black-10 transition-colors"
               >
-                <Settings className="h-5 w-5" />
-              </Button>
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => setShowLogoutDialog(true)}
-                className="h-10 w-10"
-              >
-                <LogOut className="h-5 w-5" />
-              </Button>
+                <Settings className="w-5 h-5 text-figma-black-60" />
+              </button>
             </div>
+          </div>
+
+          {/* Title */}
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-lg font-medium text-figma-black-100">
+                그룹 관리 👥
+              </h1>
+              <p className="text-sm text-figma-black-40">
+                {family ? family.name : '그룹을 만들거나 가입하세요'}
+              </p>
+            </div>
+            <button
+              onClick={() => setShowLogoutDialog(true)}
+              className="w-10 h-10 bg-figma-info rounded-full flex items-center justify-center"
+              title="로그아웃"
+            >
+              <span className="text-xl">👋</span>
+            </button>
           </div>
         </div>
       </header>
 
       {/* Content */}
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-lg mx-auto px-6 py-4">
         {family ? (
-          <div className="space-y-6">
+          <div className="space-y-4">
             {/* Family Info Card */}
-            <Card className="shadow-lg">
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  {editingName ? (
-                    <div className="flex-1 space-y-2">
-                      <Input
-                        value={editedFamilyName}
-                        onChange={(e) => setEditedFamilyName(e.target.value)}
-                        placeholder="그룹 이름 입력"
-                        disabled={savingName}
-                        className="text-2xl font-bold h-12"
-                        onKeyPress={(e) => {
-                          if (e.key === 'Enter') {
-                            handleSaveFamilyName();
-                          }
-                        }}
-                      />
-                      {nameError && (
-                        <p className="text-sm text-red-600">{nameError}</p>
-                      )}
-                      <div className="flex gap-2">
-                        <Button
-                          size="sm"
-                          onClick={handleSaveFamilyName}
-                          disabled={savingName}
-                        >
-                          <Check className="h-4 w-4 mr-1" />
-                          {savingName ? '저장 중...' : '저장'}
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={handleCancelEditName}
-                          disabled={savingName}
-                        >
-                          <X className="h-4 w-4 mr-1" />
-                          취소
-                        </Button>
-                      </div>
-                    </div>
-                  ) : (
-                    <>
-                      <CardTitle className="text-3xl">{family.name}</CardTitle>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={handleStartEditName}
-                        className="h-8 px-2"
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                    </>
-                  )}
-                </div>
-                {!editingName && (
-                  <CardDescription>그룹 정보 및 설정</CardDescription>
-                )}
-              </CardHeader>
-              <CardContent className="space-y-6">
-                {/* Invite Code Section */}
-                <div className="bg-gradient-to-br from-indigo-50 to-blue-50 border-2 border-indigo-200 rounded-lg p-6">
-                  <Label className="text-sm font-medium text-gray-600 mb-2 block">
-                    초대 코드
-                  </Label>
-                  <div className="flex items-center justify-between gap-4">
-                    <div className="flex-1">
-                      <p className="text-4xl font-bold text-indigo-600 tracking-widest">
-                        {family.inviteCode}
-                      </p>
-                    </div>
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={handleCopyInviteCode}
-                      className="h-12 w-12 shrink-0"
-                    >
-                      {copied ? (
-                        <Check className="h-5 w-5 text-green-600" />
-                      ) : (
-                        <Copy className="h-5 w-5" />
-                      )}
-                    </Button>
-                  </div>
-                  <p className="text-sm text-gray-600 mt-3">
-                    그룹 구성원과 이 코드를 공유하세요
-                  </p>
-                </div>
-
-                {/* Members List */}
-                <div>
-                  <div className="flex items-center gap-2 mb-4">
-                    <Users className="h-5 w-5 text-gray-600" />
-                    <h3 className="text-lg font-semibold text-gray-900">
-                      그룹 구성원
-                    </h3>
-                    <Badge variant="secondary" className="ml-auto">
-                      {family.members?.length || 0}명
-                    </Badge>
-                  </div>
-                  <div className="space-y-2">
-                    {family.members?.map((member) => (
-                      <div
-                        key={member.id}
-                        className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
-                      >
-                        <div className="flex items-center gap-3">
-                          <div className="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center">
-                            <span className="text-indigo-600 font-semibold">
-                              {member.displayName.charAt(0)}
-                            </span>
-                          </div>
-                          <div>
-                            <p className="font-medium text-gray-900">
-                              {member.displayName}
-                            </p>
-                            <p className="text-sm text-gray-500">
-                              @{member.username}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Settings Section */}
-                <div className="border-t pt-6">
-                  <div className="flex items-center gap-2 mb-4">
-                    <Bell className="h-5 w-5 text-gray-600" />
-                    <h3 className="text-lg font-semibold text-gray-900">
-                      알림 설정
-                    </h3>
-                  </div>
-                  <div className="bg-gray-50 rounded-lg p-4">
-                    <div className="flex items-center justify-between gap-4">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          {enableReminders ? (
-                            <Bell className="h-4 w-4 text-indigo-600" />
-                          ) : (
-                            <BellOff className="h-4 w-4 text-gray-400" />
-                          )}
-                          <Label className="font-medium text-gray-900 cursor-pointer">
-                            오후 9시 습관 알림
-                          </Label>
-                        </div>
-                        <p className="text-sm text-gray-600">
-                          미완료 습관이 있을 때 알림을 받습니다
-                        </p>
-                      </div>
+            <div className="bg-white border border-figma-black-10 rounded-2xl p-4">
+              {/* Family Name */}
+              <div className="mb-4">
+                {editingName ? (
+                  <div className="space-y-3">
+                    <Input
+                      value={editedFamilyName}
+                      onChange={(e) => setEditedFamilyName(e.target.value)}
+                      placeholder="그룹 이름 입력"
+                      disabled={savingName}
+                      className="text-xl font-semibold h-12 rounded-xl border-figma-black-10 focus:border-figma-blue-100"
+                      onKeyPress={(e) => {
+                        if (e.key === 'Enter') {
+                          handleSaveFamilyName();
+                        }
+                      }}
+                    />
+                    {nameError && (
+                      <p className="text-sm text-figma-red">{nameError}</p>
+                    )}
+                    <div className="flex gap-2">
                       <button
-                        onClick={handleToggleReminders}
-                        className={`
-                          relative inline-flex h-7 w-12 shrink-0 cursor-pointer rounded-full
-                          border-2 border-transparent transition-colors duration-200 ease-in-out
-                          focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2
-                          ${enableReminders ? 'bg-indigo-600' : 'bg-gray-200'}
-                        `}
-                        role="switch"
-                        aria-checked={enableReminders}
+                        onClick={handleSaveFamilyName}
+                        disabled={savingName}
+                        className="flex items-center gap-1 px-4 py-2 bg-figma-green text-white text-sm font-medium rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50"
                       >
-                        <span
-                          className={`
-                            pointer-events-none inline-block h-6 w-6 transform rounded-full
-                            bg-white shadow ring-0 transition duration-200 ease-in-out
-                            ${enableReminders ? 'translate-x-5' : 'translate-x-0'}
-                          `}
-                        />
+                        <Check className="h-4 w-4" />
+                        {savingName ? '저장 중...' : '저장'}
+                      </button>
+                      <button
+                        onClick={handleCancelEditName}
+                        disabled={savingName}
+                        className="flex items-center gap-1 px-4 py-2 bg-figma-black-10 text-figma-black-60 text-sm font-medium rounded-xl hover:bg-figma-black-20 transition-colors disabled:opacity-50"
+                      >
+                        <X className="h-4 w-4" />
+                        취소
                       </button>
                     </div>
                   </div>
-                </div>
-
-                {/* Leave Family Button */}
-                <div className="pt-4">
-                  <Button
-                    variant="destructive"
-                    className="w-full"
-                    onClick={handleLeaveFamily}
-                  >
-                    <UserMinus className="mr-2 h-4 w-4" />
-                    그룹 떠나기
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        ) : (
-          <div className="space-y-6">
-            {/* Create or Join Family */}
-            <Card className="shadow-lg">
-              <CardHeader>
-                <CardTitle className="text-2xl">그룹 만들기 또는 가입하기</CardTitle>
-                <CardDescription>
-                  그룹을 생성하거나 초대 코드로 기존 그룹에 가입하세요
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                {error && (
-                  <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
-                    {error}
+                ) : (
+                  <div className="flex items-center justify-between">
+                    <h2 className="text-xl font-bold text-figma-black-100">{family.name}</h2>
+                    <button
+                      onClick={handleStartEditName}
+                      className="p-2 rounded-xl hover:bg-figma-black-10 transition-colors text-figma-black-40"
+                    >
+                      <Edit className="h-5 w-5" />
+                    </button>
                   </div>
                 )}
+              </div>
 
-                {/* Create Family */}
-                <div className="space-y-4">
+              {/* Invite Code Section */}
+              <div className="bg-gradient-to-r from-[#6B73FF] to-[#3843FF] rounded-2xl p-4 mb-4">
+                <p className="text-white/80 text-xs font-medium uppercase tracking-wide mb-2">
+                  초대 코드
+                </p>
+                <div className="flex items-center justify-between">
+                  <p className="text-2xl font-bold text-white tracking-widest">
+                    {family.inviteCode}
+                  </p>
+                  <button
+                    onClick={handleCopyInviteCode}
+                    className="p-2.5 bg-white/20 rounded-xl hover:bg-white/30 transition-colors"
+                  >
+                    {copied ? (
+                      <Check className="h-5 w-5 text-white" />
+                    ) : (
+                      <Copy className="h-5 w-5 text-white" />
+                    )}
+                  </button>
+                </div>
+                <p className="text-white/70 text-xs mt-2">
+                  그룹 구성원과 이 코드를 공유하세요
+                </p>
+              </div>
+
+              {/* Members List */}
+              <div className="mb-4">
+                <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
-                    <UserPlus className="h-5 w-5 text-indigo-600" />
-                    <h3 className="text-lg font-semibold text-gray-900">
-                      새 그룹 만들기
+                    <Users className="h-4 w-4 text-figma-black-60" />
+                    <h3 className="text-sm font-medium text-figma-black-100">
+                      그룹 구성원
                     </h3>
                   </div>
-                  <form onSubmit={handleCreateFamily} className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="familyName">그룹 이름</Label>
-                      <Input
-                        id="familyName"
-                        type="text"
-                        placeholder="예: 우리 그룹"
-                        value={newFamilyName}
-                        onChange={(e) => setNewFamilyName(e.target.value)}
-                        required
-                        className="w-full"
-                      />
-                    </div>
-                    <Button
-                      type="submit"
-                      className="w-full"
-                      disabled={submitting}
+                  <span className="px-2 py-0.5 bg-figma-blue-10 text-figma-blue-100 text-xs font-medium rounded-full">
+                    {family.members?.length || 0}명
+                  </span>
+                </div>
+                <div className="space-y-2">
+                  {family.members?.map((member) => (
+                    <div
+                      key={member.id}
+                      className="flex items-center gap-3 p-3 bg-figma-bg rounded-xl"
                     >
-                      <UserPlus className="mr-2 h-4 w-4" />
-                      {submitting ? '생성 중...' : '만들기'}
-                    </Button>
-                  </form>
-                </div>
-
-                {/* Divider */}
-                <div className="relative">
-                  <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-gray-300"></div>
-                  </div>
-                  <div className="relative flex justify-center text-sm">
-                    <span className="px-4 bg-white text-gray-500 font-medium">
-                      또는
-                    </span>
-                  </div>
-                </div>
-
-                {/* Join Family */}
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2">
-                    <Users className="h-5 w-5 text-indigo-600" />
-                    <h3 className="text-lg font-semibold text-gray-900">
-                      기존 그룹 가입하기
-                    </h3>
-                  </div>
-                  <form onSubmit={handleJoinFamily} className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="inviteCode">초대 코드</Label>
-                      <Input
-                        id="inviteCode"
-                        type="text"
-                        placeholder="초대 코드를 입력하세요"
-                        value={inviteCode}
-                        onChange={(e) =>
-                          setInviteCode(e.target.value.toUpperCase())
-                        }
-                        required
-                        className="w-full uppercase tracking-wider"
-                      />
+                      <div className="h-9 w-9 rounded-full bg-gradient-to-br from-[#6B73FF] to-[#3843FF] flex items-center justify-center">
+                        <span className="text-white text-sm font-semibold">
+                          {member.displayName.charAt(0)}
+                        </span>
+                      </div>
+                      <div>
+                        <p className="font-medium text-figma-black-100 text-sm">
+                          {member.displayName}
+                        </p>
+                        <p className="text-xs text-figma-black-40">
+                          @{member.username}
+                        </p>
+                      </div>
                     </div>
-                    <Button
-                      type="submit"
-                      className="w-full"
-                      disabled={submitting}
-                    >
-                      <Users className="mr-2 h-4 w-4" />
-                      {submitting ? '가입 중...' : '가입하기'}
-                    </Button>
-                  </form>
+                  ))}
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+
+              {/* Leave Family Button */}
+              <button
+                onClick={handleLeaveFamily}
+                className="w-full h-11 bg-figma-red text-white text-sm font-medium rounded-xl hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
+              >
+                <UserMinus className="h-4 w-4" />
+                그룹 떠나기
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {/* Create or Join Family Card */}
+            <div className="bg-white border border-figma-black-10 rounded-2xl p-4">
+              <div className="text-center mb-5">
+                <div className="w-14 h-14 bg-gradient-to-br from-[#6B73FF] to-[#3843FF] rounded-2xl flex items-center justify-center mx-auto mb-3">
+                  <Users className="h-7 w-7 text-white" />
+                </div>
+                <h2 className="text-lg font-semibold text-figma-black-100">
+                  그룹 만들기 또는 가입하기
+                </h2>
+                <p className="text-figma-black-40 text-sm mt-1">
+                  그룹을 생성하거나 초대 코드로 기존 그룹에 가입하세요
+                </p>
+              </div>
+
+              {error && (
+                <div className="mb-4 p-3 text-sm text-figma-red bg-red-50 border border-red-100 rounded-xl">
+                  {error}
+                </div>
+              )}
+
+              {/* Create Family */}
+              <div className="space-y-3 mb-5">
+                <div className="flex items-center gap-2">
+                  <UserPlus className="h-4 w-4 text-figma-blue-100" />
+                  <h3 className="text-sm font-medium text-figma-black-100">
+                    새 그룹 만들기
+                  </h3>
+                </div>
+                <form onSubmit={handleCreateFamily} className="space-y-3">
+                  <div className="space-y-2">
+                    <Label htmlFor="familyName" className="text-xs font-medium text-figma-black-40 uppercase tracking-wide">
+                      그룹 이름
+                    </Label>
+                    <Input
+                      id="familyName"
+                      type="text"
+                      placeholder="예: 우리 그룹"
+                      value={newFamilyName}
+                      onChange={(e) => setNewFamilyName(e.target.value)}
+                      required
+                      className="rounded-xl border-figma-black-10 focus:border-figma-blue-100 focus:ring-figma-blue-100 h-11"
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    disabled={submitting}
+                    className="w-full h-11 bg-gradient-to-r from-[#6B73FF] to-[#3843FF] text-white text-sm font-medium rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  >
+                    {submitting ? (
+                      <>
+                        <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                        생성 중...
+                      </>
+                    ) : (
+                      <>
+                        <UserPlus className="h-4 w-4" />
+                        만들기
+                      </>
+                    )}
+                  </button>
+                </form>
+              </div>
+
+              {/* Divider */}
+              <div className="relative my-5">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-figma-black-10"></div>
+                </div>
+                <div className="relative flex justify-center text-sm">
+                  <span className="px-4 bg-white text-figma-black-40 text-xs font-medium">
+                    또는
+                  </span>
+                </div>
+              </div>
+
+              {/* Join Family */}
+              <div className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <Users className="h-4 w-4 text-figma-blue-100" />
+                  <h3 className="text-sm font-medium text-figma-black-100">
+                    기존 그룹 가입하기
+                  </h3>
+                </div>
+                <form onSubmit={handleJoinFamily} className="space-y-3">
+                  <div className="space-y-2">
+                    <Label htmlFor="inviteCode" className="text-xs font-medium text-figma-black-40 uppercase tracking-wide">
+                      초대 코드
+                    </Label>
+                    <Input
+                      id="inviteCode"
+                      type="text"
+                      placeholder="초대 코드를 입력하세요"
+                      value={inviteCode}
+                      onChange={(e) =>
+                        setInviteCode(e.target.value.toUpperCase())
+                      }
+                      required
+                      className="rounded-xl border-figma-black-10 focus:border-figma-blue-100 focus:ring-figma-blue-100 h-11 uppercase tracking-wider"
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    disabled={submitting}
+                    className="w-full h-11 bg-figma-green text-white text-sm font-medium rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  >
+                    {submitting ? (
+                      <>
+                        <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                        가입 중...
+                      </>
+                    ) : (
+                      <>
+                        <Users className="h-4 w-4" />
+                        가입하기
+                      </>
+                    )}
+                  </button>
+                </form>
+              </div>
+            </div>
           </div>
         )}
       </main>
 
       {/* Logout Confirmation Dialog */}
       <Dialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
-        <DialogContent>
+        <DialogContent className="rounded-3xl border-0 shadow-figma max-w-sm mx-4">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <AlertTriangle className="h-5 w-5 text-amber-600" />
+            <DialogTitle className="flex items-center gap-2 text-figma-black-100">
+              <AlertTriangle className="h-5 w-5 text-amber-500" />
               로그아웃
             </DialogTitle>
-            <DialogDescription>
+            <DialogDescription className="text-figma-black-40">
               정말 로그아웃하시겠습니까?
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter className="gap-2 sm:gap-0">
-            <Button
-              variant="outline"
+          <DialogFooter className="gap-2 sm:gap-2">
+            <button
               onClick={() => setShowLogoutDialog(false)}
+              className="flex-1 h-11 bg-figma-black-10 text-figma-black-60 font-medium rounded-xl hover:bg-figma-black-20 transition-colors"
             >
               취소
-            </Button>
-            <Button
+            </button>
+            <button
               onClick={() => {
                 logout();
                 navigate('/login');
               }}
+              className="flex-1 h-11 bg-figma-blue-100 text-white font-medium rounded-xl hover:opacity-90 transition-opacity"
             >
               로그아웃
-            </Button>
+            </button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
       {/* Leave Family Confirmation Dialog */}
       <Dialog open={showLeaveDialog} onOpenChange={setShowLeaveDialog}>
-        <DialogContent>
+        <DialogContent className="rounded-3xl border-0 shadow-figma max-w-sm mx-4">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-red-600">
+            <DialogTitle className="flex items-center gap-2 text-figma-red">
               <AlertTriangle className="h-5 w-5" />
               그룹 떠나기
             </DialogTitle>
-            <DialogDescription className="pt-3">
-              <p className="font-medium mb-2">정말 이 그룹을 떠나시겠습니까?</p>
-              <p className="text-sm text-gray-600">
+            <DialogDescription className="pt-3 text-figma-black-60">
+              <p className="font-medium text-figma-black-100 mb-2">정말 이 그룹을 떠나시겠습니까?</p>
+              <p className="text-sm">
                 모든 공유 습관에 대한 접근 권한을 잃게 됩니다. 이 작업은 되돌릴 수 없습니다.
               </p>
               {error && (
-                <div className="mt-3 p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-md">
+                <div className="mt-3 p-3 text-sm text-figma-red bg-red-50 border border-red-100 rounded-xl">
                   {error}
                 </div>
               )}
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter className="gap-2 sm:gap-0">
-            <Button
-              variant="outline"
+          <DialogFooter className="gap-2 sm:gap-2">
+            <button
               onClick={() => {
                 setShowLeaveDialog(false);
                 setError('');
               }}
+              className="flex-1 h-11 bg-figma-black-10 text-figma-black-60 font-medium rounded-xl hover:bg-figma-black-20 transition-colors"
             >
               취소
-            </Button>
-            <Button
-              variant="destructive"
+            </button>
+            <button
               onClick={confirmLeaveFamily}
+              className="flex-1 h-11 bg-figma-red text-white font-medium rounded-xl hover:opacity-90 transition-opacity"
             >
               그룹 떠나기
-            </Button>
+            </button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

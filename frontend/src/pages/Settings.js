@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
-import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../components/ui/dialog';
-import { ArrowLeft, Trash2, AlertTriangle, User, Mail, Shield, Edit, Check, X, Coffee, ExternalLink, Bell, Clock } from 'lucide-react';
+import { Trash2, AlertTriangle, User, Mail, Shield, Edit, Check, X, Coffee, ExternalLink, Bell, Clock, Home, TrendingUp, Users } from 'lucide-react';
 import api from '../services/api';
 import { authAPI } from '../services/api';
 
@@ -90,7 +88,6 @@ export default function Settings() {
 
     try {
       const response = await authAPI.updateDisplayName(newDisplayName.trim());
-      // Update user in context
       updateUser({ ...user, displayName: response.data.displayName });
       setEditingName(false);
       setNewDisplayName('');
@@ -108,7 +105,6 @@ export default function Settings() {
 
     try {
       await api.deleteAccount();
-      // Logout and redirect to login page
       logout();
       navigate('/login');
     } catch (err) {
@@ -119,281 +115,296 @@ export default function Settings() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
-      <div className="max-w-2xl mx-auto space-y-4">
-        {/* Header */}
-        <div className="flex items-center gap-3 mb-6">
-          <button
-            onClick={() => navigate('/dashboard')}
-            className="p-2 hover:bg-white/50 rounded-lg transition-colors"
-          >
-            <ArrowLeft className="h-6 w-6 text-blue-600" />
-          </button>
-          <h1 className="text-2xl font-bold">설정</h1>
-        </div>
+    <div className="min-h-screen bg-figma-bg pb-8">
+      {/* Header - Dashboard style */}
+      <header className="bg-white border-b border-figma-black-10 sticky top-0 z-50">
+        <div className="max-w-lg mx-auto px-6 py-4">
+          {/* Top Row - Icons */}
+          <div className="flex justify-between items-center mb-4">
+            <button
+              onClick={() => navigate('/dashboard')}
+              className="w-12 h-12 flex items-center justify-center rounded-2xl border border-figma-black-10 bg-white hover:bg-figma-black-10 transition-colors"
+            >
+              <Home className="w-5 h-5 text-figma-black-60" />
+            </button>
+            <div className="flex gap-2">
+              <button
+                onClick={() => navigate('/monthly')}
+                className="w-12 h-12 flex items-center justify-center rounded-2xl border border-figma-black-10 bg-white hover:bg-figma-black-10 transition-colors"
+              >
+                <TrendingUp className="w-5 h-5 text-figma-black-60" />
+              </button>
+              <button
+                onClick={() => navigate('/family')}
+                className="w-12 h-12 flex items-center justify-center rounded-2xl border border-figma-black-10 bg-white hover:bg-figma-black-10 transition-colors"
+              >
+                <Users className="w-5 h-5 text-figma-black-60" />
+              </button>
+            </div>
+          </div>
 
+          {/* Title */}
+          <div>
+            <h1 className="text-lg font-medium text-figma-black-100">
+              설정
+            </h1>
+            <p className="text-sm text-figma-black-40">
+              알림, 계정 정보를 관리하세요
+            </p>
+          </div>
+        </div>
+      </header>
+
+      <div className="max-w-lg mx-auto px-6 py-4 space-y-4">
         {/* Account Info */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <User className="h-5 w-5" />
-              계정 정보
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {/* Display Name - Editable */}
-            <div className="p-3 bg-gray-50 rounded-lg">
-              <div className="flex items-center justify-between mb-2">
-                <p className="text-sm text-gray-500">사용자 이름</p>
-                {!editingName && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleStartEditName}
-                    className="h-8 px-2"
-                  >
-                    <Edit className="h-4 w-4" />
-                  </Button>
-                )}
-              </div>
-              {editingName ? (
-                <div className="space-y-2">
-                  <Input
-                    value={newDisplayName}
-                    onChange={(e) => setNewDisplayName(e.target.value)}
-                    placeholder="새 이름 입력"
-                    disabled={savingName}
-                    onKeyPress={(e) => {
-                      if (e.key === 'Enter') {
-                        handleSaveDisplayName();
-                      }
-                    }}
-                  />
-                  {nameError && (
-                    <p className="text-sm text-red-600">{nameError}</p>
-                  )}
-                  <div className="flex gap-2">
-                    <Button
-                      size="sm"
-                      onClick={handleSaveDisplayName}
-                      disabled={savingName}
-                      className="flex-1"
-                    >
-                      <Check className="h-4 w-4 mr-1" />
-                      {savingName ? '저장 중...' : '저장'}
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={handleCancelEditName}
-                      disabled={savingName}
-                      className="flex-1"
-                    >
-                      <X className="h-4 w-4 mr-1" />
-                      취소
-                    </Button>
-                  </div>
-                </div>
-              ) : (
-                <p className="font-medium">{user?.displayName}</p>
+        <div className="bg-white border border-figma-black-10 rounded-2xl p-4">
+          <div className="flex items-center gap-2 mb-4">
+            <User className="h-5 w-5 text-figma-blue-100" />
+            <h2 className="font-semibold text-figma-black-100">계정 정보</h2>
+          </div>
+
+          {/* Display Name - Editable */}
+          <div className="bg-figma-bg rounded-2xl p-4 mb-3">
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-xs font-medium text-figma-black-40 uppercase tracking-wide">사용자 이름</p>
+              {!editingName && (
+                <button
+                  onClick={handleStartEditName}
+                  className="p-1.5 rounded-lg hover:bg-figma-black-10 transition-colors text-figma-black-40"
+                >
+                  <Edit className="h-4 w-4" />
+                </button>
               )}
             </div>
+            {editingName ? (
+              <div className="space-y-3">
+                <Input
+                  value={newDisplayName}
+                  onChange={(e) => setNewDisplayName(e.target.value)}
+                  placeholder="새 이름 입력"
+                  disabled={savingName}
+                  className="rounded-xl border-figma-black-10 focus:border-figma-blue-100 h-11"
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter') {
+                      handleSaveDisplayName();
+                    }
+                  }}
+                />
+                {nameError && (
+                  <p className="text-sm text-figma-red">{nameError}</p>
+                )}
+                <div className="flex gap-2">
+                  <button
+                    onClick={handleSaveDisplayName}
+                    disabled={savingName}
+                    className="flex-1 h-10 bg-figma-green text-white text-sm font-medium rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center gap-1"
+                  >
+                    <Check className="h-4 w-4" />
+                    {savingName ? '저장 중...' : '저장'}
+                  </button>
+                  <button
+                    onClick={handleCancelEditName}
+                    disabled={savingName}
+                    className="flex-1 h-10 bg-figma-black-10 text-figma-black-60 text-sm font-medium rounded-xl hover:bg-figma-black-20 transition-colors disabled:opacity-50 flex items-center justify-center gap-1"
+                  >
+                    <X className="h-4 w-4" />
+                    취소
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <p className="font-medium text-figma-black-100">{user?.displayName}</p>
+            )}
+          </div>
 
-            {/* Email - Read Only */}
-            <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-              <Mail className="h-5 w-5 text-gray-600" />
+          {/* Email - Read Only */}
+          <div className="bg-figma-bg rounded-2xl p-4">
+            <div className="flex items-center gap-3">
+              <Mail className="h-5 w-5 text-figma-black-40" />
               <div>
-                <p className="text-sm text-gray-500">이메일</p>
-                <p className="font-medium">{user?.email}</p>
+                <p className="text-xs font-medium text-figma-black-40 uppercase tracking-wide">이메일</p>
+                <p className="font-medium text-figma-black-100">{user?.email}</p>
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
         {/* Notification Settings */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Bell className="h-5 w-5" />
-              알림 설정
-            </CardTitle>
-            <CardDescription>
-              미완료 습관 알림을 받을 시간을 설정하세요
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {loadingReminders ? (
-              <div className="text-center text-gray-500 py-2">로딩 중...</div>
-            ) : (
-              <>
-                {/* Enable/Disable Toggle */}
-                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+        <div className="bg-white border border-figma-black-10 rounded-2xl p-4">
+          <div className="flex items-center gap-2 mb-2">
+            <Bell className="h-4 w-4 text-figma-blue-100" />
+            <h2 className="text-sm font-medium text-figma-black-100">알림 설정</h2>
+          </div>
+          <p className="text-sm text-figma-black-40 mb-4">
+            미완료 습관 알림을 받을 시간을 설정하세요
+          </p>
+
+          {loadingReminders ? (
+            <div className="flex items-center justify-center py-4 text-figma-black-40">
+              <span className="w-4 h-4 border-2 border-figma-blue-100 border-t-transparent rounded-full animate-spin mr-2"></span>
+              로딩 중...
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {/* Enable/Disable Toggle */}
+              <div className="bg-figma-bg rounded-2xl p-4">
+                <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <Bell className="h-5 w-5 text-gray-600" />
-                    <span>습관 알림 받기</span>
+                    <Bell className="h-5 w-5 text-figma-black-60" />
+                    <span className="font-medium text-figma-black-100">습관 알림 받기</span>
                   </div>
                   <button
                     onClick={handleReminderToggle}
                     disabled={savingReminders}
-                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                      enableReminders ? 'bg-blue-600' : 'bg-gray-300'
-                    } ${savingReminders ? 'opacity-50' : ''}`}
+                    className={`
+                      relative inline-flex h-7 w-12 shrink-0 cursor-pointer rounded-full
+                      transition-colors duration-200 ease-in-out disabled:opacity-50
+                      ${enableReminders ? 'bg-figma-green' : 'bg-figma-black-20'}
+                    `}
                   >
                     <span
-                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                        enableReminders ? 'translate-x-6' : 'translate-x-1'
-                      }`}
+                      className={`
+                        pointer-events-none inline-block h-6 w-6 transform rounded-full
+                        bg-white shadow-sm transition duration-200 ease-in-out mt-0.5 ml-0.5
+                        ${enableReminders ? 'translate-x-5' : 'translate-x-0'}
+                      `}
                     />
                   </button>
                 </div>
+              </div>
 
-                {/* Reminder Time Selection */}
-                {enableReminders && (
-                  <div className="p-3 bg-gray-50 rounded-lg">
-                    <div className="flex items-center gap-2 mb-3">
-                      <Clock className="h-5 w-5 text-gray-600" />
-                      <span>알림 시간</span>
-                    </div>
-                    <select
-                      value={reminderTime.split(':')[0]}
-                      onChange={(e) => handleReminderTimeChange(`${e.target.value}:00`)}
-                      disabled={savingReminders}
-                      className="w-full p-2 border rounded-lg bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    >
-                      {Array.from({ length: 24 }, (_, i) => {
-                        const hour = i.toString().padStart(2, '0');
-                        const displayHour = i === 0 ? '오전 12시' :
-                                           i < 12 ? `오전 ${i}시` :
-                                           i === 12 ? '오후 12시' :
-                                           `오후 ${i - 12}시`;
-                        return (
-                          <option key={hour} value={hour}>
-                            {displayHour}
-                          </option>
-                        );
-                      })}
-                    </select>
-                    <p className="text-sm text-gray-500 mt-2">
-                      선택한 시간에 미완료 습관이 있으면 알림을 받습니다
-                    </p>
+              {/* Reminder Time Selection */}
+              {enableReminders && (
+                <div className="bg-figma-bg rounded-2xl p-4">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Clock className="h-5 w-5 text-figma-black-60" />
+                    <span className="font-medium text-figma-black-100">알림 시간</span>
                   </div>
-                )}
-              </>
-            )}
-          </CardContent>
-        </Card>
+                  <select
+                    value={reminderTime.split(':')[0]}
+                    onChange={(e) => handleReminderTimeChange(`${e.target.value}:00`)}
+                    disabled={savingReminders}
+                    className="w-full p-3 border border-figma-black-10 rounded-xl bg-white focus:ring-2 focus:ring-figma-blue-100 focus:border-figma-blue-100 text-figma-black-100"
+                  >
+                    {Array.from({ length: 24 }, (_, i) => {
+                      const hour = i.toString().padStart(2, '0');
+                      const displayHour = i === 0 ? '오전 12시' :
+                                         i < 12 ? `오전 ${i}시` :
+                                         i === 12 ? '오후 12시' :
+                                         `오후 ${i - 12}시`;
+                      return (
+                        <option key={hour} value={hour}>
+                          {displayHour}
+                        </option>
+                      );
+                    })}
+                  </select>
+                  <p className="text-sm text-figma-black-40 mt-2">
+                    선택한 시간에 미완료 습관이 있으면 알림을 받습니다
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
 
         {/* Privacy */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Shield className="h-5 w-5" />
-              개인정보 보호
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Button
-              variant="outline"
-              className="w-full"
-              onClick={() => navigate('/privacy-policy')}
-            >
-              개인정보 처리방침 보기
-            </Button>
-          </CardContent>
-        </Card>
+        <div className="bg-white border border-figma-black-10 rounded-2xl p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <Shield className="h-4 w-4 text-figma-blue-100" />
+            <h2 className="text-sm font-medium text-figma-black-100">개인정보 보호</h2>
+          </div>
+          <button
+            onClick={() => navigate('/privacy-policy')}
+            className="w-full h-11 border border-figma-black-10 text-figma-black-100 text-sm font-medium rounded-xl hover:bg-figma-bg transition-colors"
+          >
+            개인정보 처리방침 보기
+          </button>
+        </div>
 
         {/* Developer Support */}
-        <Card className="border-amber-200 bg-gradient-to-br from-white to-amber-50">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-amber-700">
-              <Coffee className="h-5 w-5" />
-              개발자 후원
-            </CardTitle>
-            <CardDescription>
-              이 앱이 도움이 되셨나요? 커피 한 잔으로 응원해주세요!
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button
-              className="w-full bg-amber-500 hover:bg-amber-600 text-white"
-              onClick={() => window.open('https://buymeacoffee.com/programtuna', '_blank')}
-            >
-              <Coffee className="h-4 w-4 mr-2" />
-              커피 한 잔 사주기
-              <ExternalLink className="h-4 w-4 ml-2" />
-            </Button>
-          </CardContent>
-        </Card>
+        <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl p-4 border border-amber-200">
+          <div className="flex items-center gap-2 mb-2">
+            <Coffee className="h-4 w-4 text-amber-600" />
+            <h2 className="text-sm font-medium text-amber-700">개발자 후원</h2>
+          </div>
+          <p className="text-xs text-amber-600 mb-3">
+            이 앱이 도움이 되셨나요? 커피 한 잔으로 응원해주세요!
+          </p>
+          <button
+            onClick={() => window.open('https://buymeacoffee.com/programtuna', '_blank')}
+            className="w-full h-11 bg-amber-500 text-white text-sm font-medium rounded-xl hover:bg-amber-600 transition-colors flex items-center justify-center gap-2"
+          >
+            <Coffee className="h-4 w-4" />
+            커피 한 잔 사주기
+            <ExternalLink className="h-3 w-3" />
+          </button>
+        </div>
 
         {/* Danger Zone */}
-        <Card className="border-red-200">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-red-600">
-              <AlertTriangle className="h-5 w-5" />
-              위험 영역
-            </CardTitle>
-            <CardDescription>
-              이 작업은 되돌릴 수 없습니다. 신중하게 진행해주세요.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button
-              variant="destructive"
-              className="w-full"
-              onClick={() => setShowDeleteDialog(true)}
-            >
-              <Trash2 className="h-4 w-4 mr-2" />
-              회원 탈퇴
-            </Button>
-          </CardContent>
-        </Card>
-
-        {/* Delete Confirmation Dialog */}
-        <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle className="flex items-center gap-2 text-red-600">
-                <AlertTriangle className="h-5 w-5" />
-                정말로 탈퇴하시겠습니까?
-              </DialogTitle>
-              <DialogDescription className="space-y-3 pt-3">
-                <p className="font-medium">이 작업은 되돌릴 수 없습니다.</p>
-                <p>계정을 삭제하면 다음 데이터가 영구적으로 삭제됩니다:</p>
-                <ul className="list-disc list-inside space-y-1 text-sm">
-                  <li>모든 습관 기록</li>
-                  <li>습관 완료 데이터</li>
-                  <li>계정 정보</li>
-                  <li>그룹 구성원 정보 (본인)</li>
-                </ul>
-                {error && (
-                  <div className="p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-md">
-                    {error}
-                  </div>
-                )}
-              </DialogDescription>
-            </DialogHeader>
-            <DialogFooter className="gap-2 sm:gap-0">
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setShowDeleteDialog(false);
-                  setError('');
-                }}
-                disabled={deleting}
-              >
-                취소
-              </Button>
-              <Button
-                variant="destructive"
-                onClick={handleDeleteAccount}
-                disabled={deleting}
-              >
-                {deleting ? '삭제 중...' : '계정 삭제'}
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+        <div className="bg-white rounded-2xl p-4 border border-red-200">
+          <div className="flex items-center gap-2 mb-2">
+            <AlertTriangle className="h-4 w-4 text-figma-red" />
+            <h2 className="text-sm font-medium text-figma-red">위험 영역</h2>
+          </div>
+          <p className="text-xs text-figma-black-40 mb-3">
+            이 작업은 되돌릴 수 없습니다. 신중하게 진행해주세요.
+          </p>
+          <button
+            onClick={() => setShowDeleteDialog(true)}
+            className="w-full h-11 bg-figma-red text-white text-sm font-medium rounded-xl hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
+          >
+            <Trash2 className="h-4 w-4" />
+            회원 탈퇴
+          </button>
+        </div>
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <DialogContent className="rounded-3xl border-0 shadow-figma max-w-sm mx-4">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-figma-red">
+              <AlertTriangle className="h-5 w-5" />
+              정말로 탈퇴하시겠습니까?
+            </DialogTitle>
+            <DialogDescription className="space-y-3 pt-3 text-figma-black-60">
+              <p className="font-medium text-figma-black-100">이 작업은 되돌릴 수 없습니다.</p>
+              <p className="text-sm">계정을 삭제하면 다음 데이터가 영구적으로 삭제됩니다:</p>
+              <ul className="list-disc list-inside space-y-1 text-sm text-figma-black-40">
+                <li>모든 습관 기록</li>
+                <li>습관 완료 데이터</li>
+                <li>계정 정보</li>
+                <li>그룹 구성원 정보 (본인)</li>
+              </ul>
+              {error && (
+                <div className="p-3 text-sm text-figma-red bg-red-50 border border-red-100 rounded-xl">
+                  {error}
+                </div>
+              )}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 sm:gap-2">
+            <button
+              onClick={() => {
+                setShowDeleteDialog(false);
+                setError('');
+              }}
+              disabled={deleting}
+              className="flex-1 h-11 bg-figma-black-10 text-figma-black-60 font-medium rounded-xl hover:bg-figma-black-20 transition-colors disabled:opacity-50"
+            >
+              취소
+            </button>
+            <button
+              onClick={handleDeleteAccount}
+              disabled={deleting}
+              className="flex-1 h-11 bg-figma-red text-white font-medium rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50"
+            >
+              {deleting ? '삭제 중...' : '계정 삭제'}
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

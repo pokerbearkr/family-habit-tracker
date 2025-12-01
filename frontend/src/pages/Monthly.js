@@ -2,9 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { habitLogAPI } from '../services/api';
-import { Button } from '../components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
-import { Badge } from '../components/ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../components/ui/dialog';
 import {
   Home,
@@ -13,7 +10,6 @@ import {
   ChevronLeft,
   ChevronRight,
   Calendar,
-  BarChart3,
   TrendingUp,
   Award,
   Settings,
@@ -85,364 +81,331 @@ function Monthly() {
 
   if (!user.familyId) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-        <Card className="w-full max-w-md">
-          <CardHeader>
-            <CardTitle className="text-2xl text-center">그룹에 가입해주세요</CardTitle>
-            <CardDescription className="text-center">
-              월간 통계를 보려면 그룹에 속해 있어야 합니다.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="flex justify-center">
-            <Button onClick={() => navigate('/family')} className="w-full">
-              <Users className="mr-2 h-4 w-4" />
-              그룹 관리
-            </Button>
-          </CardContent>
-        </Card>
+      <div className="min-h-screen bg-figma-bg flex items-center justify-center p-4">
+        <div className="w-full max-w-md bg-white rounded-3xl p-6 shadow-figma text-center">
+          <div className="w-16 h-16 bg-gradient-to-br from-[#6B73FF] to-[#3843FF] rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-figma">
+            <Users className="h-8 w-8 text-white" />
+          </div>
+          <h2 className="text-xl font-semibold text-figma-black-100 mb-2">그룹에 가입해주세요</h2>
+          <p className="text-figma-black-40 text-sm mb-6">
+            월간 통계를 보려면 그룹에 속해 있어야 합니다.
+          </p>
+          <button
+            onClick={() => navigate('/family')}
+            className="w-full h-12 bg-gradient-to-r from-[#6B73FF] to-[#3843FF] text-white font-medium rounded-2xl hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
+          >
+            <Users className="h-5 w-5" />
+            그룹 관리
+          </button>
+        </div>
       </div>
     );
   }
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
-        <Card className="w-full max-w-md">
-          <CardContent className="pt-6 text-center">
-            <div className="flex flex-col items-center gap-2">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-              <p className="text-sm text-muted-foreground">로딩 중...</p>
-            </div>
-          </CardContent>
-        </Card>
+      <div className="min-h-screen bg-figma-bg flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-figma-blue-100 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-figma-black-40">로딩 중...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-4 py-3 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <BarChart3 className="h-6 w-6 text-blue-600" />
-              <h1 className="text-xl sm:text-2xl font-bold text-gray-900">월간 요약</h1>
-            </div>
-            <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => navigate('/dashboard')}
-                className="h-9 w-9"
-              >
-                <Home className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => navigate('/family')}
-                className="h-9 w-9"
-              >
-                <Users className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="outline"
-                size="icon"
+    <div className="min-h-screen bg-figma-bg pb-8">
+      {/* Header - Dashboard style */}
+      <header className="bg-white border-b border-figma-black-10 sticky top-0 z-50">
+        <div className="max-w-lg mx-auto px-6 py-4">
+          {/* Top Row - Icons */}
+          <div className="flex justify-between items-center mb-4">
+            <button
+              onClick={() => navigate('/dashboard')}
+              className="w-12 h-12 flex items-center justify-center rounded-2xl border border-figma-black-10 bg-white hover:bg-figma-black-10 transition-colors"
+            >
+              <Home className="w-5 h-5 text-figma-black-60" />
+            </button>
+            <div className="flex gap-2">
+              <button
                 onClick={() => navigate('/settings')}
-                className="h-9 w-9"
+                className="w-12 h-12 flex items-center justify-center rounded-2xl border border-figma-black-10 bg-white hover:bg-figma-black-10 transition-colors"
               >
-                <Settings className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => setShowLogoutDialog(true)}
-                className="h-9 w-9"
+                <Settings className="w-5 h-5 text-figma-black-60" />
+              </button>
+              <button
+                onClick={() => navigate('/family')}
+                className="w-12 h-12 flex items-center justify-center rounded-2xl border border-figma-black-10 bg-white hover:bg-figma-black-10 transition-colors"
               >
-                <LogOut className="h-4 w-4" />
-              </Button>
+                <Users className="w-5 h-5 text-figma-black-60" />
+              </button>
             </div>
+          </div>
+
+          {/* Title */}
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-lg font-medium text-figma-black-100">
+                월간 요약 📊
+              </h1>
+              <p className="text-sm text-figma-black-40">
+                이번 달 습관 달성 현황을 확인하세요
+              </p>
+            </div>
+            <button
+              onClick={() => setShowLogoutDialog(true)}
+              className="w-10 h-10 bg-figma-info rounded-full flex items-center justify-center"
+              title="로그아웃"
+            >
+              <span className="text-xl">📈</span>
+            </button>
           </div>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8 space-y-6">
-        {/* Month Selector */}
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between gap-4">
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => changeMonth(-1)}
-                className="h-10 w-10 shrink-0"
-              >
-                <ChevronLeft className="h-5 w-5" />
-              </Button>
-              <div className="flex items-center justify-center gap-2 flex-1">
-                <Calendar className="h-5 w-5 text-blue-600" />
-                <h2 className="text-xl sm:text-2xl font-semibold text-center">
-                  {getMonthName()}
-                </h2>
-              </div>
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => changeMonth(1)}
-                className="h-10 w-10 shrink-0"
-              >
-                <ChevronRight className="h-5 w-5" />
-              </Button>
+      <main className="max-w-lg mx-auto px-6 py-4 space-y-4">
+        {/* Month Selector - Horizontal Style */}
+        <div className="flex items-center justify-between gap-4">
+          <button
+            onClick={() => changeMonth(-1)}
+            className="w-12 h-12 flex items-center justify-center rounded-2xl border border-figma-black-10 bg-white hover:bg-figma-black-10 transition-colors"
+          >
+            <ChevronLeft className="h-5 w-5 text-figma-black-60" />
+          </button>
+          <div className="flex-1 bg-gradient-to-r from-[#6B73FF] to-[#3843FF] rounded-2xl py-3 px-4 text-center">
+            <div className="flex items-center justify-center gap-2">
+              <Calendar className="h-5 w-5 text-white/80" />
+              <span className="text-lg font-semibold text-white">
+                {getMonthName()}
+              </span>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+          <button
+            onClick={() => changeMonth(1)}
+            className="w-12 h-12 flex items-center justify-center rounded-2xl border border-figma-black-10 bg-white hover:bg-figma-black-10 transition-colors"
+          >
+            <ChevronRight className="h-5 w-5 text-figma-black-60" />
+          </button>
+        </div>
 
         {stats && (
           <>
             {/* User Stats */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <TrendingUp className="h-5 w-5 text-blue-600" />
-                  그룹 구성원별 통계
-                </CardTitle>
-                <CardDescription>이번 달 그룹 구성원들의 습관 달성률</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {stats.userStats.map((userStat) => (
-                    <div
-                      key={userStat.userId}
-                      className="p-4 rounded-lg border bg-gradient-to-br from-white to-gray-50 hover:shadow-md transition-shadow"
-                    >
-                      <div className="flex items-start justify-between mb-3">
-                        <div className="flex items-center gap-2">
-                          <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
-                            <span className="text-lg font-semibold text-blue-600">
-                              {userStat.displayName.charAt(0)}
-                            </span>
-                          </div>
-                          <h4 className="font-semibold text-gray-900">
+            <div className="bg-white border border-figma-black-10 rounded-2xl p-4">
+              <div className="flex items-center gap-2 mb-3">
+                <TrendingUp className="h-4 w-4 text-figma-blue-100" />
+                <h3 className="text-sm font-medium text-figma-black-100">그룹 구성원별 통계</h3>
+              </div>
+
+              <div className="space-y-3">
+                {stats.userStats.map((userStat) => (
+                  <div
+                    key={userStat.userId}
+                    className="bg-figma-bg rounded-xl p-3"
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <div className="h-8 w-8 rounded-full bg-gradient-to-br from-[#6B73FF] to-[#3843FF] flex items-center justify-center">
+                          <span className="text-white text-sm font-semibold">
+                            {userStat.displayName.charAt(0)}
+                          </span>
+                        </div>
+                        <div>
+                          <h4 className="font-medium text-figma-black-100 text-sm">
                             {userStat.displayName}
                           </h4>
-                        </div>
-                        <Badge
-                          variant={
-                            userStat.completionRate >= 80
-                              ? 'default'
-                              : userStat.completionRate >= 50
-                              ? 'secondary'
-                              : 'outline'
-                          }
-                          className="text-sm font-bold"
-                        >
-                          {userStat.completionRate.toFixed(1)}%
-                        </Badge>
-                      </div>
-
-                      {/* Progress Bar */}
-                      <div className="mb-3">
-                        <div className="h-2.5 bg-gray-200 rounded-full overflow-hidden">
-                          <div
-                            className="h-full bg-gradient-to-r from-blue-500 to-blue-600 transition-all duration-500 ease-out rounded-full"
-                            style={{ width: `${Math.min(userStat.completionRate, 100)}%` }}
-                          />
-                        </div>
-                      </div>
-
-                      <p className="text-sm text-muted-foreground">
-                        {userStat.completedCount} / {userStat.totalPossible} 완료
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Habit Stats */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Award className="h-5 w-5 text-blue-600" />
-                  습관별 통계
-                </CardTitle>
-                <CardDescription>이번 달 습관별 달성률</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {stats.habitStats.map((habitStat) => (
-                    <div
-                      key={habitStat.habitId}
-                      className="p-4 rounded-lg border bg-gradient-to-br from-white to-gray-50 hover:shadow-md transition-shadow"
-                    >
-                      <div className="flex items-start justify-between mb-3">
-                        <div>
-                          <h4
-                            className="font-semibold text-base mb-1"
-                            style={{ color: habitStat.color }}
-                          >
-                            {habitStat.habitName}
-                          </h4>
-                          <p className="text-xs text-muted-foreground">
-                            {habitStat.displayName}
+                          <p className="text-[10px] text-figma-black-40">
+                            {userStat.completedCount} / {userStat.totalPossible} 완료
                           </p>
                         </div>
-                        <Badge
-                          variant={
-                            habitStat.completionRate >= 80
-                              ? 'default'
-                              : habitStat.completionRate >= 50
-                              ? 'secondary'
-                              : 'outline'
-                          }
-                          className="text-sm font-bold shrink-0"
-                        >
-                          {habitStat.completionRate.toFixed(1)}%
-                        </Badge>
                       </div>
-
-                      {/* Progress Bar */}
-                      <div className="mb-3">
-                        <div className="h-2.5 bg-gray-200 rounded-full overflow-hidden">
-                          <div
-                            className="h-full transition-all duration-500 ease-out rounded-full"
-                            style={{
-                              backgroundColor: habitStat.color,
-                              width: `${Math.min(habitStat.completionRate, 100)}%`
-                            }}
-                          />
-                        </div>
-                      </div>
-
-                      <p className="text-sm text-muted-foreground">
-                        {habitStat.completedCount} / {habitStat.totalPossible} 완료
-                      </p>
+                      <span className={`
+                        px-2 py-0.5 text-xs font-bold rounded-full
+                        ${userStat.completionRate >= 80
+                          ? 'bg-green-100 text-green-700'
+                          : userStat.completionRate >= 50
+                          ? 'bg-amber-100 text-amber-700'
+                          : 'bg-figma-black-10 text-figma-black-60'
+                        }
+                      `}>
+                        {userStat.completionRate.toFixed(0)}%
+                      </span>
                     </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+
+                    {/* Progress Bar */}
+                    <div className="h-1.5 bg-figma-black-10 rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-gradient-to-r from-[#6B73FF] to-[#3843FF] transition-all duration-500 ease-out rounded-full"
+                        style={{ width: `${Math.min(userStat.completionRate, 100)}%` }}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Habit Stats */}
+            <div className="bg-white border border-figma-black-10 rounded-2xl p-4">
+              <div className="flex items-center gap-2 mb-3">
+                <Award className="h-4 w-4 text-figma-blue-100" />
+                <h3 className="text-sm font-medium text-figma-black-100">습관별 통계</h3>
+              </div>
+
+              <div className="space-y-3">
+                {stats.habitStats.map((habitStat) => (
+                  <div
+                    key={habitStat.habitId}
+                    className="bg-figma-bg rounded-xl p-3"
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <div>
+                        <h4
+                          className="font-medium text-sm mb-0.5"
+                          style={{ color: habitStat.color }}
+                        >
+                          {habitStat.habitName}
+                        </h4>
+                        <p className="text-[10px] text-figma-black-40">
+                          {habitStat.displayName} | {habitStat.completedCount} / {habitStat.totalPossible}
+                        </p>
+                      </div>
+                      <span className={`
+                        px-2 py-0.5 text-xs font-bold rounded-full
+                        ${habitStat.completionRate >= 80
+                          ? 'bg-green-100 text-green-700'
+                          : habitStat.completionRate >= 50
+                          ? 'bg-amber-100 text-amber-700'
+                          : 'bg-figma-black-10 text-figma-black-60'
+                        }
+                      `}>
+                        {habitStat.completionRate.toFixed(0)}%
+                      </span>
+                    </div>
+
+                    {/* Progress Bar */}
+                    <div className="h-1.5 bg-figma-black-10 rounded-full overflow-hidden">
+                      <div
+                        className="h-full transition-all duration-500 ease-out rounded-full"
+                        style={{
+                          backgroundColor: habitStat.color,
+                          width: `${Math.min(habitStat.completionRate, 100)}%`
+                        }}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
 
             {/* Calendar View */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Calendar className="h-5 w-5 text-blue-600" />
-                  월간 캘린더
-                </CardTitle>
-                <CardDescription>일별 습관 완료 현황</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {/* Week Day Headers */}
-                <div className="grid grid-cols-7 gap-1 sm:gap-2 mb-2">
-                  {weekDays.map((day, index) => (
-                    <div
-                      key={day}
-                      className={`text-center font-semibold text-xs sm:text-sm py-2 ${
-                        index === 0
-                          ? 'text-red-600'
-                          : index === 6
-                          ? 'text-blue-600'
-                          : 'text-gray-600'
-                      }`}
-                    >
-                      {day}
-                    </div>
-                  ))}
-                </div>
+            <div className="bg-white border border-figma-black-10 rounded-2xl p-4">
+              <div className="flex items-center gap-2 mb-3">
+                <Calendar className="h-4 w-4 text-figma-blue-100" />
+                <h3 className="text-sm font-medium text-figma-black-100">월간 캘린더</h3>
+              </div>
 
-                {/* Calendar Grid */}
-                <div className="grid grid-cols-7 gap-1 sm:gap-2">
-                  {Object.entries(stats.dailyStats)
-                    .sort(([a], [b]) => a.localeCompare(b))
-                    .map(([dateKey, dayStat]) => {
-                      // Parse date string directly to avoid timezone issues
-                      const [year, month, day] = dateKey.split('-').map(Number);
-                      const date = new Date(year, month - 1, day); // month is 0-indexed
-                      const dayOfWeek = date.getDay();
-                      const completionRate =
-                        dayStat.totalHabits > 0
-                          ? (dayStat.completedCount / dayStat.totalHabits) * 100
-                          : 0;
+              {/* Week Day Headers */}
+              <div className="grid grid-cols-7 gap-1 mb-1">
+                {weekDays.map((day, index) => (
+                  <div
+                    key={day}
+                    className={`text-center font-medium text-[10px] py-1 ${
+                      index === 0
+                        ? 'text-figma-red'
+                        : index === 6
+                        ? 'text-figma-blue-100'
+                        : 'text-figma-black-40'
+                    }`}
+                  >
+                    {day}
+                  </div>
+                ))}
+              </div>
 
-                      let bgColorClass = 'bg-gray-100 hover:bg-gray-200';
-                      let textColorClass = 'text-gray-600';
-                      let borderClass = 'border-gray-200';
+              {/* Calendar Grid */}
+              <div className="grid grid-cols-7 gap-1">
+                {Object.entries(stats.dailyStats)
+                  .sort(([a], [b]) => a.localeCompare(b))
+                  .map(([dateKey, dayStat]) => {
+                    const [year, month, day] = dateKey.split('-').map(Number);
+                    const date = new Date(year, month - 1, day);
+                    const dayOfWeek = date.getDay();
+                    const completionRate =
+                      dayStat.totalHabits > 0
+                        ? (dayStat.completedCount / dayStat.totalHabits) * 100
+                        : 0;
 
-                      if (completionRate >= 80) {
-                        bgColorClass = 'bg-green-100 hover:bg-green-200';
-                        textColorClass = 'text-green-800';
-                        borderClass = 'border-green-300';
-                      } else if (completionRate >= 50) {
-                        bgColorClass = 'bg-yellow-100 hover:bg-yellow-200';
-                        textColorClass = 'text-yellow-800';
-                        borderClass = 'border-yellow-300';
-                      } else if (completionRate > 0) {
-                        bgColorClass = 'bg-red-100 hover:bg-red-200';
-                        textColorClass = 'text-red-800';
-                        borderClass = 'border-red-300';
-                      }
+                    let bgClass = 'bg-figma-black-10';
+                    let textClass = 'text-figma-black-40';
 
-                      return (
-                        <div
-                          key={dateKey}
-                          className={`
-                            aspect-square p-1 sm:p-2 border rounded-lg
-                            flex flex-col items-center justify-center
-                            cursor-pointer transition-all duration-200
-                            hover:scale-105 hover:shadow-md
-                            ${bgColorClass} ${borderClass}
-                          `}
-                          style={{
-                            gridColumnStart: date.getDate() === 1 ? dayOfWeek + 1 : 'auto'
-                          }}
-                          title={`${dayStat.completedCount}/${dayStat.totalHabits} 완료 (${completionRate.toFixed(1)}%)`}
-                          onClick={() => handleDayClick(dateKey, dayStat)}
-                        >
-                          <div className={`font-bold text-xs sm:text-base ${textColorClass}`}>
-                            {date.getDate()}
-                          </div>
-                          <div className="text-[10px] sm:text-xs text-gray-600 whitespace-nowrap">
-                            {dayStat.completedCount}/{dayStat.totalHabits}
-                          </div>
+                    if (completionRate >= 80) {
+                      bgClass = 'bg-green-100';
+                      textClass = 'text-green-700';
+                    } else if (completionRate >= 50) {
+                      bgClass = 'bg-amber-100';
+                      textClass = 'text-amber-700';
+                    } else if (completionRate > 0) {
+                      bgClass = 'bg-red-100';
+                      textClass = 'text-red-700';
+                    }
+
+                    return (
+                      <div
+                        key={dateKey}
+                        className={`
+                          aspect-square rounded-lg flex flex-col items-center justify-center
+                          cursor-pointer transition-all duration-200
+                          hover:scale-105 hover:shadow-sm
+                          ${bgClass}
+                        `}
+                        style={{
+                          gridColumnStart: date.getDate() === 1 ? dayOfWeek + 1 : 'auto'
+                        }}
+                        title={`${dayStat.completedCount}/${dayStat.totalHabits} 완료 (${completionRate.toFixed(1)}%)`}
+                        onClick={() => handleDayClick(dateKey, dayStat)}
+                      >
+                        <div className={`font-bold text-xs ${textClass}`}>
+                          {date.getDate()}
                         </div>
-                      );
-                    })}
-                </div>
+                        <div className="text-[8px] text-figma-black-40">
+                          {dayStat.completedCount}/{dayStat.totalHabits}
+                        </div>
+                      </div>
+                    );
+                  })}
+              </div>
 
-                {/* Legend */}
-                <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 mt-6 pt-4 border-t">
-                  <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 sm:w-5 sm:h-5 rounded bg-green-100 border border-green-300"></div>
-                    <span className="text-xs sm:text-sm text-gray-700">80% 이상</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 sm:w-5 sm:h-5 rounded bg-yellow-100 border border-yellow-300"></div>
-                    <span className="text-xs sm:text-sm text-gray-700">50-79%</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 sm:w-5 sm:h-5 rounded bg-red-100 border border-red-300"></div>
-                    <span className="text-xs sm:text-sm text-gray-700">1-49%</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 sm:w-5 sm:h-5 rounded bg-gray-100 border border-gray-200"></div>
-                    <span className="text-xs sm:text-sm text-gray-700">0%</span>
-                  </div>
+              {/* Legend */}
+              <div className="flex flex-wrap items-center justify-center gap-3 mt-4 pt-3 border-t border-figma-black-10">
+                <div className="flex items-center gap-1">
+                  <div className="w-3 h-3 rounded bg-green-100"></div>
+                  <span className="text-[10px] text-figma-black-40">80%+</span>
                 </div>
-              </CardContent>
-            </Card>
+                <div className="flex items-center gap-1">
+                  <div className="w-3 h-3 rounded bg-amber-100"></div>
+                  <span className="text-[10px] text-figma-black-40">50-79%</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <div className="w-3 h-3 rounded bg-red-100"></div>
+                  <span className="text-[10px] text-figma-black-40">1-49%</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <div className="w-3 h-3 rounded bg-figma-black-10"></div>
+                  <span className="text-[10px] text-figma-black-40">0%</span>
+                </div>
+              </div>
+            </div>
           </>
         )}
       </main>
 
       {/* Day Detail Dialog */}
       <Dialog open={showDayDialog} onOpenChange={setShowDayDialog}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="rounded-3xl border-0 shadow-figma max-w-sm mx-4">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Calendar className="h-5 w-5 text-blue-600" />
+            <DialogTitle className="flex items-center gap-2 text-figma-black-100">
+              <Calendar className="h-5 w-5 text-figma-blue-100" />
               {selectedDayData && selectedDayData.dateObj && selectedDayData.dateObj.toLocaleDateString('ko-KR', {
                 year: 'numeric',
                 month: 'long',
@@ -455,72 +418,75 @@ function Monthly() {
           {selectedDayData && (
             <div className="space-y-4">
               {/* Summary */}
-              <div className="p-4 bg-gray-50 rounded-lg">
+              <div className="p-4 bg-figma-bg rounded-2xl">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm text-gray-600">완료율</span>
-                  <Badge variant={
-                    selectedDayData.totalHabits > 0 && (selectedDayData.completedCount / selectedDayData.totalHabits * 100) >= 80
-                      ? 'default'
+                  <span className="text-sm text-figma-black-40">완료율</span>
+                  <span className={`
+                    px-3 py-1 text-sm font-bold rounded-full
+                    ${selectedDayData.totalHabits > 0 && (selectedDayData.completedCount / selectedDayData.totalHabits * 100) >= 80
+                      ? 'bg-green-100 text-green-700'
                       : selectedDayData.totalHabits > 0 && (selectedDayData.completedCount / selectedDayData.totalHabits * 100) >= 50
-                      ? 'secondary'
-                      : 'outline'
-                  }>
+                      ? 'bg-amber-100 text-amber-700'
+                      : 'bg-figma-black-10 text-figma-black-60'
+                    }
+                  `}>
                     {selectedDayData.totalHabits > 0
-                      ? `${((selectedDayData.completedCount / selectedDayData.totalHabits) * 100).toFixed(1)}%`
+                      ? `${((selectedDayData.completedCount / selectedDayData.totalHabits) * 100).toFixed(0)}%`
                       : '0%'
                     }
-                  </Badge>
+                  </span>
                 </div>
-                <div className="text-2xl font-bold text-gray-900">
+                <div className="text-2xl font-bold text-figma-black-100">
                   {selectedDayData.completedCount} / {selectedDayData.totalHabits}
                 </div>
-                <p className="text-sm text-gray-600 mt-1">
+                <p className="text-sm text-figma-black-40 mt-1">
                   {selectedDayData.completedCount}개 완료, {selectedDayData.totalHabits - selectedDayData.completedCount}개 미완료
                 </p>
               </div>
 
               {/* Habit List */}
               <div className="space-y-2">
-                <h3 className="font-semibold text-sm text-gray-700">습관 목록</h3>
+                <h3 className="font-semibold text-sm text-figma-black-60">습관 목록</h3>
                 {selectedDayData.logs && selectedDayData.logs.length > 0 ? (
                   <div className="space-y-2 max-h-64 overflow-y-auto">
                     {selectedDayData.logs.map((log, index) => (
                       <div
                         key={index}
-                        className={`p-3 rounded-lg border transition-colors ${
+                        className={`p-3 rounded-2xl transition-colors ${
                           log.completed
-                            ? 'bg-green-50 border-green-200'
-                            : 'bg-gray-50 border-gray-200'
+                            ? 'bg-green-50'
+                            : 'bg-figma-bg'
                         }`}
                       >
                         <div className="flex items-start gap-3">
-                          <div className="mt-0.5">
+                          <div className={`
+                            mt-0.5 w-5 h-5 rounded-full flex items-center justify-center
+                            ${log.completed ? 'bg-figma-green' : 'bg-figma-black-20'}
+                          `}>
                             {log.completed ? (
-                              <Check className="h-5 w-5 text-green-600" />
+                              <Check className="h-3 w-3 text-white" />
                             ) : (
-                              <X className="h-5 w-5 text-gray-400" />
+                              <X className="h-3 w-3 text-white" />
                             )}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2">
-                              <p className={`font-medium ${
-                                log.completed ? 'text-green-900' : 'text-gray-700'
-                              }`}>
-                                {log.habitName}
-                              </p>
-                            </div>
-                            <p className="text-xs text-gray-500 mt-0.5">
+                            <p className={`font-medium ${
+                              log.completed ? 'text-green-700' : 'text-figma-black-60'
+                            }`}>
+                              {log.habitName}
+                            </p>
+                            <p className="text-xs text-figma-black-40 mt-0.5">
                               {log.userName}
                               {log.completed && log.completedAt && (
-                                <span className="ml-2 text-gray-400">
-                                  • {new Date(log.completedAt).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}
+                                <span className="ml-2">
+                                  {new Date(log.completedAt).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}
                                 </span>
                               )}
                             </p>
                             {log.note && (
-                              <div className="flex items-start gap-1 mt-2 p-2 bg-white/60 rounded border border-gray-100">
-                                <MessageSquare className="w-3 h-3 text-gray-400 mt-0.5 flex-shrink-0" />
-                                <p className="text-xs text-gray-600 break-words">{log.note}</p>
+                              <div className="flex items-start gap-1 mt-2 p-2 bg-white rounded-xl">
+                                <MessageSquare className="w-3 h-3 text-figma-black-40 mt-0.5 flex-shrink-0" />
+                                <p className="text-xs text-figma-black-60 break-words">{log.note}</p>
                               </div>
                             )}
                           </div>
@@ -529,7 +495,7 @@ function Monthly() {
                     ))}
                   </div>
                 ) : (
-                  <p className="text-sm text-gray-500 text-center py-4">
+                  <p className="text-sm text-figma-black-40 text-center py-4">
                     이 날짜에 기록된 습관이 없습니다.
                   </p>
                 )}
@@ -541,31 +507,32 @@ function Monthly() {
 
       {/* Logout Confirmation Dialog */}
       <Dialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
-        <DialogContent>
+        <DialogContent className="rounded-3xl border-0 shadow-figma max-w-sm mx-4">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <AlertTriangle className="h-5 w-5 text-amber-600" />
+            <DialogTitle className="flex items-center gap-2 text-figma-black-100">
+              <AlertTriangle className="h-5 w-5 text-amber-500" />
               로그아웃
             </DialogTitle>
-            <DialogDescription>
+            <DialogDescription className="text-figma-black-40">
               정말 로그아웃하시겠습니까?
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter className="gap-2 sm:gap-0">
-            <Button
-              variant="outline"
+          <DialogFooter className="gap-2 sm:gap-2">
+            <button
               onClick={() => setShowLogoutDialog(false)}
+              className="flex-1 h-11 bg-figma-black-10 text-figma-black-60 font-medium rounded-xl hover:bg-figma-black-20 transition-colors"
             >
               취소
-            </Button>
-            <Button
+            </button>
+            <button
               onClick={() => {
                 logout();
                 navigate('/login');
               }}
+              className="flex-1 h-11 bg-figma-blue-100 text-white font-medium rounded-xl hover:opacity-90 transition-opacity"
             >
               로그아웃
-            </Button>
+            </button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
