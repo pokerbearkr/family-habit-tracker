@@ -2,14 +2,19 @@ package com.habittracker.service;
 
 import com.habittracker.dto.CreateHabitRequest;
 import com.habittracker.dto.HabitReorderRequest;
+import com.habittracker.dto.HabitResponse;
 import com.habittracker.entity.Family;
 import com.habittracker.entity.Habit;
+import com.habittracker.entity.HabitLog;
 import com.habittracker.entity.User;
+import com.habittracker.repository.HabitLogRepository;
 import com.habittracker.repository.HabitRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -19,6 +24,7 @@ import java.util.stream.Collectors;
 public class HabitService {
 
     private final HabitRepository habitRepository;
+    private final HabitLogRepository habitLogRepository;
     private final AuthService authService;
 
     @Transactional
@@ -52,6 +58,21 @@ public class HabitService {
     }
 
     @Transactional(readOnly = true)
+    public List<HabitResponse> getFamilyHabitsWithStreak() {
+        User currentUser = authService.getCurrentUser();
+
+        if (currentUser.getFamily() == null) {
+            throw new RuntimeException("User must belong to a family to view habits");
+        }
+
+        List<Habit> habits = habitRepository.findByFamilyId(currentUser.getFamily().getId());
+
+        return habits.stream()
+                .map(habit -> HabitResponse.from(habit, calculateStreak(habit)))
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
     public List<Habit> getFamilyHabits() {
         User currentUser = authService.getCurrentUser();
 
@@ -60,6 +81,153 @@ public class HabitService {
         }
 
         return habitRepository.findByFamilyId(currentUser.getFamily().getId());
+    }
+
+    /**
+     * Calculate streak for a habit based on habit type
+     */
+    private int calculateStreak(Habit habit) {
+        List<HabitLog> completedLogs = habitLogRepository.findCompletedLogsByHabitIdOrderByLogDateDesc(habit.getId());
+
+        if (completedLogs.isEmpty()) {
+            return 0;
+        }
+
+        LocalDate today = LocalDate.now();
+        String habitType = habit.getHabitType() != null ? habit.getHabitType() : "DAILY";
+
+        if ("WEEKLY_COUNT".equals(habitType)) {
+            // For WEEKLY_COUNT, calculate week-based streak
+            return calculateWeeklyCountStreak(habit, completedLogs);
+        } else if ("WEEKLY".equals(habitType)) {
+            // For WEEKLY (specific days), calculate based on selected days
+            return calculateWeeklyStreak(habit, completedLogs);
+        } else {
+            // For DAILY habits
+            return calculateDailyStreak(completedLogs, today);
+        }
+    }
+
+    private int calculateDailyStreak(List<HabitLog> completedLogs, LocalDate today) {
+        Set<LocalDate> completedDates = completedLogs.stream()
+                .map(HabitLog::getLogDate)
+                .collect(Collectors.toSet());
+
+        int streak = 0;
+        LocalDate checkDate = today;
+
+        // If today is not completed, start from yesterday
+        if (!completedDates.contains(today)) {
+            checkDate = today.minusDays(1);
+        }
+
+        // Count consecutive days
+        while (completedDates.contains(checkDate)) {
+            streak++;
+            checkDate = checkDate.minusDays(1);
+        }
+
+        return streak;
+    }
+
+    private int calculateWeeklyStreak(Habit habit, List<HabitLog> completedLogs) {
+        if (habit.getSelectedDays() == null || habit.getSelectedDays().isEmpty()) {
+            return 0;
+        }
+
+        Set<Integer> selectedDays = new HashSet<>();
+        for (String day : habit.getSelectedDays().split(",")) {
+            selectedDays.add(Integer.parseInt(day.trim()));
+        }
+
+        Set<LocalDate> completedDates = completedLogs.stream()
+                .map(HabitLog::getLogDate)
+                .collect(Collectors.toSet());
+
+        LocalDate today = LocalDate.now();
+        int streak = 0;
+        LocalDate checkDate = today;
+
+        // Find the most recent scheduled day (today or before)
+        while (!selectedDays.contains(checkDate.getDayOfWeek().getValue())) {
+            checkDate = checkDate.minusDays(1);
+            if (checkDate.isBefore(today.minusDays(7))) {
+                return 0; // No scheduled day in the past week
+            }
+        }
+
+        // If the most recent scheduled day is not completed, start from previous scheduled day
+        if (!completedDates.contains(checkDate)) {
+            checkDate = findPreviousScheduledDay(checkDate.minusDays(1), selectedDays);
+        }
+
+        // Count consecutive scheduled days that were completed
+        while (checkDate != null && completedDates.contains(checkDate)) {
+            streak++;
+            checkDate = findPreviousScheduledDay(checkDate.minusDays(1), selectedDays);
+            if (checkDate != null && checkDate.isBefore(today.minusDays(365))) {
+                break; // Limit to 1 year
+            }
+        }
+
+        return streak;
+    }
+
+    private LocalDate findPreviousScheduledDay(LocalDate from, Set<Integer> selectedDays) {
+        LocalDate checkDate = from;
+        for (int i = 0; i < 7; i++) {
+            if (selectedDays.contains(checkDate.getDayOfWeek().getValue())) {
+                return checkDate;
+            }
+            checkDate = checkDate.minusDays(1);
+        }
+        return null;
+    }
+
+    private int calculateWeeklyCountStreak(Habit habit, List<HabitLog> completedLogs) {
+        if (habit.getWeeklyTarget() == null || habit.getWeeklyTarget() <= 0) {
+            return 0;
+        }
+
+        int weeklyTarget = habit.getWeeklyTarget();
+        LocalDate today = LocalDate.now();
+
+        // Get week start (Monday)
+        LocalDate currentWeekStart = today.minusDays(today.getDayOfWeek().getValue() - 1);
+
+        int streak = 0;
+
+        // Count completions for current week
+        long currentWeekCount = completedLogs.stream()
+                .filter(log -> !log.getLogDate().isBefore(currentWeekStart) && !log.getLogDate().isAfter(today))
+                .count();
+
+        // If current week target is met, count it
+        if (currentWeekCount >= weeklyTarget) {
+            streak++;
+        }
+
+        // Go back week by week
+        LocalDate weekStart = currentWeekStart.minusDays(7);
+        LocalDate weekEnd = currentWeekStart.minusDays(1);
+
+        for (int i = 0; i < 52; i++) { // Max 1 year
+            final LocalDate ws = weekStart;
+            final LocalDate we = weekEnd;
+            long weekCount = completedLogs.stream()
+                    .filter(log -> !log.getLogDate().isBefore(ws) && !log.getLogDate().isAfter(we))
+                    .count();
+
+            if (weekCount >= weeklyTarget) {
+                streak++;
+                weekStart = weekStart.minusDays(7);
+                weekEnd = weekEnd.minusDays(7);
+            } else {
+                break;
+            }
+        }
+
+        return streak;
     }
 
     @Transactional

@@ -83,7 +83,18 @@ function SortableHabitItem({ habit, userLog, onToggle, onEdit, onDelete, daysDis
                 <GripVertical className="w-5 h-5" />
               </div>
               <div className="flex-1 min-w-0">
-                <h3 className="font-semibold text-lg break-words">{habit.name}</h3>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h3 className="font-semibold text-lg break-words">{habit.name}</h3>
+                  {habit.currentStreak > 0 && (
+                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                      habit.currentStreak >= 30 ? 'bg-orange-100 text-orange-700' :
+                      habit.currentStreak >= 7 ? 'bg-amber-100 text-amber-700' :
+                      'bg-gray-100 text-gray-600'
+                    }`}>
+                      🔥 {habit.currentStreak}일
+                    </span>
+                  )}
+                </div>
                 {daysDisplay && (
                   <Badge variant="outline" className="mt-1 text-xs">
                     {daysDisplay}

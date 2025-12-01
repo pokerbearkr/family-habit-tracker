@@ -29,4 +29,7 @@ public interface HabitLogRepository extends JpaRepository<HabitLog, Long> {
         @Param("startDate") LocalDate startDate,
         @Param("endDate") LocalDate endDate
     );
+
+    @Query("SELECT hl FROM HabitLog hl WHERE hl.habit.id = :habitId AND hl.completed = true ORDER BY hl.logDate DESC")
+    List<HabitLog> findCompletedLogsByHabitIdOrderByLogDateDesc(@Param("habitId") Long habitId);
 }

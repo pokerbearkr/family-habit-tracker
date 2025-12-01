@@ -21,8 +21,13 @@ public class HabitResponse {
     private String habitType;
     private String selectedDays;
     private Integer weeklyTarget;
+    private Integer currentStreak;
 
     public static HabitResponse from(Habit habit) {
+        return from(habit, 0);
+    }
+
+    public static HabitResponse from(Habit habit, int currentStreak) {
         return new HabitResponse(
             habit.getId(),
             habit.getName(),
@@ -35,7 +40,8 @@ public class HabitResponse {
             habit.getDisplayOrder(),
             habit.getHabitType(),
             habit.getSelectedDays(),
-            habit.getWeeklyTarget()
+            habit.getWeeklyTarget(),
+            currentStreak
         );
     }
 }

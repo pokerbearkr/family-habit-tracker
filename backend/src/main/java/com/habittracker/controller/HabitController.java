@@ -11,7 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/habits")
@@ -28,12 +27,7 @@ public class HabitController {
 
     @GetMapping
     public ResponseEntity<List<HabitResponse>> getFamilyHabits() {
-        List<Habit> habits = habitService.getFamilyHabits();
-        return ResponseEntity.ok(
-            habits.stream()
-                .map(HabitResponse::from)
-                .collect(Collectors.toList())
-        );
+        return ResponseEntity.ok(habitService.getFamilyHabitsWithStreak());
     }
 
     @PutMapping("/{id}")
