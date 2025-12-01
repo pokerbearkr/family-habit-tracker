@@ -216,8 +216,10 @@ function Dashboard() {
     color: getLastUsedColor(),
     habitType: 'DAILY',
     selectedDays: [],
-    weeklyTarget: 3
+    weeklyTarget: 3,
+    emoji: '✨'
   });
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [notificationPermission, setNotificationPermission] = useState(
@@ -500,8 +502,12 @@ function Dashboard() {
 
       const weeklyTarget = newHabit.habitType === 'WEEKLY_COUNT' ? newHabit.weeklyTarget : null;
 
+      // Prepend emoji to name if not already included
+      const nameHasEmoji = newHabit.name.match(/[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/gu);
+      const habitName = nameHasEmoji ? newHabit.name : `${newHabit.emoji} ${newHabit.name}`;
+
       await habitAPI.create(
-        newHabit.name,
+        habitName,
         newHabit.description,
         newHabit.color,
         newHabit.habitType,
@@ -512,8 +518,9 @@ function Dashboard() {
       // Save the last used color to localStorage
       localStorage.setItem('lastHabitColor', newHabit.color);
 
-      setNewHabit({ name: '', description: '', color: newHabit.color, habitType: 'DAILY', selectedDays: [], weeklyTarget: 3 });
+      setNewHabit({ name: '', description: '', color: newHabit.color, habitType: 'DAILY', selectedDays: [], weeklyTarget: 3, emoji: '✨' });
       setShowAddHabit(false);
+      setShowEmojiPicker(false);
       loadData();
     } catch (error) {
       console.error('Error adding habit:', error);
@@ -522,13 +529,17 @@ function Dashboard() {
 
   const handleEditHabit = (habit) => {
     setEditingHabit(habit);
+    // Extract emoji from habit name
+    const emojiMatch = habit.name.match(/[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/gu);
+    const emoji = emojiMatch ? emojiMatch[0] : '✨';
     setNewHabit({
       name: habit.name,
       description: habit.description || '',
       color: habit.color,
       habitType: habit.habitType || 'DAILY',
       selectedDays: habit.selectedDays ? habit.selectedDays.split(',').map(d => parseInt(d)) : [],
-      weeklyTarget: habit.weeklyTarget || 3
+      weeklyTarget: habit.weeklyTarget || 3,
+      emoji: emoji
     });
     setShowAddHabit(false);
   };
@@ -555,8 +566,9 @@ function Dashboard() {
       // Save the last used color to localStorage
       localStorage.setItem('lastHabitColor', newHabit.color);
 
-      setNewHabit({ name: '', description: '', color: getLastUsedColor(), habitType: 'DAILY', selectedDays: [], weeklyTarget: 3 });
+      setNewHabit({ name: '', description: '', color: getLastUsedColor(), habitType: 'DAILY', selectedDays: [], weeklyTarget: 3, emoji: '✨' });
       setEditingHabit(null);
+      setShowEmojiPicker(false);
       loadData();
     } catch (error) {
       console.error('Error updating habit:', error);
@@ -635,7 +647,7 @@ function Dashboard() {
 
   const handleCancelEdit = () => {
     setEditingHabit(null);
-    setNewHabit({ name: '', description: '', color: getLastUsedColor(), habitType: 'DAILY', selectedDays: [] });
+    setNewHabit({ name: '', description: '', color: getLastUsedColor(), habitType: 'DAILY', selectedDays: [], weeklyTarget: 3, emoji: '✨' });
   };
 
   const toggleDaySelection = (dayNumber) => {
@@ -990,7 +1002,7 @@ function Dashboard() {
               onClick={() => {
                 setShowAddHabit(!showAddHabit);
                 setEditingHabit(null);
-                setNewHabit({ name: '', description: '', color: getLastUsedColor(), habitType: 'DAILY', selectedDays: [] });
+                setNewHabit({ name: '', description: '', color: getLastUsedColor(), habitType: 'DAILY', selectedDays: [], weeklyTarget: 3, emoji: '✨' });
               }}
               className="text-[10px] font-bold tracking-wide uppercase text-figma-blue-100 hover:text-figma-blue-100/80"
             >
@@ -1029,8 +1041,37 @@ function Dashboard() {
                   <div className="flex gap-4">
                     <div className="space-y-2">
                       <Label className="text-xs font-medium text-figma-black-40 uppercase tracking-wide">아이콘</Label>
-                      <div className="w-14 h-14 rounded-xl border border-figma-black-10 flex items-center justify-center text-2xl bg-figma-black-10/50">
-                        {newHabit.name.match(/[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/gu)?.[0] || '✨'}
+                      <div className="relative">
+                        <button
+                          type="button"
+                          onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                          className="w-14 h-14 rounded-xl border border-figma-black-10 flex items-center justify-center text-2xl bg-white hover:bg-figma-black-10 transition-colors cursor-pointer"
+                        >
+                          {newHabit.emoji}
+                        </button>
+                        {showEmojiPicker && (
+                          <div className="absolute top-16 left-0 z-50 bg-white border border-figma-black-10 rounded-xl p-3 shadow-lg w-64">
+                            <div className="grid grid-cols-7 gap-1">
+                              {['✨', '💧', '🏃', '📚', '💪', '🧘', '😴',
+                                '🍎', '💊', '🎯', '✍️', '🎨', '🎵', '🧹',
+                                '🌅', '🌙', '☀️', '🔥', '💡', '🎮', '📱',
+                                '💰', '🛒', '🚗', '✈️', '🏠', '👨‍👩‍👧', '❤️',
+                                '🙏', '😊', '🎉', '⭐', '🌟', '💎', '🏆'].map((emoji) => (
+                                <button
+                                  key={emoji}
+                                  type="button"
+                                  onClick={() => {
+                                    setNewHabit({ ...newHabit, emoji });
+                                    setShowEmojiPicker(false);
+                                  }}
+                                  className="w-8 h-8 flex items-center justify-center text-xl hover:bg-figma-black-10 rounded-lg transition-colors"
+                                >
+                                  {emoji}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
                     <div className="space-y-2">
@@ -1450,7 +1491,7 @@ function Dashboard() {
           onClick={() => {
             setShowAddHabit(!showAddHabit);
             setEditingHabit(null);
-            setNewHabit({ name: '', description: '', color: getLastUsedColor(), habitType: 'DAILY', selectedDays: [] });
+            setNewHabit({ name: '', description: '', color: getLastUsedColor(), habitType: 'DAILY', selectedDays: [], weeklyTarget: 3, emoji: '✨' });
             window.scrollTo({ top: 0, behavior: 'smooth' });
           }}
           className="w-14 h-14 bg-gradient-to-r from-[#6B73FF] to-[#3843FF] rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all hover:scale-105"
