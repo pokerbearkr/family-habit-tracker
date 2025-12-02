@@ -80,7 +80,7 @@ function ProgressCircle({ progress, size = 36, strokeWidth = 3, color = '#3843FF
 }
 
 // SortableHabitItem component for drag and drop - Figma Style
-function SortableHabitItem({ habit, userLog, onToggle, onEdit, onDelete, daysDisplay, weeklyProgress }) {
+function SortableHabitItem({ habit, userLog, onToggle, onEdit, onDelete, daysDisplay, weeklyProgress, familyMembers, currentUserId, onCommentAdded }) {
   const {
     attributes,
     listeners,
@@ -169,10 +169,20 @@ function SortableHabitItem({ habit, userLog, onToggle, onEdit, onDelete, daysDis
                 <p className="text-xs text-figma-black-60 break-words">{userLog.note}</p>
               </div>
             )}
+            {/* Comment Section for completed habits */}
+            {userLog?.completed && userLog?.id && (
+              <CommentSection
+                habitLogId={userLog.id}
+                comments={userLog.comments || []}
+                familyMembers={familyMembers}
+                currentUserId={currentUserId}
+                onCommentAdded={onCommentAdded}
+              />
+            )}
           </div>
 
           {/* Action Buttons */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-shrink-0">
             <button
               onClick={() => onEdit(habit)}
               className="w-9 h-9 flex items-center justify-center rounded-xl border border-figma-black-10 bg-white dark:bg-gray-800 text-figma-black-40 hover:bg-figma-black-10 transition-colors"
@@ -1409,6 +1419,9 @@ function Dashboard() {
                           onDelete={handleDeleteHabit}
                           daysDisplay={daysDisplay}
                           weeklyProgress={weeklyProgress}
+                          familyMembers={family?.members || []}
+                          currentUserId={user.id}
+                          onCommentAdded={loadData}
                         />
                       );
                     })}
