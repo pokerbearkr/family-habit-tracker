@@ -1,7 +1,7 @@
 /* eslint-disable no-restricted-globals */
 
 // Cache name - increment version to force update
-const CACHE_NAME = 'habit-tracker-v2';
+const CACHE_NAME = 'habit-tracker-v3';
 
 // Files to cache
 const urlsToCache = [
@@ -88,7 +88,6 @@ self.addEventListener('push', (event) => {
   const options = {
     body: data.body,
     icon: data.icon || '/logo192.png',
-    badge: data.badge || '/logo192.png',
     vibrate: [200, 100, 200],
     tag: 'habit-notification',
     requireInteraction: false

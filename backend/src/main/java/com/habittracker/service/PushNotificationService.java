@@ -73,7 +73,7 @@ public class PushNotificationService {
             List<PushSubscription> subscriptions = pushSubscriptionRepository.findByUser(user);
 
             String payload = String.format(
-                "{\"title\":\"%s\",\"body\":\"%s\",\"icon\":\"/logo192.png\",\"badge\":\"/logo192.png\"}",
+                "{\"title\":\"%s\",\"body\":\"%s\",\"icon\":\"/logo192.png\"}",
                 escapeJson(title),
                 escapeJson(body)
             );
