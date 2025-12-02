@@ -4,7 +4,7 @@ import { MessageSquare, Send, X, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 function CommentSection({ habitLogId, comments = [], familyMembers = [], currentUserId, onCommentAdded }) {
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(true);
   const [newComment, setNewComment] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showMentionList, setShowMentionList] = useState(false);
