@@ -1,8 +1,11 @@
 package com.habittracker.controller;
 
+import com.habittracker.dto.CommentResponse;
 import com.habittracker.dto.HabitLogResponse;
 import com.habittracker.dto.LogHabitRequest;
+import com.habittracker.entity.Comment;
 import com.habittracker.entity.HabitLog;
+import com.habittracker.repository.CommentRepository;
 import com.habittracker.service.HabitLogService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -20,6 +24,7 @@ import java.util.stream.Collectors;
 public class HabitLogController {
 
     private final HabitLogService habitLogService;
+    private final CommentRepository commentRepository;
 
     @PostMapping
     public ResponseEntity<HabitLogResponse> logHabit(@Valid @RequestBody LogHabitRequest request) {
@@ -31,11 +36,24 @@ public class HabitLogController {
     public ResponseEntity<List<HabitLogResponse>> getFamilyLogsForDate(
             @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
         List<HabitLog> logs = habitLogService.getFamilyLogsForDate(date);
-        return ResponseEntity.ok(
-            logs.stream()
+        List<HabitLogResponse> responses = logs.stream()
                 .map(HabitLogResponse::from)
-                .collect(Collectors.toList())
-        );
+                .collect(Collectors.toList());
+
+        // Fetch comments for all logs
+        List<Long> logIds = logs.stream().map(HabitLog::getId).collect(Collectors.toList());
+        if (!logIds.isEmpty()) {
+            Map<Long, List<CommentResponse>> commentsMap = commentRepository.findByHabitLogIdsWithUser(logIds)
+                    .stream()
+                    .map(CommentResponse::from)
+                    .collect(Collectors.groupingBy(CommentResponse::getHabitLogId));
+
+            responses.forEach(response -> {
+                response.setComments(commentsMap.getOrDefault(response.getId(), new java.util.ArrayList<>()));
+            });
+        }
+
+        return ResponseEntity.ok(responses);
     }
 
     @GetMapping("/family/range")
@@ -43,11 +61,24 @@ public class HabitLogController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
         List<HabitLog> logs = habitLogService.getFamilyLogsForDateRange(startDate, endDate);
-        return ResponseEntity.ok(
-            logs.stream()
+        List<HabitLogResponse> responses = logs.stream()
                 .map(HabitLogResponse::from)
-                .collect(Collectors.toList())
-        );
+                .collect(Collectors.toList());
+
+        // Fetch comments for all logs
+        List<Long> logIds = logs.stream().map(HabitLog::getId).collect(Collectors.toList());
+        if (!logIds.isEmpty()) {
+            Map<Long, List<CommentResponse>> commentsMap = commentRepository.findByHabitLogIdsWithUser(logIds)
+                    .stream()
+                    .map(CommentResponse::from)
+                    .collect(Collectors.groupingBy(CommentResponse::getHabitLogId));
+
+            responses.forEach(response -> {
+                response.setComments(commentsMap.getOrDefault(response.getId(), new java.util.ArrayList<>()));
+            });
+        }
+
+        return ResponseEntity.ok(responses);
     }
 
     @GetMapping("/my/{date}")

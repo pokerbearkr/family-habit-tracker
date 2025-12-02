@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { habitAPI, habitLogAPI, familyAPI, pushAPI } from '../services/api';
+import { habitAPI, habitLogAPI, familyAPI, pushAPI, commentAPI } from '../services/api';
 import websocketService from '../services/websocket';
 import toast, { Toaster } from 'react-hot-toast';
+import CommentSection from '../components/CommentSection';
 import {
   DndContext,
   closestCenter,
@@ -1507,11 +1508,21 @@ function Dashboard() {
                             <p className="text-xs text-figma-black-60 break-words">{habitLog.note}</p>
                           </div>
                         )}
+                        {/* Comment Section for completed habits */}
+                        {isCompleted && habitLog?.id && (
+                          <CommentSection
+                            habitLogId={habitLog.id}
+                            comments={habitLog.comments || []}
+                            familyMembers={family?.members || []}
+                            currentUserId={user.id}
+                            onCommentAdded={loadData}
+                          />
+                        )}
                       </div>
 
                       {/* Status Indicator */}
                       <div
-                        className={`w-9 h-9 flex items-center justify-center rounded-xl ${
+                        className={`w-9 h-9 flex items-center justify-center rounded-xl flex-shrink-0 ${
                           isCompleted
                             ? 'bg-figma-green text-white'
                             : 'bg-figma-black-10 text-figma-black-40'

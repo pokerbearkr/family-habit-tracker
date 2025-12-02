@@ -78,6 +78,13 @@ export const pushAPI = {
   unsubscribe: (endpoint) => api.post('/push/unsubscribe', { endpoint })
 };
 
+// Comment API
+export const commentAPI = {
+  create: (habitLogId, content) => api.post('/comments', { habitLogId, content }),
+  getByHabitLogId: (habitLogId) => api.get(`/comments/habit-log/${habitLogId}`),
+  delete: (id) => api.delete(`/comments/${id}`)
+};
+
 // Default export with all API functions
 const apiClient = {
   ...api,
