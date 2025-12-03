@@ -18,6 +18,8 @@ public class CreateHabitRequest {
     @NotBlank(message = "Color is required")
     private String color;
 
+    private String icon; // Emoji icon for the habit
+
     private String habitType; // DAILY, WEEKLY, or WEEKLY_COUNT (defaults to DAILY if not provided)
 
     private String selectedDays; // Comma-separated day numbers for WEEKLY habits

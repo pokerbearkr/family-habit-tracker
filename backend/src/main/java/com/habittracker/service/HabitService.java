@@ -46,6 +46,7 @@ public class HabitService {
                 .name(request.getName())
                 .description(request.getDescription())
                 .color(request.getColor())
+                .icon(request.getIcon())
                 .user(currentUser)
                 .family(currentUser.getFamily())
                 .displayOrder(newOrder)
@@ -244,6 +245,7 @@ public class HabitService {
         habit.setName(request.getName());
         habit.setDescription(request.getDescription());
         habit.setColor(request.getColor());
+        habit.setIcon(request.getIcon());
 
         // Update habitType and selectedDays if provided
         if (request.getHabitType() != null) {

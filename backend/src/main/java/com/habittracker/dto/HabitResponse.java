@@ -13,6 +13,7 @@ public class HabitResponse {
     private String name;
     private String description;
     private String color;
+    private String icon;
     private Long familyId;
     private Long userId;
     private String userName;
@@ -33,6 +34,7 @@ public class HabitResponse {
             habit.getName(),
             habit.getDescription(),
             habit.getColor(),
+            habit.getIcon(),
             habit.getFamily() != null ? habit.getFamily().getId() : null,
             habit.getUser() != null ? habit.getUser().getId() : null,
             habit.getUser() != null ? habit.getUser().getUsername() : null,

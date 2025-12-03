@@ -39,6 +39,9 @@ public class Habit {
     @Column(nullable = false)
     private String color; // Hex color code for UI
 
+    @Column(length = 10)
+    private String icon; // Emoji icon for the habit
+
     @Column(name = "display_order")
     private Integer displayOrder; // Order for displaying habits
 

@@ -50,10 +50,10 @@ export const familyAPI = {
 // Habit API
 export const habitAPI = {
   getAll: () => api.get('/habits'),
-  create: (name, description, color, habitType, selectedDays, weeklyTarget) =>
-    api.post('/habits', { name, description, color, habitType, selectedDays, weeklyTarget }),
-  update: (id, name, description, color, habitType, selectedDays, weeklyTarget) =>
-    api.put(`/habits/${id}`, { name, description, color, habitType, selectedDays, weeklyTarget }),
+  create: (name, description, color, icon, habitType, selectedDays, weeklyTarget) =>
+    api.post('/habits', { name, description, color, icon, habitType, selectedDays, weeklyTarget }),
+  update: (id, name, description, color, icon, habitType, selectedDays, weeklyTarget) =>
+    api.put(`/habits/${id}`, { name, description, color, icon, habitType, selectedDays, weeklyTarget }),
   delete: (id) => api.delete(`/habits/${id}`),
   reorder: (id, direction) => api.put(`/habits/${id}/reorder`, null, { params: { direction } }),
   reorderBatch: (updates) => api.put('/habits/reorder-batch', updates)

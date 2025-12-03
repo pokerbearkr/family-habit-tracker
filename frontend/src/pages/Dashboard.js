@@ -103,8 +103,9 @@ function SortableHabitItem({ habit, userLog, onToggle, onEdit, onDelete, daysDis
     return 0;
   };
 
-  // Get emoji from habit name or use default
+  // Get emoji from habit.icon field or fallback to name parsing or default
   const getEmoji = () => {
+    if (habit.icon) return habit.icon;
     const emojis = habit.name.match(/[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/gu);
     return emojis ? emojis[0] : '✨';
   };
@@ -522,6 +523,7 @@ function Dashboard() {
         newHabit.name,
         newHabit.description,
         newHabit.color,
+        newHabit.emoji,
         newHabit.habitType,
         selectedDaysStr,
         weeklyTarget
@@ -541,9 +543,12 @@ function Dashboard() {
 
   const handleEditHabit = (habit) => {
     setEditingHabit(habit);
-    // Extract emoji from habit name
-    const emojiMatch = habit.name.match(/[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/gu);
-    const emoji = emojiMatch ? emojiMatch[0] : '✨';
+    // Use habit.icon if available, otherwise extract from name or use default
+    let emoji = habit.icon || '✨';
+    if (!habit.icon) {
+      const emojiMatch = habit.name.match(/[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/gu);
+      emoji = emojiMatch ? emojiMatch[0] : '✨';
+    }
     setNewHabit({
       name: habit.name,
       description: habit.description || '',
@@ -570,6 +575,7 @@ function Dashboard() {
         newHabit.name,
         newHabit.description,
         newHabit.color,
+        newHabit.emoji,
         newHabit.habitType,
         selectedDaysStr,
         weeklyTarget
@@ -1071,9 +1077,7 @@ function Dashboard() {
                                   key={emoji}
                                   type="button"
                                   onClick={() => {
-                                    // Replace existing emoji at start or prepend new emoji
-                                    const nameWithoutEmoji = newHabit.name.replace(/^[\u{1F300}-\u{1F9FF}][\s]?|^[\u{2600}-\u{26FF}][\s]?|^[\u{2700}-\u{27BF}][\s]?/gu, '');
-                                    setNewHabit({ ...newHabit, emoji, name: `${emoji} ${nameWithoutEmoji}`.trim() });
+                                    setNewHabit({ ...newHabit, emoji });
                                     setShowEmojiPicker(false);
                                   }}
                                   className="w-8 h-8 flex items-center justify-center text-xl hover:bg-figma-black-10 rounded-lg transition-colors"
@@ -1244,9 +1248,7 @@ function Dashboard() {
                                   key={emoji}
                                   type="button"
                                   onClick={() => {
-                                    // Replace existing emoji at start or prepend new emoji
-                                    const nameWithoutEmoji = newHabit.name.replace(/^[\u{1F300}-\u{1F9FF}][\s]?|^[\u{2600}-\u{26FF}][\s]?|^[\u{2700}-\u{27BF}][\s]?/gu, '');
-                                    setNewHabit({ ...newHabit, emoji, name: `${emoji} ${nameWithoutEmoji}`.trim() });
+                                    setNewHabit({ ...newHabit, emoji });
                                     setShowEmojiPicker(false);
                                   }}
                                   className="w-8 h-8 flex items-center justify-center text-xl hover:bg-figma-black-10 rounded-lg transition-colors"
@@ -1466,8 +1468,8 @@ function Dashboard() {
                 const isCompleted = habitLog?.completed || false;
                 const daysDisplay = getDaysDisplay(habit);
 
-                // Get emoji from habit name
-                const emoji = habit.name.match(/[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/gu)?.[0] || '✨';
+                // Get emoji from habit.icon field or fallback to name parsing or default
+                const emoji = habit.icon || habit.name.match(/[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/gu)?.[0] || '✨';
 
                 return (
                   <div
