@@ -402,7 +402,6 @@ function Dashboard() {
         registration.showNotification(title, {
           body,
           icon: '/logo192.png',
-          badge: '/logo192.png',
           tag: 'habit-check',
           requireInteraction: false,
           vibrate: [200, 100, 200]
