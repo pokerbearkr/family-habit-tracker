@@ -466,9 +466,9 @@ function Calendar() {
                     !isCurrentMonthDay ? 'bg-muted/30' : ''
                   }`}
                 >
-                  <div className="flex justify-center mb-1">
+                  <div className="flex justify-center">
                     <span
-                      className={`text-sm w-7 h-7 flex items-center justify-center rounded-full ${
+                      className={`text-xs md:text-sm w-5 h-5 md:w-7 md:h-7 flex items-center justify-center rounded-full ${
                         isTodayDay
                           ? 'bg-primary text-primary-foreground font-bold'
                           : !isCurrentMonthDay
@@ -486,7 +486,7 @@ function Calendar() {
 
                   {/* Holiday/Anniversary */}
                   {holidayInfo && (
-                    <div className={`text-[10px] md:text-xs px-0.5 mb-0.5 truncate ${
+                    <div className={`text-[9px] md:text-xs px-0.5 truncate ${
                       holidayInfo.isHoliday ? 'text-red-500' : 'text-muted-foreground'
                     }`}>
                       {holidayInfo.name}
@@ -499,7 +499,7 @@ function Calendar() {
                       <div
                         key={`${event.id}-${eventIndex}`}
                         onClick={(e) => handleEventClick(event, e)}
-                        className="text-[10px] md:text-xs px-0.5 py-0.5 rounded cursor-pointer hover:opacity-80 transition-opacity overflow-hidden"
+                        className="text-[9px] md:text-xs px-0.5 py-0.5 rounded cursor-pointer hover:opacity-80 transition-opacity overflow-hidden"
                         style={{
                           backgroundColor: event.color + '20',
                           color: event.color,
@@ -512,7 +512,7 @@ function Calendar() {
                       </div>
                     ))}
                     {dayEvents.length > 3 && (
-                      <div className="text-[10px] md:text-xs text-muted-foreground px-0.5">
+                      <div className="text-[9px] md:text-xs text-muted-foreground px-0.5">
                         +{dayEvents.length - 3}개
                       </div>
                     )}
