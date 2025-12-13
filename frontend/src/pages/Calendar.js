@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { calendarAPI, familyAPI } from '../services/api';
+import Holidays from 'date-holidays';
 import websocketService from '../services/websocket';
 import toast, { Toaster } from 'react-hot-toast';
 import { Button } from '../components/ui/button';
@@ -59,6 +60,27 @@ const REMINDER_OPTIONS = [
 
 const DAY_NAMES = ['일', '월', '화', '수', '목', '금', '토'];
 
+// 한국 공휴일 라이브러리 초기화
+const hd = new Holidays('KR');
+
+// 공휴일 이름 한글화 매핑
+const HOLIDAY_NAME_MAP = {
+  'New Year\'s Day': '신정',
+  'Seollal': '설날',
+  'Korean New Year': '설날',
+  'Independence Movement Day': '삼일절',
+  'Children\'s Day': '어린이날',
+  'Buddha\'s Birthday': '부처님오신날',
+  'Memorial Day': '현충일',
+  'Liberation Day': '광복절',
+  'Chuseok': '추석',
+  'National Foundation Day': '개천절',
+  'Hangul Day': '한글날',
+  'Christmas Day': '크리스마스',
+  '기독탄신일': '크리스마스',
+  'Substitute Holiday': '대체공휴일',
+};
+
 function Calendar() {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
@@ -89,6 +111,14 @@ function Calendar() {
   });
   const [isEditing, setIsEditing] = useState(false);
 
+  // Format date to YYYY-MM-DD in local timezone
+  const formatDateLocal = useCallback((date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }, []);
+
   // Get calendar data
   const getMonthRange = useCallback((date) => {
     const year = date.getFullYear();
@@ -104,10 +134,10 @@ function Calendar() {
     endDate.setDate(endDate.getDate() + (6 - lastDay.getDay()));
 
     return {
-      start: startDate.toISOString().split('T')[0],
-      end: endDate.toISOString().split('T')[0]
+      start: formatDateLocal(startDate),
+      end: formatDateLocal(endDate)
     };
-  }, []);
+  }, [formatDateLocal]);
 
   const loadEvents = useCallback(async () => {
     try {
@@ -203,9 +233,24 @@ function Calendar() {
     return days;
   };
 
+  // Get holiday info for a specific date using date-holidays library
+  const getHolidayInfo = useCallback((date) => {
+    const holidays = hd.isHoliday(date);
+    if (holidays && holidays.length > 0) {
+      const holiday = holidays[0];
+      // public = 공휴일, observance = 기념일
+      const displayName = HOLIDAY_NAME_MAP[holiday.name] || holiday.name;
+      return {
+        name: displayName,
+        isHoliday: holiday.type === 'public'
+      };
+    }
+    return null;
+  }, []);
+
   // Get events for a specific day
   const getEventsForDay = (date) => {
-    const dateStr = date.toISOString().split('T')[0];
+    const dateStr = formatDateLocal(date);
     return events.filter(event => {
       const eventStart = event.startDatetime.split('T')[0];
       const eventEnd = event.endDatetime.split('T')[0];
@@ -215,7 +260,7 @@ function Calendar() {
 
   // Handle day click
   const handleDayClick = (date) => {
-    const dateStr = date.toISOString().split('T')[0];
+    const dateStr = formatDateLocal(date);
     setSelectedDate(dateStr);
     setEventForm({
       title: '',
@@ -411,6 +456,7 @@ function Calendar() {
               const dayEvents = getEventsForDay(date);
               const isCurrentMonthDay = isCurrentMonth(date);
               const isTodayDay = isToday(date);
+              const holidayInfo = getHolidayInfo(date);
 
               return (
                 <div
@@ -427,7 +473,7 @@ function Calendar() {
                           ? 'bg-primary text-primary-foreground font-bold'
                           : !isCurrentMonthDay
                           ? 'text-muted-foreground'
-                          : date.getDay() === 0
+                          : holidayInfo?.isHoliday || date.getDay() === 0
                           ? 'text-red-500'
                           : date.getDay() === 6
                           ? 'text-blue-500'
@@ -438,30 +484,36 @@ function Calendar() {
                     </span>
                   </div>
 
+                  {/* Holiday/Anniversary */}
+                  {holidayInfo && (
+                    <div className={`text-xs px-1 mb-0.5 truncate ${
+                      holidayInfo.isHoliday ? 'text-red-500' : 'text-muted-foreground'
+                    }`}>
+                      {holidayInfo.name}
+                    </div>
+                  )}
+
                   {/* Events */}
                   <div className="space-y-0.5">
-                    {dayEvents.slice(0, 3).map((event, eventIndex) => (
+                    {dayEvents.slice(0, holidayInfo ? 2 : 3).map((event, eventIndex) => (
                       <div
                         key={`${event.id}-${eventIndex}`}
                         onClick={(e) => handleEventClick(event, e)}
-                        className="text-xs px-1.5 py-0.5 rounded truncate cursor-pointer hover:opacity-80 transition-opacity"
+                        className="text-xs px-1 py-0.5 rounded cursor-pointer hover:opacity-80 transition-opacity overflow-hidden"
                         style={{
                           backgroundColor: event.color + '20',
                           color: event.color,
-                          borderLeft: `3px solid ${event.color}`
+                          borderLeft: `2px solid ${event.color}`
                         }}
                       >
-                        {!event.allDay && (
-                          <span className="font-medium mr-1">
-                            {formatTime(event.startDatetime)}
-                          </span>
-                        )}
-                        {event.title}
+                        <div className="whitespace-nowrap overflow-hidden text-ellipsis font-medium">
+                          {event.title}
+                        </div>
                       </div>
                     ))}
                     {dayEvents.length > 3 && (
-                      <div className="text-xs text-muted-foreground px-1.5">
-                        +{dayEvents.length - 3}개 더보기
+                      <div className="text-xs text-muted-foreground px-1">
+                        +{dayEvents.length - 3}개
                       </div>
                     )}
                   </div>
