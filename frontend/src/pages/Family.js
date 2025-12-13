@@ -18,7 +18,8 @@ import {
   Settings,
   Edit,
   X,
-  AlertTriangle
+  AlertTriangle,
+  Calendar as CalendarIcon
 } from 'lucide-react';
 
 function Family() {
@@ -178,41 +179,17 @@ function Family() {
   }
 
   return (
-    <div className="min-h-screen bg-figma-bg pb-8">
+    <div className="min-h-screen bg-figma-bg pb-24">
       <Toaster position="top-right" />
 
-      {/* Header - Dashboard style */}
+      {/* Header */}
       <header className="bg-white dark:bg-gray-800 border-b border-figma-black-10 sticky top-0 z-50">
         <div className="max-w-lg mx-auto px-6 py-4">
-          {/* Top Row - Icons */}
-          <div className="flex justify-between items-center mb-4">
-            <button
-              onClick={() => navigate('/dashboard')}
-              className="w-12 h-12 flex items-center justify-center rounded-2xl border border-figma-black-10 bg-white dark:bg-gray-800 hover:bg-figma-black-10 transition-colors"
-            >
-              <Home className="w-5 h-5 text-figma-black-60" />
-            </button>
-            <div className="flex gap-2">
-              <button
-                onClick={() => navigate('/monthly')}
-                className="w-12 h-12 flex items-center justify-center rounded-2xl border border-figma-black-10 bg-white dark:bg-gray-800 hover:bg-figma-black-10 transition-colors"
-              >
-                <TrendingUp className="w-5 h-5 text-figma-black-60" />
-              </button>
-              <button
-                onClick={() => navigate('/settings')}
-                className="w-12 h-12 flex items-center justify-center rounded-2xl border border-figma-black-10 bg-white dark:bg-gray-800 hover:bg-figma-black-10 transition-colors"
-              >
-                <Settings className="w-5 h-5 text-figma-black-60" />
-              </button>
-            </div>
-          </div>
-
           {/* Title */}
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-lg font-medium text-figma-black-100">
-                그룹 관리 👥
+                그룹 관리
               </h1>
               <p className="text-sm text-figma-black-40">
                 {family ? family.name : '그룹을 만들거나 가입하세요'}
@@ -515,6 +492,32 @@ function Family() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Bottom Navigation */}
+      <nav className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-figma-black-10">
+        <div className="flex justify-around items-center py-2">
+          <button onClick={() => navigate('/')} className="flex flex-col items-center p-2 text-figma-black-40">
+            <Home className="w-6 h-6" />
+            <span className="text-xs mt-1">홈</span>
+          </button>
+          <button onClick={() => navigate('/calendar')} className="flex flex-col items-center p-2 text-figma-black-40">
+            <CalendarIcon className="w-6 h-6" />
+            <span className="text-xs mt-1">캘린더</span>
+          </button>
+          <button onClick={() => navigate('/monthly')} className="flex flex-col items-center p-2 text-figma-black-40">
+            <TrendingUp className="w-6 h-6" />
+            <span className="text-xs mt-1">통계</span>
+          </button>
+          <button className="flex flex-col items-center p-2 text-figma-blue-100">
+            <Users className="w-6 h-6" />
+            <span className="text-xs mt-1">가족</span>
+          </button>
+          <button onClick={() => navigate('/settings')} className="flex flex-col items-center p-2 text-figma-black-40">
+            <Settings className="w-6 h-6" />
+            <span className="text-xs mt-1">설정</span>
+          </button>
+        </div>
+      </nav>
 
       {/* Leave Family Confirmation Dialog */}
       <Dialog open={showLeaveDialog} onOpenChange={setShowLeaveDialog}>

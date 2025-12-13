@@ -7,6 +7,7 @@ import Signup from './pages/Signup';
 import Dashboard from './pages/Dashboard';
 import Family from './pages/Family';
 import Monthly from './pages/Monthly';
+import Calendar from './pages/Calendar';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import Settings from './pages/Settings';
 
@@ -73,6 +74,14 @@ function App() {
             element={
               <PrivateRoute>
                 <Monthly />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/calendar"
+            element={
+              <PrivateRoute>
+                <Calendar />
               </PrivateRoute>
             }
           />

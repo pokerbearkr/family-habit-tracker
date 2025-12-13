@@ -85,6 +85,15 @@ export const commentAPI = {
   delete: (id) => api.delete(`/comments/${id}`)
 };
 
+// Calendar API
+export const calendarAPI = {
+  getEvents: (startDate, endDate) =>
+    api.get('/calendar', { params: { start: startDate, end: endDate } }),
+  createEvent: (event) => api.post('/calendar', event),
+  updateEvent: (id, event) => api.put(`/calendar/${id}`, event),
+  deleteEvent: (id) => api.delete(`/calendar/${id}`)
+};
+
 // Default export with all API functions
 const apiClient = {
   ...api,
