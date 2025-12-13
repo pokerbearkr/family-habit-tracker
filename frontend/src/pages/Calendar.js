@@ -434,7 +434,7 @@ function Calendar() {
       </header>
 
       {/* Calendar Grid */}
-      <main className="max-w-7xl mx-auto px-4 py-4">
+      <main className="max-w-7xl mx-auto px-0 md:px-4 py-2 md:py-4">
         <Card className="overflow-hidden">
           {/* Day Headers */}
           <div className="grid grid-cols-7 border-b border-border">
@@ -486,7 +486,7 @@ function Calendar() {
 
                   {/* Holiday/Anniversary */}
                   {holidayInfo && (
-                    <div className={`text-xs px-1 mb-0.5 truncate ${
+                    <div className={`text-[10px] md:text-xs px-0.5 mb-0.5 truncate ${
                       holidayInfo.isHoliday ? 'text-red-500' : 'text-muted-foreground'
                     }`}>
                       {holidayInfo.name}
@@ -499,7 +499,7 @@ function Calendar() {
                       <div
                         key={`${event.id}-${eventIndex}`}
                         onClick={(e) => handleEventClick(event, e)}
-                        className="text-xs px-1 py-0.5 rounded cursor-pointer hover:opacity-80 transition-opacity overflow-hidden"
+                        className="text-[10px] md:text-xs px-0.5 py-0.5 rounded cursor-pointer hover:opacity-80 transition-opacity overflow-hidden"
                         style={{
                           backgroundColor: event.color + '20',
                           color: event.color,
@@ -512,7 +512,7 @@ function Calendar() {
                       </div>
                     ))}
                     {dayEvents.length > 3 && (
-                      <div className="text-xs text-muted-foreground px-1">
+                      <div className="text-[10px] md:text-xs text-muted-foreground px-0.5">
                         +{dayEvents.length - 3}개
                       </div>
                     )}

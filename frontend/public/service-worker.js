@@ -1,7 +1,7 @@
 /* eslint-disable no-restricted-globals */
 
 // Cache name - increment version to force update
-const CACHE_NAME = 'habit-tracker-v3';
+const CACHE_NAME = 'habit-tracker-v4';
 
 // Files to cache
 const urlsToCache = [
