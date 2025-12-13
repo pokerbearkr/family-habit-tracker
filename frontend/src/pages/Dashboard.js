@@ -1683,20 +1683,12 @@ function Dashboard() {
               className="resize-none text-base"
             />
           </div>
-          <DialogFooter className="flex-col sm:flex-row gap-2">
-            <Button
-              variant="outline"
-              onClick={() => handleMemoSubmit(false)}
-              className="w-full sm:w-auto"
-            >
-              메모 없이 체크
-            </Button>
+          <DialogFooter>
             <Button
               onClick={() => handleMemoSubmit(true)}
               style={{ backgroundColor: memoHabit?.color }}
               className="w-full sm:w-auto"
             >
-              <MessageSquare className="w-4 h-4 mr-1" />
               저장
             </Button>
           </DialogFooter>
