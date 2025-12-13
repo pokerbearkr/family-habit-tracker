@@ -17,7 +17,8 @@ import {
   X,
   AlertTriangle,
   MessageSquare,
-  Calendar as CalendarIcon
+  Calendar as CalendarIcon,
+  Heart
 } from 'lucide-react';
 
 function Monthly() {
@@ -493,9 +494,9 @@ function Monthly() {
             <CalendarIcon className="w-6 h-6" />
             <span className="text-xs mt-1">캘린더</span>
           </button>
-          <button className="flex flex-col items-center p-2 text-figma-blue-100">
-            <TrendingUp className="w-6 h-6" />
-            <span className="text-xs mt-1">통계</span>
+          <button onClick={() => navigate('/health')} className="flex flex-col items-center p-2 text-figma-black-40">
+            <Heart className="w-6 h-6" />
+            <span className="text-xs mt-1">건강</span>
           </button>
           <button onClick={() => navigate('/family')} className="flex flex-col items-center p-2 text-figma-black-40">
             <Users className="w-6 h-6" />

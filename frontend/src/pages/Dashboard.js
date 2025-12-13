@@ -46,7 +46,8 @@ import {
   AlertTriangle,
   MessageSquare,
   Home,
-  Calendar as CalendarIcon
+  Calendar as CalendarIcon,
+  Heart
 } from 'lucide-react';
 
 // Figma-style Progress Circle component
@@ -861,13 +862,22 @@ function Dashboard() {
                 {family ? `${family.name}` : '오늘도 습관을 만들어요!'}
               </p>
             </div>
-            <button
-              onClick={() => setShowLogoutDialog(true)}
-              className="w-10 h-10 bg-figma-black-10 rounded-full flex items-center justify-center hover:bg-figma-black-20 transition-colors"
-              title="로그아웃"
-            >
-              <DoorOpen className="w-5 h-5 text-figma-black-60" />
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => navigate('/monthly')}
+                className="w-10 h-10 bg-figma-black-10 rounded-full flex items-center justify-center hover:bg-figma-black-20 transition-colors"
+                title="월간 통계"
+              >
+                <TrendingUp className="w-5 h-5 text-figma-black-60" />
+              </button>
+              <button
+                onClick={() => setShowLogoutDialog(true)}
+                className="w-10 h-10 bg-figma-black-10 rounded-full flex items-center justify-center hover:bg-figma-black-20 transition-colors"
+                title="로그아웃"
+              >
+                <DoorOpen className="w-5 h-5 text-figma-black-60" />
+              </button>
+            </div>
           </div>
         </div>
       </header>
@@ -1554,9 +1564,9 @@ function Dashboard() {
             <CalendarIcon className="w-6 h-6" />
             <span className="text-xs mt-1">캘린더</span>
           </button>
-          <button onClick={() => navigate('/monthly')} className="flex flex-col items-center p-2 text-figma-black-40">
-            <TrendingUp className="w-6 h-6" />
-            <span className="text-xs mt-1">통계</span>
+          <button onClick={() => navigate('/health')} className="flex flex-col items-center p-2 text-figma-black-40">
+            <Heart className="w-6 h-6" />
+            <span className="text-xs mt-1">건강</span>
           </button>
           <button onClick={() => navigate('/family')} className="flex flex-col items-center p-2 text-figma-black-40">
             <Users className="w-6 h-6" />

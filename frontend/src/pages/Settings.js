@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { Input } from '../components/ui/input';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../components/ui/dialog';
-import { Trash2, AlertTriangle, User, Mail, Shield, Edit, Check, X, Coffee, ExternalLink, Bell, Clock, Home, TrendingUp, Users, Moon, Sun, Monitor, Settings as SettingsIcon, Calendar as CalendarIcon } from 'lucide-react';
+import { Trash2, AlertTriangle, User, Mail, Shield, Edit, Check, X, Coffee, ExternalLink, Bell, Clock, Home, Users, Moon, Sun, Monitor, Settings as SettingsIcon, Calendar as CalendarIcon, Heart } from 'lucide-react';
 import api from '../services/api';
 import { authAPI } from '../services/api';
 
@@ -413,9 +413,9 @@ export default function Settings() {
             <CalendarIcon className="w-6 h-6" />
             <span className="text-xs mt-1">캘린더</span>
           </button>
-          <button onClick={() => navigate('/monthly')} className="flex flex-col items-center p-2 text-figma-black-40">
-            <TrendingUp className="w-6 h-6" />
-            <span className="text-xs mt-1">통계</span>
+          <button onClick={() => navigate('/health')} className="flex flex-col items-center p-2 text-figma-black-40">
+            <Heart className="w-6 h-6" />
+            <span className="text-xs mt-1">건강</span>
           </button>
           <button onClick={() => navigate('/family')} className="flex flex-col items-center p-2 text-figma-black-40">
             <Users className="w-6 h-6" />

@@ -94,6 +94,21 @@ export const calendarAPI = {
   deleteEvent: (id) => api.delete(`/calendar/${id}`)
 };
 
+// Health Record API
+export const healthAPI = {
+  create: (record) => api.post('/health', record),
+  update: (id, record) => api.put(`/health/${id}`, record),
+  delete: (id) => api.delete(`/health/${id}`),
+  getMyRecords: (startDate, endDate, type) =>
+    api.get('/health/my', { params: { startDate, endDate, type } }),
+  getFamilyRecords: (startDate, endDate, type) =>
+    api.get('/health/family', { params: { startDate, endDate, type } }),
+  getRecentRecords: (type) =>
+    api.get('/health/recent', { params: { type } }),
+  getChartData: (type, startDate, endDate) =>
+    api.get('/health/chart', { params: { type, startDate, endDate } })
+};
+
 // Default export with all API functions
 const apiClient = {
   ...api,

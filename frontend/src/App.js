@@ -8,6 +8,7 @@ import Dashboard from './pages/Dashboard';
 import Family from './pages/Family';
 import Monthly from './pages/Monthly';
 import Calendar from './pages/Calendar';
+import Health from './pages/Health';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import Settings from './pages/Settings';
 
@@ -82,6 +83,14 @@ function App() {
             element={
               <PrivateRoute>
                 <Calendar />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/health"
+            element={
+              <PrivateRoute>
+                <Health />
               </PrivateRoute>
             }
           />

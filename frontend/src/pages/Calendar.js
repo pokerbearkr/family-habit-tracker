@@ -25,7 +25,8 @@ import {
   Home,
   Users,
   TrendingUp,
-  Settings
+  Settings,
+  Heart
 } from 'lucide-react';
 
 const COLORS = [
@@ -482,9 +483,9 @@ function Calendar() {
             <CalendarIcon className="w-6 h-6" />
             <span className="text-xs mt-1">캘린더</span>
           </button>
-          <button onClick={() => navigate('/monthly')} className="flex flex-col items-center p-2 text-muted-foreground">
-            <TrendingUp className="w-6 h-6" />
-            <span className="text-xs mt-1">통계</span>
+          <button onClick={() => navigate('/health')} className="flex flex-col items-center p-2 text-muted-foreground">
+            <Heart className="w-6 h-6" />
+            <span className="text-xs mt-1">건강</span>
           </button>
           <button onClick={() => navigate('/family')} className="flex flex-col items-center p-2 text-muted-foreground">
             <Users className="w-6 h-6" />
