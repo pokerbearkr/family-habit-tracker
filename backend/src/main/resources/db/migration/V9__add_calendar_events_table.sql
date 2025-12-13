@@ -1,6 +1,6 @@
 -- Calendar Events table for family shared calendar
 CREATE TABLE calendar_events (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    id BIGSERIAL PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
     description VARCHAR(1000),
     start_datetime TIMESTAMP NOT NULL,
