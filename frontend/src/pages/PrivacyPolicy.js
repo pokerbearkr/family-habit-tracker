@@ -20,7 +20,7 @@ export default function PrivacyPolicy() {
         <Card>
           <CardHeader>
             <CardTitle className="text-2xl">개인정보 처리방침</CardTitle>
-            <p className="text-sm text-gray-500 dark:text-gray-400">최종 수정일: 2025년 1월</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">최종 수정일: 2024년 12월 14일</p>
           </CardHeader>
 
           <CardContent className="space-y-6">
@@ -114,7 +114,7 @@ export default function PrivacyPolicy() {
 
             <section className="border-t dark:border-gray-700 pt-6">
               <p className="text-sm text-gray-500 dark:text-gray-400">
-                본 개인정보 처리방침은 2025년 1월부터 적용됩니다.
+                본 개인정보 처리방침은 2024년 12월 14일부터 적용됩니다.
               </p>
             </section>
           </CardContent>

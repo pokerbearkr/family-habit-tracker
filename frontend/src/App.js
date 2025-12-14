@@ -10,6 +10,8 @@ import Monthly from './pages/Monthly';
 import Calendar from './pages/Calendar';
 import Health from './pages/Health';
 import PrivacyPolicy from './pages/PrivacyPolicy';
+import TermsOfService from './pages/TermsOfService';
+import NotFound from './pages/NotFound';
 import Settings from './pages/Settings';
 
 function PrivateRoute({ children }) {
@@ -103,7 +105,9 @@ function App() {
             }
           />
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+            <Route path="/terms-of-service" element={<TermsOfService />} />
             <Route path="/" element={<Navigate to="/dashboard" />} />
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>
       </Router>
