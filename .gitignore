@@ -32,3 +32,7 @@ Thumbs.db
 *.swp
 *.swo
 *~
+
+# Android signing keys (sensitive)
+android-twa/pwabuilder/signing.keystore
+android-twa/pwabuilder/signing-key-info.txt
