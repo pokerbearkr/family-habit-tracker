@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { calendarAPI, familyAPI } from '../services/api';
@@ -111,6 +111,13 @@ function Calendar() {
   });
   const [isEditing, setIsEditing] = useState(false);
 
+  // Swipe handling
+  const [swipeOffset, setSwipeOffset] = useState(0);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const touchStartX = useRef(0);
+  const touchCurrentX = useRef(0);
+  const isDragging = useRef(false);
+
   // Format date to YYYY-MM-DD in local timezone
   const formatDateLocal = useCallback((date) => {
     const year = date.getFullYear();
@@ -211,6 +218,46 @@ function Calendar() {
 
   const goToToday = () => {
     setCurrentDate(new Date());
+  };
+
+  // Touch/Swipe handlers
+  const handleTouchStart = (e) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchCurrentX.current = e.touches[0].clientX;
+    isDragging.current = true;
+  };
+
+  const handleTouchMove = (e) => {
+    if (!isDragging.current) return;
+    touchCurrentX.current = e.touches[0].clientX;
+    const diff = touchCurrentX.current - touchStartX.current;
+    setSwipeOffset(diff * 0.3); // 저항감 있게
+  };
+
+  const handleTouchEnd = () => {
+    if (!isDragging.current) return;
+    isDragging.current = false;
+
+    const diff = touchCurrentX.current - touchStartX.current;
+    const threshold = 50; // 최소 스와이프 거리
+
+    if (Math.abs(diff) > threshold) {
+      setIsAnimating(true);
+      const direction = diff > 0 ? -1 : 1; // 오른쪽 스와이프 = 이전 달
+      setSwipeOffset(direction > 0 ? -100 : 100);
+
+      setTimeout(() => {
+        if (direction > 0) {
+          goToNextMonth();
+        } else {
+          goToPrevMonth();
+        }
+        setSwipeOffset(0);
+        setIsAnimating(false);
+      }, 200);
+    } else {
+      setSwipeOffset(0);
+    }
   };
 
   // Generate calendar days
@@ -406,8 +453,8 @@ function Calendar() {
       <header className="bg-card border-b border-border sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <h1 className="text-xl font-bold text-foreground">
+            <div className="flex items-center gap-2 md:gap-4">
+              <h1 className="text-base md:text-xl font-bold text-foreground">
                 {currentDate.getFullYear()}년 {currentDate.getMonth() + 1}월
               </h1>
               <div className="flex items-center gap-1">
@@ -434,8 +481,17 @@ function Calendar() {
       </header>
 
       {/* Calendar Grid */}
-      <main className="max-w-7xl mx-auto px-0 md:px-4 py-2 md:py-4">
-        <Card className="overflow-hidden">
+      <main className="max-w-7xl mx-auto px-0 md:px-4 py-2 md:py-4 overflow-hidden">
+        <Card
+          className="overflow-hidden"
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+          style={{
+            transform: `translateX(${swipeOffset}px)`,
+            transition: isAnimating ? 'transform 0.2s ease-out' : 'none'
+          }}
+        >
           {/* Day Headers */}
           <div className="grid grid-cols-7 border-b border-border">
             {DAY_NAMES.map((day, index) => (
