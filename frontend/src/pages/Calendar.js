@@ -462,7 +462,7 @@ function Calendar() {
                 <div
                   key={index}
                   onClick={() => handleDayClick(date)}
-                  className={`min-h-[100px] md:min-h-[120px] border-b border-r border-border p-1 cursor-pointer hover:bg-muted/50 transition-colors ${
+                  className={`min-h-[100px] md:min-h-[120px] border-b border-r border-border p-0.5 md:p-1 cursor-pointer hover:bg-muted/50 transition-colors ${
                     !isCurrentMonthDay ? 'bg-muted/30' : ''
                   }`}
                 >
@@ -486,7 +486,7 @@ function Calendar() {
 
                   {/* Holiday/Anniversary */}
                   {holidayInfo && (
-                    <div className={`text-[9px] md:text-xs px-0.5 truncate ${
+                    <div className={`text-[8px] md:text-xs leading-tight whitespace-nowrap overflow-hidden ${
                       holidayInfo.isHoliday ? 'text-red-500' : 'text-muted-foreground'
                     }`}>
                       {holidayInfo.name}
@@ -494,25 +494,24 @@ function Calendar() {
                   )}
 
                   {/* Events */}
-                  <div className="space-y-0.5">
+                  <div className="space-y-px">
                     {dayEvents.slice(0, holidayInfo ? 2 : 3).map((event, eventIndex) => (
                       <div
                         key={`${event.id}-${eventIndex}`}
                         onClick={(e) => handleEventClick(event, e)}
-                        className="text-[9px] md:text-xs px-0.5 py-0.5 rounded cursor-pointer hover:opacity-80 transition-opacity overflow-hidden"
+                        className="text-[8px] md:text-xs leading-tight py-px rounded cursor-pointer hover:opacity-80 transition-opacity whitespace-nowrap overflow-hidden"
                         style={{
                           backgroundColor: event.color + '20',
-                          color: event.color,
-                          borderLeft: `2px solid ${event.color}`
+                          color: event.color
                         }}
                       >
-                        <div className="whitespace-nowrap overflow-hidden text-ellipsis font-medium">
+                        <span className="font-medium">
                           {event.title}
-                        </div>
+                        </span>
                       </div>
                     ))}
                     {dayEvents.length > 3 && (
-                      <div className="text-[9px] md:text-xs text-muted-foreground px-0.5">
+                      <div className="text-[8px] md:text-xs text-muted-foreground">
                         +{dayEvents.length - 3}개
                       </div>
                     )}
