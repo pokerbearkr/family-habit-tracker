@@ -499,7 +499,7 @@ function Calendar() {
                       <div
                         key={`${event.id}-${eventIndex}`}
                         onClick={(e) => handleEventClick(event, e)}
-                        className="text-[8px] md:text-xs leading-tight py-px rounded cursor-pointer hover:opacity-80 transition-opacity whitespace-nowrap overflow-hidden"
+                        className="text-[8px] md:text-xs leading-tight py-px cursor-pointer hover:opacity-80 transition-opacity whitespace-nowrap overflow-hidden"
                         style={{
                           backgroundColor: event.color + '20',
                           color: event.color
