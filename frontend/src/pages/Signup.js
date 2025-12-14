@@ -251,6 +251,10 @@ function Signup() {
 
             <p className="text-center text-xs text-figma-black-40 pt-2">
               회원가입 시{' '}
+              <Link to="/terms-of-service" className="text-figma-blue-100 hover:underline font-medium">
+                이용약관
+              </Link>
+              {' '}및{' '}
               <Link to="/privacy-policy" className="text-figma-blue-100 hover:underline font-medium">
                 개인정보 처리방침
               </Link>
