@@ -47,11 +47,15 @@ public class PushNotificationService {
 
     @Transactional
     public PushSubscription subscribe(User user, String endpoint, String p256dhKey, String authKey) {
-        // Check if subscription already exists
+        // Check if subscription already exists for this user
         var existing = pushSubscriptionRepository.findByUserAndEndpoint(user, endpoint);
         if (existing.isPresent()) {
             return existing.get();
         }
+
+        // Delete any existing subscription with this endpoint (from other users)
+        // This handles the case when a user logs out and another user logs in on the same device
+        pushSubscriptionRepository.deleteByEndpoint(endpoint);
 
         PushSubscription subscription = new PushSubscription();
         subscription.setUser(user);

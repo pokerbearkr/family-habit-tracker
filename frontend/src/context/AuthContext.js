@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import { authAPI } from '../services/api';
+import { authAPI, pushAPI } from '../services/api';
 
 const AuthContext = createContext(null);
 
@@ -64,7 +64,20 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const logout = () => {
+  const logout = async () => {
+    // 푸시 알림 구독 해제
+    try {
+      if ('serviceWorker' in navigator && 'PushManager' in window) {
+        const registration = await navigator.serviceWorker.ready;
+        const subscription = await registration.pushManager.getSubscription();
+        if (subscription) {
+          await pushAPI.unsubscribe(subscription.endpoint);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to unsubscribe push:', error);
+    }
+
     localStorage.removeItem('user');
     setUser(null);
   };
