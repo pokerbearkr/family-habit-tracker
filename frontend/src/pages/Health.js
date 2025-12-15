@@ -54,6 +54,7 @@ function Health() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('BLOOD_PRESSURE');
+  const [viewMode, setViewMode] = useState('my'); // 'my' or 'family'
   const [records, setRecords] = useState([]);
   const [chartData, setChartData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -90,7 +91,9 @@ function Health() {
   const loadRecords = useCallback(async () => {
     try {
       const { startDate, endDate } = getDateRange(chartDays);
-      const response = await healthAPI.getMyRecords(startDate, endDate, activeTab);
+      const response = viewMode === 'my'
+        ? await healthAPI.getMyRecords(startDate, endDate, activeTab)
+        : await healthAPI.getFamilyRecords(startDate, endDate, activeTab);
       setRecords(response.data);
     } catch (error) {
       console.error('Error loading records:', error);
@@ -98,7 +101,7 @@ function Health() {
         toast.error('기록을 불러오는데 실패했습니다');
       }
     }
-  }, [activeTab, chartDays, getDateRange]);
+  }, [activeTab, chartDays, getDateRange, viewMode]);
 
   const loadChartData = useCallback(async () => {
     try {
@@ -490,6 +493,30 @@ function Health() {
               기록
             </Button>
           </div>
+          {/* View Mode Toggle */}
+          <div className="flex gap-2 mt-3">
+            <button
+              onClick={() => setViewMode('my')}
+              className={`flex-1 py-2 text-sm font-medium rounded-lg transition-colors ${
+                viewMode === 'my'
+                  ? 'bg-figma-blue-100 text-white'
+                  : 'bg-figma-black-10 text-figma-black-60'
+              }`}
+            >
+              내 기록
+            </button>
+            <button
+              onClick={() => setViewMode('family')}
+              className={`flex-1 py-2 text-sm font-medium rounded-lg transition-colors ${
+                viewMode === 'family'
+                  ? 'bg-figma-blue-100 text-white'
+                  : 'bg-figma-black-10 text-figma-black-60'
+              }`}
+            >
+              <Users className="w-4 h-4 inline mr-1" />
+              가족 기록
+            </button>
+          </div>
         </div>
       </header>
 
@@ -556,45 +583,55 @@ function Health() {
             </div>
           ) : (
             <div className="space-y-3">
-              {records.map((record) => (
-                <div
-                  key={record.id}
-                  className="flex items-center justify-between p-3 bg-figma-black-5 rounded-xl"
-                >
-                  <div>
-                    <div className="text-sm text-figma-black-40 mb-1">
-                      {new Date(record.recordDate).toLocaleDateString('ko-KR', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric'
-                      })}
-                      {record.measureTime && (
-                        <span className="ml-2">
-                          {MEASURE_TIMES.find(m => m.value === record.measureTime)?.label}
-                        </span>
+              {records.map((record) => {
+                const isMyRecord = record.userId === user?.id;
+                return (
+                  <div
+                    key={record.id}
+                    className="flex items-center justify-between p-3 bg-figma-black-5 rounded-xl"
+                  >
+                    <div>
+                      <div className="text-sm text-figma-black-40 mb-1">
+                        {viewMode === 'family' && (
+                          <span className="font-medium text-figma-blue-100 mr-2">
+                            {record.userDisplayName}
+                          </span>
+                        )}
+                        {new Date(record.recordDate).toLocaleDateString('ko-KR', {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric'
+                        })}
+                        {record.measureTime && (
+                          <span className="ml-2">
+                            {MEASURE_TIMES.find(m => m.value === record.measureTime)?.label}
+                          </span>
+                        )}
+                      </div>
+                      {renderRecordValue(record)}
+                      {record.note && (
+                        <p className="text-sm text-figma-black-40 mt-1">{record.note}</p>
                       )}
                     </div>
-                    {renderRecordValue(record)}
-                    {record.note && (
-                      <p className="text-sm text-figma-black-40 mt-1">{record.note}</p>
+                    {isMyRecord && (
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => openEditDialog(record)}
+                          className="p-2 text-figma-black-40 hover:text-figma-blue-100"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => handleDeleteRecord(record.id)}
+                          className="p-2 text-figma-black-40 hover:text-figma-red"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
                     )}
                   </div>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => openEditDialog(record)}
-                      className="p-2 text-figma-black-40 hover:text-figma-blue-100"
-                    >
-                      <Edit className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={() => handleDeleteRecord(record.id)}
-                      className="p-2 text-figma-black-40 hover:text-figma-red"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </Card>
