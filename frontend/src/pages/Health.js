@@ -55,6 +55,8 @@ function Health() {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('BLOOD_PRESSURE');
   const [viewMode, setViewMode] = useState('my'); // 'my' or 'family'
+  const [selectedMember, setSelectedMember] = useState(null); // 선택된 가족 구성원
+  const [familyMembers, setFamilyMembers] = useState([]); // 가족 구성원 목록
   const [records, setRecords] = useState([]);
   const [chartData, setChartData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -94,22 +96,80 @@ function Health() {
       const response = viewMode === 'my'
         ? await healthAPI.getMyRecords(startDate, endDate, activeTab)
         : await healthAPI.getFamilyRecords(startDate, endDate, activeTab);
-      setRecords(response.data);
+
+      const data = response.data;
+      setRecords(data);
+
+      // 가족 모드일 때 고유한 가족 구성원 목록 추출
+      if (viewMode === 'family' && data.length > 0) {
+        const uniqueMembers = [];
+        const memberIds = new Set();
+        data.forEach(record => {
+          if (!memberIds.has(record.userId)) {
+            memberIds.add(record.userId);
+            uniqueMembers.push({
+              id: record.userId,
+              displayName: record.userDisplayName
+            });
+          }
+        });
+        setFamilyMembers(uniqueMembers);
+
+        // 선택된 구성원이 없거나 목록에 없으면 첫 번째 구성원 선택
+        if (!selectedMember || !uniqueMembers.find(m => m.id === selectedMember.id)) {
+          setSelectedMember(uniqueMembers[0] || null);
+        }
+      } else if (viewMode === 'my') {
+        setFamilyMembers([]);
+        setSelectedMember(null);
+      }
     } catch (error) {
       console.error('Error loading records:', error);
       if (error.response?.status !== 500) {
         toast.error('기록을 불러오는데 실패했습니다');
       }
     }
-  }, [activeTab, chartDays, getDateRange, viewMode]);
+  }, [activeTab, chartDays, getDateRange, viewMode, selectedMember]);
 
   const loadChartData = useCallback(async () => {
     try {
-      const { startDate, endDate } = getDateRange(chartDays);
-      const response = await healthAPI.getChartData(activeTab, startDate, endDate);
+      // 내 기록 모드일 때만 API 호출
+      if (viewMode === 'my') {
+        const { startDate, endDate } = getDateRange(chartDays);
+        const response = await healthAPI.getChartData(activeTab, startDate, endDate);
+
+        // Transform data for chart
+        const transformed = response.data.map(record => ({
+          date: record.recordDate,
+          systolic: record.systolic,
+          diastolic: record.diastolic,
+          heartRate: record.heartRate,
+          weight: record.weight,
+          bloodSugar: record.bloodSugar,
+          displayDate: new Date(record.recordDate).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })
+        }));
+
+        setChartData(transformed);
+      }
+      // 가족 모드는 records에서 필터링하므로 별도 처리
+    } catch (error) {
+      console.error('Error loading chart data:', error);
+    }
+  }, [activeTab, chartDays, getDateRange, viewMode]);
+
+  // 가족 모드에서 선택된 구성원이 변경되면 차트 데이터 업데이트
+  useEffect(() => {
+    if (viewMode === 'family' && selectedMember && records.length > 0) {
+      // 선택된 구성원의 기록만 필터링
+      const memberRecords = records.filter(r => r.userId === selectedMember.id);
+
+      // 날짜순 정렬 (오래된 것부터)
+      const sortedRecords = [...memberRecords].sort((a, b) =>
+        new Date(a.recordDate) - new Date(b.recordDate)
+      );
 
       // Transform data for chart
-      const transformed = response.data.map(record => ({
+      const transformed = sortedRecords.map(record => ({
         date: record.recordDate,
         systolic: record.systolic,
         diastolic: record.diastolic,
@@ -120,10 +180,8 @@ function Health() {
       }));
 
       setChartData(transformed);
-    } catch (error) {
-      console.error('Error loading chart data:', error);
     }
-  }, [activeTab, chartDays, getDateRange]);
+  }, [viewMode, selectedMember, records]);
 
   useEffect(() => {
     const loadData = async () => {
@@ -544,10 +602,36 @@ function Health() {
 
       {/* Main Content */}
       <main className="max-w-lg mx-auto px-4 py-4 space-y-4">
+        {/* Family Member Selection - 가족 모드일 때만 표시 */}
+        {viewMode === 'family' && familyMembers.length > 0 && (
+          <Card className="p-4">
+            <h3 className="text-sm font-medium text-figma-black-60 mb-3">가족 구성원 선택</h3>
+            <div className="flex flex-wrap gap-2">
+              {familyMembers.map((member) => (
+                <button
+                  key={member.id}
+                  onClick={() => setSelectedMember(member)}
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                    selectedMember?.id === member.id
+                      ? 'bg-figma-blue-100 text-white shadow-md'
+                      : 'bg-figma-black-10 text-figma-black-60 hover:bg-figma-black-20'
+                  }`}
+                >
+                  {member.displayName}
+                </button>
+              ))}
+            </div>
+          </Card>
+        )}
+
         {/* Chart Card */}
         <Card className="p-4">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="font-medium text-figma-black-100">추이 그래프</h2>
+            <h2 className="font-medium text-figma-black-100">
+              {viewMode === 'family' && selectedMember
+                ? `${selectedMember.displayName}의 추이 그래프`
+                : '추이 그래프'}
+            </h2>
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setChartDays(7)}
@@ -574,66 +658,76 @@ function Health() {
 
         {/* Recent Records */}
         <Card className="p-4">
-          <h2 className="font-medium text-figma-black-100 mb-4">최근 기록</h2>
+          <h2 className="font-medium text-figma-black-100 mb-4">
+            {viewMode === 'family' && selectedMember
+              ? `${selectedMember.displayName}의 최근 기록`
+              : '최근 기록'}
+          </h2>
           {loading ? (
             <div className="text-center py-8 text-figma-black-40">로딩 중...</div>
-          ) : records.length === 0 ? (
-            <div className="text-center py-8 text-figma-black-40">
-              기록이 없습니다. 첫 기록을 추가해보세요!
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {records.map((record) => {
-                const isMyRecord = record.userId === user?.id;
-                return (
-                  <div
-                    key={record.id}
-                    className="flex items-center justify-between p-3 bg-figma-black-5 rounded-xl"
-                  >
-                    <div>
-                      <div className="text-sm text-figma-black-40 mb-1">
-                        {viewMode === 'family' && (
-                          <span className="font-medium text-figma-blue-100 mr-2">
-                            {record.userDisplayName}
-                          </span>
-                        )}
-                        {new Date(record.recordDate).toLocaleDateString('ko-KR', {
-                          year: 'numeric',
-                          month: 'long',
-                          day: 'numeric'
-                        })}
-                        {record.measureTime && (
-                          <span className="ml-2">
-                            {MEASURE_TIMES.find(m => m.value === record.measureTime)?.label}
-                          </span>
+          ) : (() => {
+            // 가족 모드에서는 선택된 구성원의 기록만 필터링
+            const filteredRecords = viewMode === 'family' && selectedMember
+              ? records.filter(r => r.userId === selectedMember.id)
+              : records;
+
+            if (filteredRecords.length === 0) {
+              return (
+                <div className="text-center py-8 text-figma-black-40">
+                  기록이 없습니다. 첫 기록을 추가해보세요!
+                </div>
+              );
+            }
+
+            return (
+              <div className="space-y-3">
+                {filteredRecords.map((record) => {
+                  const isMyRecord = record.userId === user?.id;
+                  return (
+                    <div
+                      key={record.id}
+                      className="flex items-center justify-between p-3 bg-figma-black-5 rounded-xl"
+                    >
+                      <div>
+                        <div className="text-sm text-figma-black-40 mb-1">
+                          {new Date(record.recordDate).toLocaleDateString('ko-KR', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric'
+                          })}
+                          {record.measureTime && (
+                            <span className="ml-2">
+                              {MEASURE_TIMES.find(m => m.value === record.measureTime)?.label}
+                            </span>
+                          )}
+                        </div>
+                        {renderRecordValue(record)}
+                        {record.note && (
+                          <p className="text-sm text-figma-black-40 mt-1">{record.note}</p>
                         )}
                       </div>
-                      {renderRecordValue(record)}
-                      {record.note && (
-                        <p className="text-sm text-figma-black-40 mt-1">{record.note}</p>
+                      {isMyRecord && (
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => openEditDialog(record)}
+                            className="p-2 text-figma-black-40 hover:text-figma-blue-100"
+                          >
+                            <Edit className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteRecord(record.id)}
+                            className="p-2 text-figma-black-40 hover:text-figma-red"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
                       )}
                     </div>
-                    {isMyRecord && (
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => openEditDialog(record)}
-                          className="p-2 text-figma-black-40 hover:text-figma-blue-100"
-                        >
-                          <Edit className="w-4 h-4" />
-                        </button>
-                        <button
-                          onClick={() => handleDeleteRecord(record.id)}
-                          className="p-2 text-figma-black-40 hover:text-figma-red"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          )}
+                  );
+                })}
+              </div>
+            );
+          })()}
         </Card>
       </main>
 
