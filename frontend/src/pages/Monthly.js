@@ -33,6 +33,7 @@ function Monthly() {
   const [selectedDayData, setSelectedDayData] = useState(null);
   const [showDayDialog, setShowDayDialog] = useState(false);
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
+  const [selectedHabit, setSelectedHabit] = useState(null); // 선택된 습관 (월간 캘린더용)
 
   useEffect(() => {
     loadMonthlyStats();
@@ -80,6 +81,33 @@ function Monthly() {
   };
 
   const weekDays = ['일', '월', '화', '수', '목', '금', '토'];
+
+  // 습관 클릭 핸들러 - 토글 방식
+  const handleHabitClick = (habitStat) => {
+    if (selectedHabit && selectedHabit.habitId === habitStat.habitId) {
+      setSelectedHabit(null); // 같은 습관 클릭시 닫기
+    } else {
+      setSelectedHabit(habitStat);
+    }
+  };
+
+  // 선택된 습관의 일별 완료 데이터 계산
+  const getHabitDailyData = () => {
+    if (!selectedHabit || !stats?.dailyStats) return {};
+
+    const habitDailyData = {};
+    Object.entries(stats.dailyStats).forEach(([dateKey, dayStat]) => {
+      const habitLog = dayStat.logs?.find(
+        log => log.habitId === selectedHabit.habitId
+      );
+      habitDailyData[dateKey] = {
+        completed: habitLog?.completed || false,
+        note: habitLog?.note || null,
+        completedAt: habitLog?.completedAt || null
+      };
+    });
+    return habitDailyData;
+  };
 
   if (!user.familyId) {
     return (
@@ -228,51 +256,162 @@ function Monthly() {
               <div className="flex items-center gap-2 mb-3">
                 <Award className="h-4 w-4 text-figma-blue-100" />
                 <h3 className="text-sm font-medium text-figma-black-100">습관별 통계</h3>
+                <span className="text-[10px] text-figma-black-40">(클릭하여 캘린더 보기)</span>
               </div>
 
               <div className="space-y-3">
-                {stats.habitStats.map((habitStat) => (
-                  <div
-                    key={habitStat.habitId}
-                    className="bg-figma-bg rounded-xl p-3"
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <div>
-                        <h4
-                          className="font-medium text-sm mb-0.5"
-                          style={{ color: habitStat.color }}
-                        >
-                          {habitStat.habitName}
-                        </h4>
-                        <p className="text-[10px] text-figma-black-40">
-                          {habitStat.displayName} | {habitStat.completedCount} / {habitStat.totalPossible}
-                        </p>
-                      </div>
-                      <span className={`
-                        px-2 py-0.5 text-xs font-bold rounded-full
-                        ${habitStat.completionRate >= 80
-                          ? 'bg-green-100 text-green-700'
-                          : habitStat.completionRate >= 50
-                          ? 'bg-amber-100 text-amber-700'
-                          : 'bg-figma-black-10 text-figma-black-60'
-                        }
-                      `}>
-                        {habitStat.completionRate.toFixed(0)}%
-                      </span>
-                    </div>
+                {stats.habitStats.map((habitStat) => {
+                  const isSelected = selectedHabit?.habitId === habitStat.habitId;
+                  const habitDailyData = isSelected ? getHabitDailyData() : {};
 
-                    {/* Progress Bar */}
-                    <div className="h-1.5 bg-figma-black-10 rounded-full overflow-hidden">
+                  return (
+                    <div key={habitStat.habitId}>
                       <div
-                        className="h-full transition-all duration-500 ease-out rounded-full"
-                        style={{
-                          backgroundColor: habitStat.color,
-                          width: `${Math.min(habitStat.completionRate, 100)}%`
-                        }}
-                      />
+                        onClick={() => handleHabitClick(habitStat)}
+                        className={`bg-figma-bg rounded-xl p-3 cursor-pointer transition-all ${
+                          isSelected
+                            ? 'ring-2 ring-offset-1'
+                            : 'hover:bg-figma-black-10'
+                        }`}
+                        style={isSelected ? { ringColor: habitStat.color } : {}}
+                      >
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center gap-2">
+                            <ChevronRight
+                              className={`w-4 h-4 text-figma-black-40 transition-transform ${
+                                isSelected ? 'rotate-90' : ''
+                              }`}
+                            />
+                            <div>
+                              <h4
+                                className="font-medium text-sm mb-0.5"
+                                style={{ color: habitStat.color }}
+                              >
+                                {habitStat.habitName}
+                              </h4>
+                              <p className="text-[10px] text-figma-black-40">
+                                {habitStat.displayName} | {habitStat.completedCount} / {habitStat.totalPossible}
+                              </p>
+                            </div>
+                          </div>
+                          <span className={`
+                            px-2 py-0.5 text-xs font-bold rounded-full
+                            ${habitStat.completionRate >= 80
+                              ? 'bg-green-100 text-green-700'
+                              : habitStat.completionRate >= 50
+                              ? 'bg-amber-100 text-amber-700'
+                              : 'bg-figma-black-10 text-figma-black-60'
+                            }
+                          `}>
+                            {habitStat.completionRate.toFixed(0)}%
+                          </span>
+                        </div>
+
+                        {/* Progress Bar */}
+                        <div className="h-1.5 bg-figma-black-10 rounded-full overflow-hidden ml-6">
+                          <div
+                            className="h-full transition-all duration-500 ease-out rounded-full"
+                            style={{
+                              backgroundColor: habitStat.color,
+                              width: `${Math.min(habitStat.completionRate, 100)}%`
+                            }}
+                          />
+                        </div>
+                      </div>
+
+                      {/* 선택된 습관의 월간 캘린더 */}
+                      {isSelected && (
+                        <div className="mt-3 p-3 bg-white dark:bg-gray-700 border border-figma-black-10 rounded-xl animate-in slide-in-from-top-2 duration-200">
+                          <div className="flex items-center gap-2 mb-3">
+                            <div
+                              className="w-3 h-3 rounded-full"
+                              style={{ backgroundColor: habitStat.color }}
+                            />
+                            <span className="text-xs font-medium text-figma-black-60">
+                              {habitStat.habitName} 완료 현황
+                            </span>
+                          </div>
+
+                          {/* Week Day Headers */}
+                          <div className="grid grid-cols-7 gap-1 mb-1">
+                            {weekDays.map((day, index) => (
+                              <div
+                                key={day}
+                                className={`text-center font-medium text-[10px] py-1 ${
+                                  index === 0
+                                    ? 'text-figma-red'
+                                    : index === 6
+                                    ? 'text-figma-blue-100'
+                                    : 'text-figma-black-40'
+                                }`}
+                              >
+                                {day}
+                              </div>
+                            ))}
+                          </div>
+
+                          {/* Calendar Grid */}
+                          <div className="grid grid-cols-7 gap-1">
+                            {Object.entries(stats.dailyStats)
+                              .sort(([a], [b]) => a.localeCompare(b))
+                              .map(([dateKey]) => {
+                                const [year, month, day] = dateKey.split('-').map(Number);
+                                const date = new Date(year, month - 1, day);
+                                const dayOfWeek = date.getDay();
+                                const dayData = habitDailyData[dateKey];
+                                const isCompleted = dayData?.completed;
+
+                                return (
+                                  <div
+                                    key={dateKey}
+                                    className={`
+                                      aspect-square rounded-lg flex items-center justify-center
+                                      transition-all duration-200 text-xs font-medium
+                                      ${isCompleted
+                                        ? 'text-white'
+                                        : 'bg-figma-black-10 text-figma-black-40'
+                                      }
+                                    `}
+                                    style={{
+                                      backgroundColor: isCompleted ? habitStat.color : undefined,
+                                      gridColumnStart: date.getDate() === 1 ? dayOfWeek + 1 : 'auto'
+                                    }}
+                                    title={isCompleted ? '완료' : '미완료'}
+                                  >
+                                    {isCompleted ? (
+                                      <Check className="w-3 h-3" />
+                                    ) : (
+                                      <span className="text-[10px]">{date.getDate()}</span>
+                                    )}
+                                  </div>
+                                );
+                              })}
+                          </div>
+
+                          {/* 완료 요약 */}
+                          <div className="mt-3 pt-2 border-t border-figma-black-10 flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                              <div className="flex items-center gap-1">
+                                <div
+                                  className="w-3 h-3 rounded"
+                                  style={{ backgroundColor: habitStat.color }}
+                                />
+                                <span className="text-[10px] text-figma-black-40">완료</span>
+                              </div>
+                              <div className="flex items-center gap-1">
+                                <div className="w-3 h-3 rounded bg-figma-black-10" />
+                                <span className="text-[10px] text-figma-black-40">미완료</span>
+                              </div>
+                            </div>
+                            <span className="text-[10px] font-medium" style={{ color: habitStat.color }}>
+                              {habitStat.completedCount}일 완료
+                            </span>
+                          </div>
+                        </div>
+                      )}
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
 
