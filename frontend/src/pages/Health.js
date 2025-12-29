@@ -78,14 +78,17 @@ function Health() {
         }));
         setFamilyMembers(members);
         // 선택된 구성원이 없으면 첫 번째 구성원 선택
-        if (!selectedMember && members.length > 0) {
-          setSelectedMember(members[0]);
-        }
+        setSelectedMember(prev => {
+          if (!prev && members.length > 0) {
+            return members[0];
+          }
+          return prev;
+        });
       }
     } catch (error) {
       console.error('Error loading family members:', error);
     }
-  }, [selectedMember]);
+  }, []);
 
   // Form state
   const [formData, setFormData] = useState({
