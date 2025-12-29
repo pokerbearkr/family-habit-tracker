@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { healthAPI } from '../services/api';
+import { healthAPI, familyAPI } from '../services/api';
 import toast, { Toaster } from 'react-hot-toast';
 import { Button } from '../components/ui/button';
 import { Card } from '../components/ui/card';
@@ -67,6 +67,26 @@ function Health() {
   // Chart date range (default: 30 days)
   const [chartDays, setChartDays] = useState(30);
 
+  // 가족 구성원 목록 로드 (가족 모드 진입 시)
+  const loadFamilyMembers = useCallback(async () => {
+    try {
+      const response = await familyAPI.getMy();
+      if (response.data?.members) {
+        const members = response.data.members.map(m => ({
+          id: m.id,
+          displayName: m.displayName
+        }));
+        setFamilyMembers(members);
+        // 선택된 구성원이 없으면 첫 번째 구성원 선택
+        if (!selectedMember && members.length > 0) {
+          setSelectedMember(members[0]);
+        }
+      }
+    } catch (error) {
+      console.error('Error loading family members:', error);
+    }
+  }, [selectedMember]);
+
   // Form state
   const [formData, setFormData] = useState({
     recordType: 'BLOOD_PRESSURE',
@@ -100,26 +120,8 @@ function Health() {
       const data = response.data;
       setRecords(data);
 
-      // 가족 모드일 때 고유한 가족 구성원 목록 추출
-      if (viewMode === 'family' && data.length > 0) {
-        const uniqueMembers = [];
-        const memberIds = new Set();
-        data.forEach(record => {
-          if (!memberIds.has(record.userId)) {
-            memberIds.add(record.userId);
-            uniqueMembers.push({
-              id: record.userId,
-              displayName: record.userDisplayName
-            });
-          }
-        });
-        setFamilyMembers(uniqueMembers);
-
-        // 선택된 구성원이 없거나 목록에 없으면 첫 번째 구성원 선택
-        if (!selectedMember || !uniqueMembers.find(m => m.id === selectedMember.id)) {
-          setSelectedMember(uniqueMembers[0] || null);
-        }
-      } else if (viewMode === 'my') {
+      // 내 기록 모드로 전환 시 가족 관련 상태 초기화
+      if (viewMode === 'my') {
         setFamilyMembers([]);
         setSelectedMember(null);
       }
@@ -129,7 +131,7 @@ function Health() {
         toast.error('기록을 불러오는데 실패했습니다');
       }
     }
-  }, [activeTab, chartDays, getDateRange, viewMode, selectedMember]);
+  }, [activeTab, chartDays, getDateRange, viewMode]);
 
   const loadChartData = useCallback(async () => {
     try {
@@ -191,6 +193,13 @@ function Health() {
     };
     loadData();
   }, [loadRecords, loadChartData]);
+
+  // 가족 모드로 전환 시 가족 구성원 목록 로드
+  useEffect(() => {
+    if (viewMode === 'family') {
+      loadFamilyMembers();
+    }
+  }, [viewMode, loadFamilyMembers]);
 
   const handleAddRecord = async () => {
     try {
