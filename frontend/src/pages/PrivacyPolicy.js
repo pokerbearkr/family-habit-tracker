@@ -19,14 +19,14 @@ export default function PrivacyPolicy() {
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-2xl">개인정보 처리방침</CardTitle>
-            <p className="text-sm text-gray-500 dark:text-gray-400">최종 수정일: 2024년 12월 14일</p>
+            <CardTitle className="text-2xl">Habitree (가족 습관 트래커) 개인정보 처리방침</CardTitle>
+            <p className="text-sm text-gray-500 dark:text-gray-400">최종 수정일: 2025년 1월 1일</p>
           </CardHeader>
 
           <CardContent className="space-y-6">
             <section>
               <h2 className="text-xl font-semibold mb-3">1. 수집하는 개인정보</h2>
-              <p className="mb-2">습관 트래커는 서비스 제공을 위해 다음과 같은 개인정보를 수집합니다:</p>
+              <p className="mb-2">Habitree (가족 습관 트래커)는 서비스 제공을 위해 다음과 같은 개인정보를 수집합니다:</p>
               <ul className="list-disc list-inside space-y-1 text-gray-700 dark:text-gray-300">
                 <li>이메일 주소 (계정 생성 및 로그인용)</li>
                 <li>사용자 이름 및 표시명</li>
@@ -58,7 +58,7 @@ export default function PrivacyPolicy() {
             <section>
               <h2 className="text-xl font-semibold mb-3">4. 개인정보의 제3자 제공</h2>
               <p className="text-gray-700 dark:text-gray-300">
-                습관 트래커는 회원님의 개인정보를 제3자에게 제공하지 않습니다.
+                Habitree는 회원님의 개인정보를 제3자에게 제공하지 않습니다.
                 다만, 다음의 경우에는 예외로 합니다:
               </p>
               <ul className="list-disc list-inside space-y-1 text-gray-700 mt-2">
@@ -98,8 +98,10 @@ export default function PrivacyPolicy() {
 
             <section>
               <h2 className="text-xl font-semibold mb-3">8. 개인정보 보호책임자</h2>
-              <div className="text-gray-700">
+              <div className="text-gray-700 dark:text-gray-300">
                 <p className="mb-2">개인정보 처리에 관한 문의사항이 있으시면 아래로 연락해 주시기 바랍니다:</p>
+                <p className="font-medium">앱 이름: Habitree (가족 습관 트래커)</p>
+                <p className="font-medium">개발자: 오동원 (programtuna)</p>
                 <p className="font-medium">이메일: omj1010@naver.com</p>
               </div>
             </section>
@@ -114,7 +116,7 @@ export default function PrivacyPolicy() {
 
             <section className="border-t dark:border-gray-700 pt-6">
               <p className="text-sm text-gray-500 dark:text-gray-400">
-                본 개인정보 처리방침은 2024년 12월 14일부터 적용됩니다.
+                본 개인정보 처리방침은 2025년 1월 1일부터 적용됩니다.
               </p>
             </section>
           </CardContent>
