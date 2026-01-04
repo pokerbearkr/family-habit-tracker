@@ -267,25 +267,42 @@ export default function Settings() {
                     <Clock className="h-5 w-5 text-figma-black-60" />
                     <span className="font-medium text-figma-black-100">알림 시간</span>
                   </div>
-                  <select
-                    value={reminderTime.split(':')[0]}
-                    onChange={(e) => handleReminderTimeChange(`${e.target.value}:00`)}
-                    disabled={savingReminders}
-                    className="w-full p-3 border border-figma-black-10 rounded-xl bg-white dark:bg-gray-800 focus:ring-2 focus:ring-figma-blue-100 focus:border-figma-blue-100 text-figma-black-100"
-                  >
-                    {Array.from({ length: 24 }, (_, i) => {
-                      const hour = i.toString().padStart(2, '0');
-                      const displayHour = i === 0 ? '오전 12시' :
-                                         i < 12 ? `오전 ${i}시` :
-                                         i === 12 ? '오후 12시' :
-                                         `오후 ${i - 12}시`;
-                      return (
-                        <option key={hour} value={hour}>
-                          {displayHour}
-                        </option>
-                      );
-                    })}
-                  </select>
+                  <div className="flex gap-2">
+                    <select
+                      value={reminderTime.split(':')[0]}
+                      onChange={(e) => handleReminderTimeChange(`${e.target.value}:${reminderTime.split(':')[1] || '00'}`)}
+                      disabled={savingReminders}
+                      className="flex-1 p-3 border border-figma-black-10 rounded-xl bg-white dark:bg-gray-800 focus:ring-2 focus:ring-figma-blue-100 focus:border-figma-blue-100 text-figma-black-100"
+                    >
+                      {Array.from({ length: 24 }, (_, i) => {
+                        const hour = i.toString().padStart(2, '0');
+                        const displayHour = i === 0 ? '오전 12시' :
+                                           i < 12 ? `오전 ${i}시` :
+                                           i === 12 ? '오후 12시' :
+                                           `오후 ${i - 12}시`;
+                        return (
+                          <option key={hour} value={hour}>
+                            {displayHour}
+                          </option>
+                        );
+                      })}
+                    </select>
+                    <select
+                      value={reminderTime.split(':')[1] || '00'}
+                      onChange={(e) => handleReminderTimeChange(`${reminderTime.split(':')[0]}:${e.target.value}`)}
+                      disabled={savingReminders}
+                      className="w-24 p-3 border border-figma-black-10 rounded-xl bg-white dark:bg-gray-800 focus:ring-2 focus:ring-figma-blue-100 focus:border-figma-blue-100 text-figma-black-100"
+                    >
+                      {Array.from({ length: 60 }, (_, i) => {
+                        const minute = i.toString().padStart(2, '0');
+                        return (
+                          <option key={minute} value={minute}>
+                            {minute}분
+                          </option>
+                        );
+                      })}
+                    </select>
+                  </div>
                   <p className="text-sm text-figma-black-40 mt-2">
                     선택한 시간에 미완료 습관이 있으면 알림을 받습니다
                   </p>
