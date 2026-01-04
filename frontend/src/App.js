@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
@@ -34,11 +34,34 @@ function PublicRoute({ children }) {
   return !user ? children : <Navigate to="/dashboard" />;
 }
 
+// 알림 권한 요청 컴포넌트
+function NotificationPermissionRequest() {
+  const { user } = useAuth();
+
+  useEffect(() => {
+    const requestPermission = async () => {
+      if (!user) return;
+      if (typeof Notification === 'undefined') return;
+      if (Notification.permission !== 'default') return;
+
+      // 약간의 딜레이 후 권한 요청 (UX 개선)
+      setTimeout(async () => {
+        await Notification.requestPermission();
+      }, 1500);
+    };
+
+    requestPermission();
+  }, [user]);
+
+  return null;
+}
+
 function App() {
   return (
     <ThemeProvider>
       <Router>
         <AuthProvider>
+          <NotificationPermissionRequest />
           <Routes>
           <Route
             path="/login"
