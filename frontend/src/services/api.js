@@ -35,7 +35,11 @@ export const authAPI = {
     api.put('/auth/settings/reminders', settings),
   updateDisplayName: (displayName) =>
     api.put('/auth/profile/display-name', { displayName }),
-  deleteAccount: () => api.delete('/auth/account')
+  deleteAccount: () => api.delete('/auth/account'),
+  requestPasswordReset: (email) =>
+    api.post('/auth/forgot-password', { email }),
+  resetPassword: (token, newPassword) =>
+    api.post('/auth/reset-password', { token, newPassword })
 };
 
 // Family API

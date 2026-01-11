@@ -42,6 +42,12 @@ public class User {
     @Builder.Default
     private String reminderTime = "21:00"; // HH:mm format, default 9 PM
 
+    @Column(name = "reset_token")
+    private String resetToken;
+
+    @Column(name = "reset_token_expiry")
+    private LocalDateTime resetTokenExpiry;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "family_id")
     private Family family;

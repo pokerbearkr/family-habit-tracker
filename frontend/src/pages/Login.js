@@ -125,12 +125,19 @@ function Login() {
               )}
             </button>
 
-            <p className="text-center text-sm text-figma-black-40 pt-2">
-              계정이 없으신가요?{' '}
-              <Link to="/signup" className="text-figma-blue-100 hover:underline font-medium">
-                회원가입
-              </Link>
-            </p>
+            <div className="text-center text-sm text-figma-black-40 pt-2 space-y-2">
+              <p>
+                <Link to="/forgot-password" className="text-figma-blue-100 hover:underline font-medium">
+                  비밀번호를 잊으셨나요?
+                </Link>
+              </p>
+              <p>
+                계정이 없으신가요?{' '}
+                <Link to="/signup" className="text-figma-blue-100 hover:underline font-medium">
+                  회원가입
+                </Link>
+              </p>
+            </div>
           </form>
         </div>
 

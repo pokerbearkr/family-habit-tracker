@@ -2,6 +2,7 @@ package com.habittracker.service;
 
 import com.habittracker.dto.JwtResponse;
 import com.habittracker.dto.LoginRequest;
+import com.habittracker.dto.PasswordResetConfirmRequest;
 import com.habittracker.dto.SignupRequest;
 import com.habittracker.entity.User;
 import com.habittracker.repository.UserRepository;
@@ -16,6 +17,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -24,6 +28,7 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtils jwtUtils;
+    private final EmailService emailService;
 
     @Transactional
     public JwtResponse login(LoginRequest loginRequest) {
@@ -108,5 +113,33 @@ public class AuthService {
         // Family membership will be removed (ManyToOne)
 
         userRepository.delete(currentUser);
+    }
+
+    @Transactional
+    public void requestPasswordReset(String email) {
+        // Always return success to prevent email enumeration attacks
+        userRepository.findByEmail(email).ifPresent(user -> {
+            String token = UUID.randomUUID().toString();
+            user.setResetToken(token);
+            user.setResetTokenExpiry(LocalDateTime.now().plusHours(1));
+            userRepository.save(user);
+
+            emailService.sendPasswordResetEmail(email, token);
+        });
+    }
+
+    @Transactional
+    public void resetPassword(PasswordResetConfirmRequest request) {
+        User user = userRepository.findByResetToken(request.getToken())
+                .orElseThrow(() -> new RuntimeException("유효하지 않은 토큰입니다."));
+
+        if (user.getResetTokenExpiry() == null || user.getResetTokenExpiry().isBefore(LocalDateTime.now())) {
+            throw new RuntimeException("토큰이 만료되었습니다. 비밀번호 찾기를 다시 시도해주세요.");
+        }
+
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        user.setResetToken(null);
+        user.setResetTokenExpiry(null);
+        userRepository.save(user);
     }
 }

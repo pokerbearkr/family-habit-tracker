@@ -2,6 +2,8 @@ package com.habittracker.controller;
 
 import com.habittracker.dto.JwtResponse;
 import com.habittracker.dto.LoginRequest;
+import com.habittracker.dto.PasswordResetConfirmRequest;
+import com.habittracker.dto.PasswordResetRequest;
 import com.habittracker.dto.SignupRequest;
 import com.habittracker.entity.User;
 import com.habittracker.repository.UserRepository;
@@ -92,5 +94,22 @@ public class AuthController {
     public ResponseEntity<String> deleteAccount() {
         authService.deleteAccount();
         return ResponseEntity.ok("Account deleted successfully");
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<Map<String, String>> forgotPassword(@Valid @RequestBody PasswordResetRequest request) {
+        authService.requestPasswordReset(request.getEmail());
+        // Always return success to prevent email enumeration
+        return ResponseEntity.ok(Map.of("message", "비밀번호 재설정 이메일이 발송되었습니다."));
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<Map<String, String>> resetPassword(@Valid @RequestBody PasswordResetConfirmRequest request) {
+        try {
+            authService.resetPassword(request);
+            return ResponseEntity.ok(Map.of("message", "비밀번호가 성공적으로 변경되었습니다."));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
     }
 }

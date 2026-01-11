@@ -4,6 +4,8 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 import Dashboard from './pages/Dashboard';
 import Family from './pages/Family';
 import Monthly from './pages/Monthly';
@@ -76,6 +78,22 @@ function App() {
             element={
               <PublicRoute>
                 <Signup />
+              </PublicRoute>
+            }
+          />
+          <Route
+            path="/forgot-password"
+            element={
+              <PublicRoute>
+                <ForgotPassword />
+              </PublicRoute>
+            }
+          />
+          <Route
+            path="/reset-password/:token"
+            element={
+              <PublicRoute>
+                <ResetPassword />
               </PublicRoute>
             }
           />
